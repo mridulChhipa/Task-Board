@@ -1,0 +1,101 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    background-color: white;
+    padding-right: 50px;
+    border-bottom: 1px solid #dfe1e6;
+    align-items: center;
+    margin: none;
+
+    min-height: 68px;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.atlassian-logo {
+    background-color: #0052CC;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    width: 68px;
+}
+
+.jira-brand {
+    display: flex;
+    align-items: center;
+    padding-left: 15px;
+}
+
+.jira-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+}
+
+.brand-name {
+    font-size: 19px;
+    color: #172B4D;
+    font-weight: 500;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.btn-go-jira {
+    background-color: #0052CC;
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 20px;
+    /* Pill shape */
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.divider {
+    width: 1px;
+    height: 24px;
+    background-color: #dfe1e6;
+}
+
+.notification-icon {
+    color: #42526E;
+    cursor: pointer;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    background-color: #00A3BF;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.user-name {
+    color: #0052CC;
+    font-weight: 600;
+    font-size: 14px;
+}

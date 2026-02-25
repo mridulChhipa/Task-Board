@@ -1,0 +1,669 @@
+@font-face {
+  font-family: Charlie Display;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/6EnDcOBYnO67MYVJcpQLUc/85d36587de9855f3cd9f4e23f2119cf8/Charlie_Display-Thin.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/5Bpl6vErvLYCi1EdOqI2IK/b57fbec62ffab536b59e311837de9042/Charlie_Display-Thin.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Display;
+  font-style: italic;
+  font-display: swap;
+  font-weight: 100;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/67WF3xGxF81QiZRksym42A/cf7c507569cbbee461ff241902706970/Charlie_Display-Thin_Italic.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/PanXvQtfIyAqIFbGpM8IM/b9b87b3c6ffee63861eb501a0cb160d1/Charlie_Display-Thin_Italic.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Display;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/8JLDocv5sujCQIY4WEZsz/ebe26b857bf93efe919a72c3697afa82/Charlie_Display-Light.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/1rikelY7zYfVVcGF0ufCMx/5525e29555ebb0b403de182f334e7f2b/Charlie_Display-Light.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Display;
+  font-style: italic;
+  font-display: swap;
+  font-weight: 200;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/8JLDocv5sujCQIY4WEZsz/ebe26b857bf93efe919a72c3697afa82/Charlie_Display-Light.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/1rikelY7zYfVVcGF0ufCMx/5525e29555ebb0b403de182f334e7f2b/Charlie_Display-Light.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Display;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/6nq3flI8NfgICrz3jZjLyD/81918253d594b7bb77eb898a468d4328/Charlie_Display-Regular.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/2GTE85R9nfLI58KxINGukf/9d35203b2fe1d4a89031954f118b6c9f/Charlie_Display-Regular.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Display;
+  font-style: italic;
+  font-display: swap;
+  font-weight: 400;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/6zBd9BZlMVg6Lzzo0c9JTB/d9954046ee355a5fdbf2c5212675e67e/Charlie_Display-Italic.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/68hDvJoBF5iblYktO69b1g/7fd2a9f3582c8fc11d9d27fcfed38dd8/Charlie_Display-Italic.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Display;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/3KRSiun937K2pXBPYiUwgB/17f578e7699c12924de360e09c018c7c/Charlie_Display-Semibold.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/oQSiwcfMwyNafeeJ3DIku/364b1a7409856a36ab05c2b43a1f9bde/Charlie_Display-Semibold.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Display;
+  font-style: italic;
+  font-display: swap;
+  font-weight: 500;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/65xdTmUlQXTZEebPv41QKG/d21f19bb0e731f88caa3be64700a49f0/Charlie_Display-Semibold_Italic.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/T73q5xRByE5hy55AGMp54/67810084a3efdb1999b56f6542c85d01/Charlie_Display-Semibold_Italic.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Display;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/55uCHq9XzIzIG8yO7WRqfM/b62779fff17f06743e490f6d98a2001a/Charlie_Display-Bold.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/7lMBcxnaE1rq1n9am4LaWV/b17259435611992f2a6ffe48ca213f84/Charlie_Display-Bold.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Display;
+  font-style: italic;
+  font-display: swap;
+  font-weight: 700;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/2o3Zm0no6lPnln5cHb7JR6/55f0b66048535d78193f516062ff58e4/Charlie_Display-Bold_Italic.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/2hEATjlHYKgFNGG3XEE8FL/e5e32f1fdd86414237477cc7130acf13/Charlie_Display-Bold_Italic.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Display;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 800;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/2QtjA2B9aCIa8HvyZcNWqL/886e02c2b15732bc62dc9550078d991c/Charlie_Display-Black.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/7mOCTVLMRdYynIubPDry0Y/85324db781253d544cf91d5c9078a820/Charlie_Display-Black.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Display;
+  font-style: italic;
+  font-display: swap;
+  font-weight: 800;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/42ZnX9r0FEEC9i6aTjhGvx/9928d2d161b763db60a50c3edf0bfe78/Charlie_Display-Black_Italic.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/7J5fycblWMmgmMrC850GL9/610d735e3d4680bb111cfb40507beab7/Charlie_Display-Black_Italic.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Display;
+  font-style: italic;
+  font-display: swap;
+  font-weight: 900;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/2aGTtufjwlwNeuEifuVsDA/933ed19de4d808d8c9618a0a96f282f0/Charlie_Display-Ultra.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/61USbw5Es8ifbW4QjjYATl/19979d7f1ff46dfe7c7b79e15aacc4bc/Charlie_Display-Ultra.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Text;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/1vzZOZUcRsW8G3dlrVRc9E/6b8b429a3a35eeda98227874727af9ef/Charlie_Text-Thin.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/csqcs1t6l1ByKLqji08Sd/7354daf990b1232c01f11b79c86b8b73/Charlie_Text-Thin.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Text;
+  font-style: italic;
+  font-display: swap;
+  font-weight: 100;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/7JQoYrWJG8qtt0hqnGgei9/6d94ac079ded70cdced3b8b448890c3e/Charlie_Text-Thin_Italic.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/XA1kYory8Dhr5QrsKMlYY/df361dee9663b39de9eb21a1279b9399/Charlie_Text-Thin_Italic.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Text;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/1rfmGoSYAfdBOsdsg9qKLL/9ea188cbd87592d6ab6012f191958252/Charlie_Text-Light.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/1XWcCzbf5viNQnIbOqfeI4/8ccdfc8336f9ecb15e2f849c3fc51340/Charlie_Text-Light.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Text;
+  font-style: italic;
+  font-display: swap;
+  font-weight: 200;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/6S05s3tlC46wX9fKFizj1K/2cfa443b8c44adce54d1159035e38b23/Charlie_Text-Light_Italic.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/3kW42zdybmQkfndtF54bd1/910ddde712b570829f385b62476b2ea9/Charlie_Text-Light_Italic.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Text;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/41EruTPEOU9hcBwH94UVuZ/73ac40404d750278b451bf2adf186b1b/Charlie_Text-Regular.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/6h4LgfzSDGYFyOvrNTr21p/99d04355f5ef0b92b882013bb0857cf9/Charlie_Text-Regular.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Text;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/2d4nxzJwX8hfIqUN71D4OD/5e2c0c2a3677d935e91dd46635d5149d/Charlie_Text-Semibold.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/4Y73c86mEJg3PJBgQe0L8t/a5d27d39320e9703ed48dd3bdb308408/Charlie_Text-Semibold.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Text;
+  font-style: italic;
+  font-display: swap;
+  font-weight: 500;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/6oQuHbLiijMuGvWxuUyHsz/62fe2908bcad6b7e9fef8ca4db7f0f53/Charlie_Text-Semibold_Italic.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/3pI1pIJKtGUJG42qu4eZSU/56114eff490f7cc794552a7c9b4c8c8b/Charlie_Text-Semibold_Italic.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Text;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/6fvn66mVrRz4Yw3gQoPaJJ/458e6a69f0036d1e566e028fcbc26a50/Charlie_Text-Bold.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/3JvzHM3Atfe3nL2nvb4AqL/5bb9a76be7a4b053dbb276d9ffc6654a/Charlie_Text-Bold.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Text;
+  font-style: italic;
+  font-display: swap;
+  font-weight: 700;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/3nA8vWk7MPMalamC0inRjz/11825f8df63da9f9b792cb5478e32bd5/Charlie_Text-Bold_Italic.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/5Ba4myVpyls8UQB3g5MPQj/86da6172a058cc143a707f21f5e5d058/Charlie_Text-Bold_Italic.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Text;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 800;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/2AZXOOAKgaXV55fqGI098Y/bb085d34b97c542aedea66d5e4d9bc95/Charlie_Text-Black.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/3czBeZah9GZg8dI5cMd2er/7a13c24355717ba63712c3550921339f/Charlie_Text-Black.woff") format("woff");
+}
+
+@font-face {
+  font-family: Charlie Text;
+  font-style: italic;
+  font-display: swap;
+  font-weight: 800;
+  src: url("https://assets.ctfassets.net/rz1oowkt5gyp/59WTxSNNVWGolxmuwpW2j4/87fd7ad49eedaf1949839a7395399b6a/Charlie_Text-Black_Italic.woff2") format("woff2"), url("https://assets.ctfassets.net/rz1oowkt5gyp/1UikYvlUIsLZk1JeznIrD8/87bd38612d2caae1f6ebd621027cbc4e/Charlie_Text-Black_Italic.woff") format("woff");
+}
+
+:root {
+  --atlassian-recommended-system-fonts: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  --atlassian-recommended-sans-system-fonts: "ui-sans-serif, -apple-system, 'system-ui', 'Segoe UI', Ubuntu, 'Helvetica Neue', sans-serif";
+  --atlassian-sans-font-family: "Atlassian Sans", var(--atlassian-recommended-sans-system-fonts);
+  --bxp-charlie-display-font-family: "Charlie Display", var(--atlassian-recommended-system-fonts);
+  --bxp-charlie-text-font-family: "Charlie Text", var(--atlassian-recommended-system-fonts);
+  font-family: var(--bxp-charlie-text-font-family);
+  color-scheme: light dark;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --ds-text: #292A2E;
+  --ds-text-accent-lime: #4C6B1F;
+  --ds-text-accent-lime-bolder: #37471F;
+  --ds-text-accent-red: #AE2E24;
+  --ds-text-accent-red-bolder: #5D1F1A;
+  --ds-text-accent-orange: #9E4C00;
+  --ds-text-accent-orange-bolder: #693200;
+  --ds-text-accent-yellow: #7F5F01;
+  --ds-text-accent-yellow-bolder: #533F04;
+  --ds-text-accent-green: #216E4E;
+  --ds-text-accent-green-bolder: #164B35;
+  --ds-text-accent-teal: #206A83;
+  --ds-text-accent-teal-bolder: #164555;
+  --ds-text-accent-blue: #1558BC;
+  --ds-text-accent-blue-bolder: #123263;
+  --ds-text-accent-purple: #803FA5;
+  --ds-text-accent-purple-bolder: #48245D;
+  --ds-text-accent-magenta: #943D73;
+  --ds-text-accent-magenta-bolder: #50253F;
+  --ds-text-accent-gray: #505258;
+  --ds-text-accent-gray-bolder: #1E1F21;
+  --ds-text-disabled: #080F214A;
+  --ds-text-inverse: #FFFFFF;
+  --ds-text-selected: #1868DB;
+  --ds-text-brand: #1868DB;
+  --ds-text-danger: #AE2E24;
+  --ds-text-danger-bolder: #5D1F1A;
+  --ds-text-warning: #9E4C00;
+  --ds-text-warning-inverse: #292A2E;
+  --ds-text-warning-bolder: #693200;
+  --ds-text-success: #4C6B1F;
+  --ds-text-success-bolder: #37471F;
+  --ds-text-discovery: #803FA5;
+  --ds-text-discovery-bolder: #48245D;
+  --ds-text-information: #1558BC;
+  --ds-text-information-bolder: #123263;
+  --ds-text-subtlest: #6B6E76;
+  --ds-text-subtle: #505258;
+  --ds-link: #1868DB;
+  --ds-link-pressed: #1558BC;
+  --ds-link-visited: #803FA5;
+  --ds-link-visited-pressed: #48245D;
+  --ds-icon: #292A2E;
+  --ds-icon-accent-lime: #6A9A23;
+  --ds-icon-accent-red: #C9372C;
+  --ds-icon-accent-orange: #E06C00;
+  --ds-icon-accent-yellow: #B38600;
+  --ds-icon-accent-green: #22A06B;
+  --ds-icon-accent-teal: #2898BD;
+  --ds-icon-accent-blue: #357DE8;
+  --ds-icon-accent-purple: #AF59E1;
+  --ds-icon-accent-magenta: #CD519D;
+  --ds-icon-accent-gray: #7D818A;
+  --ds-icon-disabled: #080F214A;
+  --ds-icon-inverse: #FFFFFF;
+  --ds-icon-selected: #1868DB;
+  --ds-icon-brand: #1868DB;
+  --ds-icon-danger: #C9372C;
+  --ds-icon-warning: #E06C00;
+  --ds-icon-warning-inverse: #292A2E;
+  --ds-icon-success: #6A9A23;
+  --ds-icon-discovery: #AF59E1;
+  --ds-icon-information: #357DE8;
+  --ds-icon-subtlest: #6B6E76;
+  --ds-icon-subtle: #505258;
+  --ds-border: #0B120E24;
+  --ds-border-accent-lime: #6A9A23;
+  --ds-border-accent-red: #E2483D;
+  --ds-border-accent-orange: #E06C00;
+  --ds-border-accent-yellow: #B38600;
+  --ds-border-accent-green: #22A06B;
+  --ds-border-accent-teal: #2898BD;
+  --ds-border-accent-blue: #357DE8;
+  --ds-border-accent-purple: #AF59E1;
+  --ds-border-accent-magenta: #CD519D;
+  --ds-border-accent-gray: #7D818A;
+  --ds-border-disabled: #0515240F;
+  --ds-border-focused: #4688EC;
+  --ds-border-input: #8C8F97;
+  --ds-border-inverse: #FFFFFF;
+  --ds-border-selected: #1868DB;
+  --ds-border-brand: #1868DB;
+  --ds-border-danger: #E2483D;
+  --ds-border-warning: #E06C00;
+  --ds-border-success: #6A9A23;
+  --ds-border-discovery: #AF59E1;
+  --ds-border-information: #357DE8;
+  --ds-border-bold: #7D818A;
+  --ds-background-accent-lime-subtlest: #EFFFD6;
+  --ds-background-accent-lime-subtlest-hovered: #D3F1A7;
+  --ds-background-accent-lime-subtlest-pressed: #BDE97C;
+  --ds-background-accent-lime-subtler: #D3F1A7;
+  --ds-background-accent-lime-subtler-hovered: #BDE97C;
+  --ds-background-accent-lime-subtler-pressed: #B3DF72;
+  --ds-background-accent-lime-subtle: #94C748;
+  --ds-background-accent-lime-subtle-hovered: #B3DF72;
+  --ds-background-accent-lime-subtle-pressed: #BDE97C;
+  --ds-background-accent-lime-bolder: #5B7F24;
+  --ds-background-accent-lime-bolder-hovered: #4C6B1F;
+  --ds-background-accent-lime-bolder-pressed: #3F5224;
+  --ds-background-accent-red-subtlest: #FFECEB;
+  --ds-background-accent-red-subtlest-hovered: #FFD5D2;
+  --ds-background-accent-red-subtlest-pressed: #FFB8B2;
+  --ds-background-accent-red-subtler: #FFD5D2;
+  --ds-background-accent-red-subtler-hovered: #FFB8B2;
+  --ds-background-accent-red-subtler-pressed: #FD9891;
+  --ds-background-accent-red-subtle: #F87168;
+  --ds-background-accent-red-subtle-hovered: #FD9891;
+  --ds-background-accent-red-subtle-pressed: #FFB8B2;
+  --ds-background-accent-red-bolder: #C9372C;
+  --ds-background-accent-red-bolder-hovered: #AE2E24;
+  --ds-background-accent-red-bolder-pressed: #872821;
+  --ds-background-accent-orange-subtlest: #FFF5DB;
+  --ds-background-accent-orange-subtlest-hovered: #FCE4A6;
+  --ds-background-accent-orange-subtlest-pressed: #FBD779;
+  --ds-background-accent-orange-subtler: #FCE4A6;
+  --ds-background-accent-orange-subtler-hovered: #FBD779;
+  --ds-background-accent-orange-subtler-pressed: #FBC828;
+  --ds-background-accent-orange-subtle: #FCA700;
+  --ds-background-accent-orange-subtle-hovered: #FBC828;
+  --ds-background-accent-orange-subtle-pressed: #FBD779;
+  --ds-background-accent-orange-bolder: #BD5B00;
+  --ds-background-accent-orange-bolder-hovered: #9E4C00;
+  --ds-background-accent-orange-bolder-pressed: #7A3B00;
+  --ds-background-accent-yellow-subtlest: #FEF7C8;
+  --ds-background-accent-yellow-subtlest-hovered: #F5E989;
+  --ds-background-accent-yellow-subtlest-pressed: #EFDD4E;
+  --ds-background-accent-yellow-subtler: #F5E989;
+  --ds-background-accent-yellow-subtler-hovered: #EFDD4E;
+  --ds-background-accent-yellow-subtler-pressed: #EED12B;
+  --ds-background-accent-yellow-subtle: #EED12B;
+  --ds-background-accent-yellow-subtle-hovered: #DDB30E;
+  --ds-background-accent-yellow-subtle-pressed: #EFDD4E;
+  --ds-background-accent-yellow-bolder: #946F00;
+  --ds-background-accent-yellow-bolder-hovered: #7F5F01;
+  --ds-background-accent-yellow-bolder-pressed: #614A05;
+  --ds-background-accent-green-subtlest: #DCFFF1;
+  --ds-background-accent-green-subtlest-hovered: #BAF3DB;
+  --ds-background-accent-green-subtlest-pressed: #97EDC9;
+  --ds-background-accent-green-subtler: #BAF3DB;
+  --ds-background-accent-green-subtler-hovered: #97EDC9;
+  --ds-background-accent-green-subtler-pressed: #7EE2B8;
+  --ds-background-accent-green-subtle: #4BCE97;
+  --ds-background-accent-green-subtle-hovered: #7EE2B8;
+  --ds-background-accent-green-subtle-pressed: #97EDC9;
+  --ds-background-accent-green-bolder: #1F845A;
+  --ds-background-accent-green-bolder-hovered: #216E4E;
+  --ds-background-accent-green-bolder-pressed: #19573D;
+  --ds-background-accent-teal-subtlest: #E7F9FF;
+  --ds-background-accent-teal-subtlest-hovered: #C6EDFB;
+  --ds-background-accent-teal-subtlest-pressed: #B1E4F7;
+  --ds-background-accent-teal-subtler: #C6EDFB;
+  --ds-background-accent-teal-subtler-hovered: #B1E4F7;
+  --ds-background-accent-teal-subtler-pressed: #9DD9EE;
+  --ds-background-accent-teal-subtle: #6CC3E0;
+  --ds-background-accent-teal-subtle-hovered: #9DD9EE;
+  --ds-background-accent-teal-subtle-pressed: #B1E4F7;
+  --ds-background-accent-teal-bolder: #227D9B;
+  --ds-background-accent-teal-bolder-hovered: #206A83;
+  --ds-background-accent-teal-bolder-pressed: #1A5265;
+  --ds-background-accent-blue-subtlest: #E9F2FE;
+  --ds-background-accent-blue-subtlest-hovered: #CFE1FD;
+  --ds-background-accent-blue-subtlest-pressed: #ADCBFB;
+  --ds-background-accent-blue-subtler: #CFE1FD;
+  --ds-background-accent-blue-subtler-hovered: #ADCBFB;
+  --ds-background-accent-blue-subtler-pressed: #8FB8F6;
+  --ds-background-accent-blue-subtle: #669DF1;
+  --ds-background-accent-blue-subtle-hovered: #8FB8F6;
+  --ds-background-accent-blue-subtle-pressed: #ADCBFB;
+  --ds-background-accent-blue-bolder: #1868DB;
+  --ds-background-accent-blue-bolder-hovered: #1558BC;
+  --ds-background-accent-blue-bolder-pressed: #144794;
+  --ds-background-accent-purple-subtlest: #F8EEFE;
+  --ds-background-accent-purple-subtlest-hovered: #EED7FC;
+  --ds-background-accent-purple-subtlest-pressed: #E3BDFA;
+  --ds-background-accent-purple-subtler: #EED7FC;
+  --ds-background-accent-purple-subtler-hovered: #E3BDFA;
+  --ds-background-accent-purple-subtler-pressed: #D8A0F7;
+  --ds-background-accent-purple-subtle: #C97CF4;
+  --ds-background-accent-purple-subtle-hovered: #D8A0F7;
+  --ds-background-accent-purple-subtle-pressed: #E3BDFA;
+  --ds-background-accent-purple-bolder: #964AC0;
+  --ds-background-accent-purple-bolder-hovered: #803FA5;
+  --ds-background-accent-purple-bolder-pressed: #673286;
+  --ds-background-accent-magenta-subtlest: #FFECF8;
+  --ds-background-accent-magenta-subtlest-hovered: #FDD0EC;
+  --ds-background-accent-magenta-subtlest-pressed: #FCB6E1;
+  --ds-background-accent-magenta-subtler: #FDD0EC;
+  --ds-background-accent-magenta-subtler-hovered: #FCB6E1;
+  --ds-background-accent-magenta-subtler-pressed: #F797D2;
+  --ds-background-accent-magenta-subtle: #E774BB;
+  --ds-background-accent-magenta-subtle-hovered: #F797D2;
+  --ds-background-accent-magenta-subtle-pressed: #FCB6E1;
+  --ds-background-accent-magenta-bolder: #AE4787;
+  --ds-background-accent-magenta-bolder-hovered: #943D73;
+  --ds-background-accent-magenta-bolder-pressed: #77325B;
+  --ds-background-accent-gray-subtlest: #F0F1F2;
+  --ds-background-accent-gray-subtlest-hovered: #DDDEE1;
+  --ds-background-accent-gray-subtlest-pressed: #B7B9BE;
+  --ds-background-accent-gray-subtler: #DDDEE1;
+  --ds-background-accent-gray-subtler-hovered: #B7B9BE;
+  --ds-background-accent-gray-subtler-pressed: #8C8F97;
+  --ds-background-accent-gray-subtle: #8C8F97;
+  --ds-background-accent-gray-subtle-hovered: #B7B9BE;
+  --ds-background-accent-gray-subtle-pressed: #DDDEE1;
+  --ds-background-accent-gray-bolder: #6B6E76;
+  --ds-background-accent-gray-bolder-hovered: #505258;
+  --ds-background-accent-gray-bolder-pressed: #3B3D42;
+  --ds-background-disabled: #17171708;
+  --ds-background-input: #FFFFFF;
+  --ds-background-input-hovered: #F8F8F8;
+  --ds-background-input-pressed: #FFFFFF;
+  --ds-background-inverse-subtle: #00000029;
+  --ds-background-inverse-subtle-hovered: #0000003D;
+  --ds-background-inverse-subtle-pressed: #00000052;
+  --ds-background-neutral: #0515240F;
+  --ds-background-neutral-hovered: #0B120E24;
+  --ds-background-neutral-pressed: #080F214A;
+  --ds-background-neutral-subtle: #00000000;
+  --ds-background-neutral-subtle-hovered: #0515240F;
+  --ds-background-neutral-subtle-pressed: #0B120E24;
+  --ds-background-neutral-bold: #292A2E;
+  --ds-background-neutral-bold-hovered: #3B3D42;
+  --ds-background-neutral-bold-pressed: #505258;
+  --ds-background-selected: #E9F2FE;
+  --ds-background-selected-hovered: #CFE1FD;
+  --ds-background-selected-pressed: #8FB8F6;
+  --ds-background-selected-bold: #1868DB;
+  --ds-background-selected-bold-hovered: #1558BC;
+  --ds-background-selected-bold-pressed: #123263;
+  --ds-background-brand-subtlest: #E9F2FE;
+  --ds-background-brand-subtlest-hovered: #CFE1FD;
+  --ds-background-brand-subtlest-pressed: #ADCBFB;
+  --ds-background-brand-bold: #1868DB;
+  --ds-background-brand-bold-hovered: #1558BC;
+  --ds-background-brand-bold-pressed: #144794;
+  --ds-background-brand-boldest: #1C2B42;
+  --ds-background-brand-boldest-hovered: #123263;
+  --ds-background-brand-boldest-pressed: #144794;
+  --ds-background-danger: #FFECEB;
+  --ds-background-danger-hovered: #FFD5D2;
+  --ds-background-danger-pressed: #FFB8B2;
+  --ds-background-danger-subtler: #FFD5D2;
+  --ds-background-danger-subtler-hovered: #FFB8B2;
+  --ds-background-danger-subtler-pressed: #FD9891;
+  --ds-background-danger-bold: #C9372C;
+  --ds-background-danger-bold-hovered: #AE2E24;
+  --ds-background-danger-bold-pressed: #872821;
+  --ds-background-warning: #FFF5DB;
+  --ds-background-warning-hovered: #FCE4A6;
+  --ds-background-warning-pressed: #FBD779;
+  --ds-background-warning-subtler: #FCE4A6;
+  --ds-background-warning-subtler-hovered: #FBD779;
+  --ds-background-warning-subtler-pressed: #FBC828;
+  --ds-background-warning-bold: #FBC828;
+  --ds-background-warning-bold-hovered: #FCA700;
+  --ds-background-warning-bold-pressed: #F68909;
+  --ds-background-success: #EFFFD6;
+  --ds-background-success-hovered: #D3F1A7;
+  --ds-background-success-pressed: #BDE97C;
+  --ds-background-success-subtler: #D3F1A7;
+  --ds-background-success-subtler-hovered: #BDE97C;
+  --ds-background-success-subtler-pressed: #B3DF72;
+  --ds-background-success-bold: #5B7F24;
+  --ds-background-success-bold-hovered: #4C6B1F;
+  --ds-background-success-bold-pressed: #3F5224;
+  --ds-background-discovery: #F8EEFE;
+  --ds-background-discovery-hovered: #EED7FC;
+  --ds-background-discovery-pressed: #E3BDFA;
+  --ds-background-discovery-subtler: #EED7FC;
+  --ds-background-discovery-subtler-hovered: #E3BDFA;
+  --ds-background-discovery-subtler-pressed: #D8A0F7;
+  --ds-background-discovery-bold: #964AC0;
+  --ds-background-discovery-bold-hovered: #803FA5;
+  --ds-background-discovery-bold-pressed: #673286;
+  --ds-background-information: #E9F2FE;
+  --ds-background-information-hovered: #CFE1FD;
+  --ds-background-information-pressed: #ADCBFB;
+  --ds-background-information-subtler: #CFE1FD;
+  --ds-background-information-subtler-hovered: #ADCBFB;
+  --ds-background-information-subtler-pressed: #8FB8F6;
+  --ds-background-information-bold: #1868DB;
+  --ds-background-information-bold-hovered: #1558BC;
+  --ds-background-information-bold-pressed: #144794;
+  --ds-blanket: #050C1F75;
+  --ds-blanket-selected: #388BFF14;
+  --ds-blanket-danger: #EF5C4814;
+  --ds-interaction-hovered: #00000029;
+  --ds-interaction-pressed: #00000052;
+  --ds-skeleton: #0515240F;
+  --ds-skeleton-subtle: #17171708;
+  --ds-chart-categorical-1: #357DE8;
+  --ds-chart-categorical-1-hovered: #1868DB;
+  --ds-chart-categorical-2: #82B536;
+  --ds-chart-categorical-2-hovered: #6A9A23;
+  --ds-chart-categorical-3: #BF63F3;
+  --ds-chart-categorical-3-hovered: #AF59E1;
+  --ds-chart-categorical-4: #F68909;
+  --ds-chart-categorical-4-hovered: #E06C00;
+  --ds-chart-categorical-5: #1558BC;
+  --ds-chart-categorical-5-hovered: #123263;
+  --ds-chart-categorical-6: #964AC0;
+  --ds-chart-categorical-6-hovered: #803FA5;
+  --ds-chart-categorical-7: #42B2D7;
+  --ds-chart-categorical-7-hovered: #2898BD;
+  --ds-chart-categorical-8: #BD5B00;
+  --ds-chart-categorical-8-hovered: #7A3B00;
+  --ds-chart-lime-bold: #6A9A23;
+  --ds-chart-lime-bold-hovered: #5B7F24;
+  --ds-chart-lime-bolder: #5B7F24;
+  --ds-chart-lime-bolder-hovered: #4C6B1F;
+  --ds-chart-lime-boldest: #4C6B1F;
+  --ds-chart-lime-boldest-hovered: #37471F;
+  --ds-chart-neutral: #8C8F97;
+  --ds-chart-neutral-hovered: #7D818A;
+  --ds-chart-red-bold: #F15B50;
+  --ds-chart-red-bold-hovered: #E2483D;
+  --ds-chart-red-bolder: #E2483D;
+  --ds-chart-red-bolder-hovered: #C9372C;
+  --ds-chart-red-boldest: #AE2E24;
+  --ds-chart-red-boldest-hovered: #5D1F1A;
+  --ds-chart-orange-bold: #E06C00;
+  --ds-chart-orange-bold-hovered: #BD5B00;
+  --ds-chart-orange-bolder: #BD5B00;
+  --ds-chart-orange-bolder-hovered: #9E4C00;
+  --ds-chart-orange-boldest: #7A3B00;
+  --ds-chart-orange-boldest-hovered: #693200;
+  --ds-chart-yellow-bold: #B38600;
+  --ds-chart-yellow-bold-hovered: #946F00;
+  --ds-chart-yellow-bolder: #946F00;
+  --ds-chart-yellow-bolder-hovered: #7F5F01;
+  --ds-chart-yellow-boldest: #7F5F01;
+  --ds-chart-yellow-boldest-hovered: #533F04;
+  --ds-chart-green-bold: #22A06B;
+  --ds-chart-green-bold-hovered: #1F845A;
+  --ds-chart-green-bolder: #1F845A;
+  --ds-chart-green-bolder-hovered: #216E4E;
+  --ds-chart-green-boldest: #216E4E;
+  --ds-chart-green-boldest-hovered: #164B35;
+  --ds-chart-teal-bold: #2898BD;
+  --ds-chart-teal-bold-hovered: #227D9B;
+  --ds-chart-teal-bolder: #227D9B;
+  --ds-chart-teal-bolder-hovered: #206A83;
+  --ds-chart-teal-boldest: #206A83;
+  --ds-chart-teal-boldest-hovered: #164555;
+  --ds-chart-blue-bold: #4688EC;
+  --ds-chart-blue-bold-hovered: #357DE8;
+  --ds-chart-blue-bolder: #357DE8;
+  --ds-chart-blue-bolder-hovered: #1868DB;
+  --ds-chart-blue-boldest: #1558BC;
+  --ds-chart-blue-boldest-hovered: #123263;
+  --ds-chart-purple-bold: #BF63F3;
+  --ds-chart-purple-bold-hovered: #AF59E1;
+  --ds-chart-purple-bolder: #AF59E1;
+  --ds-chart-purple-bolder-hovered: #964AC0;
+  --ds-chart-purple-boldest: #803FA5;
+  --ds-chart-purple-boldest-hovered: #48245D;
+  --ds-chart-magenta-bold: #DA62AC;
+  --ds-chart-magenta-bold-hovered: #CD519D;
+  --ds-chart-magenta-bolder: #CD519D;
+  --ds-chart-magenta-bolder-hovered: #AE4787;
+  --ds-chart-magenta-boldest: #943D73;
+  --ds-chart-magenta-boldest-hovered: #50253F;
+  --ds-chart-gray-bold: #8C8F97;
+  --ds-chart-gray-bold-hovered: #7D818A;
+  --ds-chart-gray-bolder: #7D818A;
+  --ds-chart-gray-bolder-hovered: #6B6E76;
+  --ds-chart-gray-boldest: #505258;
+  --ds-chart-gray-boldest-hovered: #3B3D42;
+  --ds-chart-brand: #357DE8;
+  --ds-chart-brand-hovered: #1868DB;
+  --ds-chart-danger: #E2483D;
+  --ds-chart-danger-hovered: #C9372C;
+  --ds-chart-danger-bold: #872821;
+  --ds-chart-danger-bold-hovered: #5D1F1A;
+  --ds-chart-warning: #F68909;
+  --ds-chart-warning-hovered: #E06C00;
+  --ds-chart-warning-bold: #BD5B00;
+  --ds-chart-warning-bold-hovered: #9E4C00;
+  --ds-chart-success: #82B536;
+  --ds-chart-success-hovered: #6A9A23;
+  --ds-chart-success-bold: #5B7F24;
+  --ds-chart-success-bold-hovered: #4C6B1F;
+  --ds-chart-discovery: #BF63F3;
+  --ds-chart-discovery-hovered: #AF59E1;
+  --ds-chart-discovery-bold: #803FA5;
+  --ds-chart-discovery-bold-hovered: #964AC0;
+  --ds-chart-information: #357DE8;
+  --ds-chart-information-hovered: #1868DB;
+  --ds-chart-information-bold: #1558BC;
+  --ds-chart-information-bold-hovered: #123263;
+  --ds-surface: #FFFFFF;
+  --ds-surface-hovered: #F0F1F2;
+  --ds-surface-pressed: #DDDEE1;
+  --ds-surface-overlay: #FFFFFF;
+  --ds-surface-overlay-hovered: #F0F1F2;
+  --ds-surface-overlay-pressed: #DDDEE1;
+  --ds-surface-raised: #FFFFFF;
+  --ds-surface-raised-hovered: #F0F1F2;
+  --ds-surface-raised-pressed: #DDDEE1;
+  --ds-surface-sunken: #F8F8F8;
+  --ds-shadow-overflow: 0px 0px 8px #1E1F2129, 0px 0px 1px #1E1F211F;
+  --ds-shadow-overflow-perimeter: #1E1F211f;
+  --ds-shadow-overflow-spread: #1E1F2129;
+  --ds-shadow-overlay: 0px 8px 12px #1E1F2126, 0px 0px 1px #1E1F214F;
+  --ds-shadow-raised: 0px 1px 1px #1E1F2140, 0px 0px 1px #1E1F214F;
+  --ds-opacity-disabled: 0.4;
+  --ds-opacity-loading: 0.2;
+  --ds-UNSAFE-transparent: transparent;
+  --ds-elevation-surface-current: #FFFFFF;
+}
+
+body {
+  margin: 0;
+  /* place-items: center; */
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--bxp-charlie-display-font-family);
+}
+
+input,
+button {
+  font-family: var(--bxp-charlie-text-font-family);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #ffffff;
+    background-color: #213547;
+  }
+
+  button {
+    background-color: #f9f9f9;
+  }
+}
