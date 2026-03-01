@@ -2,63 +2,12 @@
 
 ## 1. Setup
 
-
-## 5. Directory Structure
+## 2. Directory Structure
 ```
 backend/
-├── .env                  # Environment variables (DB credentials, JWT secrets)
-├── package.json          # Dependencies and scripts
-├── tsconfig.json         # TypeScript configuration
-├── Dockerfile            # Docker configuration for deployment
 ├── src/
-│   ├── index.ts          # Application entry point (server initialization)
-│   ├── app.ts            # Express app setup (middlewares, routes)
-│   │
-│   ├── config/           # App configurations
-│   │   ├── database.ts   # Database connection pool setup
-│   │   └── env.ts        # Environment variable validation
-│   │
-│   ├── routes/           # API route definitions (mapping endpoints to controllers)
-│   │   ├── auth.routes.ts
-│   │   ├── project.routes.ts
-│   │   ├── board.routes.ts
-│   │   └── issue.routes.ts
-│   │
-│   ├── controllers/      # Extracting req/res, calling services, sending JSON
-│   │   ├── auth.controller.ts
-│   │   ├── project.controller.ts
-│   │   └── issue.controller.ts
-│   │
-│   ├── services/         # Core Business Logic (WIP limits, hierarchy checks live here)
-│   │   ├── auth.service.ts
-│   │   ├── board.service.ts
-│   │   ├── issue.service.ts
-│   │   └── notification.service.ts
-│   │
-│   ├── repositories/     # Direct database interactions (SQL queries / ORM calls)
-│   │   ├── user.repository.ts
-│   │   ├── issue.repository.ts
-│   │   └── audit.repository.ts
-│   │
-│   ├── middlewares/      # Interceptors for requests
-│   │   ├── auth.guard.ts # Verifies JWT
-│   │   ├── rbac.guard.ts # Checks Global/Project Roles
-│   │   └── error.handler.ts 
-│   │
-│   ├── events/           # Internal event pub/sub (Decouples logic)
-│   │   ├── eventBus.ts   # Event emitter setup
-│   │   └── listeners/    # Listens for 'IssueMoved' to trigger audits/notifications
-│   │
-│   ├── utils/            # Helper functions
-│   │   ├── jwt.utils.ts
-│   │   └── hash.utils.ts
-│   │
-│   └── types/            # TypeScript interfaces/types
-│       └── express.d.ts  # Extending Express Request object (e.g., req.user)
-│
-└── tests/                # Unit and integration tests
-    ├── services/
-    └── controllers/
+│   ├── app.ts
+│   ├── index.ts  
 
 frontend/
 ├── .env                  # API URLs (e.g., VITE_API_BASE_URL)
