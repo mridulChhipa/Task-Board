@@ -1,0 +1,42 @@
+.button{
+    padding-left: 20px;
+    border-radius: 10px;
+    height: 45px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.button:active{
+    transform: scale(0.97);
+}
+
+.button:disabled{
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.first{
+    color: white;
+    font-size: large;
+    background-color: #a00000;
+}
+
+.first:hover{
+    background-color: #700000;
+}
+
+.second{
+    color: white;
+    font-size: medium;
+    background-color: #0000FF;
+}
+
+.second:hover{
+    background-color: #0000A0;
+}
+
+.third{
+    color: white;
+    font-size: medium;
+    background-color: transparent;
+}
