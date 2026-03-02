@@ -1,5 +1,10 @@
 .button {
   padding-left: 20px;
+  padding-right: 20px;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
   border-radius: 10px;
   height: 45px;
   transition:
