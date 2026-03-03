@@ -1,3 +1,4 @@
+import type { Request } from 'express';
 export enum TokenType {
   ACCESS,
   REFRESH,

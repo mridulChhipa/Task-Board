@@ -1,15 +1,35 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction, RequestHandler } from 'express';
+import type { AuthenticatedRequest } from '../../types/auth.types';
+import { db } from '../../config/db';
+import { GlobalRole } from '../../../generated/prisma/enums';
 
 export function authorizeGlobalAdmin(
   req: Request,
   res: Response,
   next: NextFunction,
-): void {
-  const user = req.user;
+): RequestHandler {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const authReq = req as unknown as AuthenticatedRequest;
+      const userId = authReq.user.sub;
 
-  if (!user /* Also check for global priviledges here */) {
-    return next(
-      new Error('Access Denied: Global Admin level priviledges are required'),
-    );
+      const user = await db.user.findUnique({
+        where: {
+          id: userId,
+        }
+      });
+
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      if (!(user.globalRole === GlobalRole.GLOBAL_ADMIN)) {
+        throw new Error('Global Admin priviledges required');
+      }
+
+      next();
+    } catch (error) {
+      next(error);
+    }
   }
 }
