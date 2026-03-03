@@ -2,7 +2,8 @@
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
-    "rootDir": "./src",
+    // "rootDir": "./src",
+    "rootDir": "./",
     "outDir": "./dist",
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
@@ -10,12 +11,8 @@
     "moduleResolution": "bundler", // Removed error of resolveJsonModule
     "target": "es2024",
     // For nodejs:
-    "lib": [
-      "ES2024"
-    ],
-    "types": [
-      "node"
-    ],
+    "lib": ["ES2024"],
+    "types": ["node"],
     // and npm install -D @types/node
     // Other Outputs
     "sourceMap": true,
@@ -40,11 +37,6 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

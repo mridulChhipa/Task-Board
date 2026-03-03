@@ -1,4 +1,4 @@
-import { prisma } from "../lib/prisma";
+import { prisma } from '../lib/prisma';
 
 async function main() {
   // Create a new user with a post
@@ -14,7 +14,7 @@ async function main() {
 
   // Fetch all users
   const allUsers = await prisma.user.findMany();
-  console.log("All users:", JSON.stringify(allUsers, null, 2));
+  console.log('All users:', JSON.stringify(allUsers, null, 2));
 }
 
 main()

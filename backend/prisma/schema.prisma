@@ -13,18 +13,31 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id     Int     @id @default(autoincrement())
-  name   String?
-  email  String  @unique
-  avatar String?
-  role   String
-}
-
 model Project {
   id           Int      @id @default(autoincrement())
   name         String
   description  String?
   createdAt    DateTime @default(now())
   lastModified DateTime @updatedAt
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  name     String
+  password String
+  email    String  @unique
+  avatar   String?
+  role     String
+
+  sessions Session[]
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    Int
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

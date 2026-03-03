@@ -1,22 +1,22 @@
 import express from 'express';
 import type { Application, Request, Response } from 'express';
+import { authRouter } from './routes/auth.route';
+import { errorHandler } from './middlewares/error.handler';
+import cookieParser from 'cookie-parser';
 
 const app: Application = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'Hello, TypeScript + Express!' });
+  console.log(req.body);
+  res.json({ message: 'Hello, Start your Task Board Journey!' });
 });
 
-app.use((req: Request, res: Response) => {
-  res.status(404).json({ error: 'Route not found' });
-});
+app.use('/api/auth', authRouter);
 
-app.use((err: Error, req: Request, res: Response) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Internal Server Error' });
-});
+app.use(errorHandler);
 
 export { app };

@@ -83,9 +83,9 @@ export default defineConfig([
       'func-style': [
         'error',
         'declaration',
-        // {
-        //   allowArrowFunctions: true,
-        // },
+        {
+          allowArrowFunctions: true,
+        },
       ],
       'prefer-rest-params': 'error',
       'prefer-spread': 'error',
