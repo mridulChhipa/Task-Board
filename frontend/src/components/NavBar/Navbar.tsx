@@ -1,30 +1,42 @@
 import styles from "./Navbar.module.css";
-import Button from "../Button/Button";
 import logo from "../../assets/logo.png";
+import type { ReactNode } from "react";
+import { useNavigate } from "react-router";
 
-type NavProps = {
-    feature: () => void;
-    about: () => void;
-    sign_up: () => void;
-    sign_in: () => void;
+type NavItem = {
+    item: ReactNode;
+    onClick: () => void;
 }
 
-function NavBar({feature, about, sign_up, sign_in}: NavProps) {
+type NavProps = {
+    left_list: NavItem[];
+    right_list: NavItem[];
+}
+
+function NavBar({left_list, right_list}: NavProps) {
+  const navigate = useNavigate();
   return (
     <nav className={styles.navbar}>
       <div className={styles.left}>
-        <img src={logo} alt="Task Board Logo" style={{ height: "100px" }} />
-        <h3 style={{ fontSize: "1.5rem", fontWeight: "bold", marginLeft: "0.5rem" }}>Task Board</h3>
+        <img src={logo} alt="Task Board Logo" style={{ height: "60px" }} onClick={() => {navigate("/")}} />
+        <h3 style={{ fontSize: "1.5rem", fontWeight: "bold", marginLeft: "0.5rem" }} onClick={() => {navigate("/")}}>Task Board</h3>
         <div style={{ width: "2rem" }}></div>
-        <Button priority="third" onClick={feature}>Features</Button>
-        <Button priority="third" onClick={about}>About</Button>
+        {left_list.map((item, index) => (
+          <div key={index} onClick={item.onClick} className={styles.nav_item}>
+            {item.item}
+          </div>
+        ))}
       </div>
       <div className={styles.right}>
-        <Button priority="second" onClick={sign_in}>Sign In</Button>
-        <Button priority="first" onClick={sign_up}>Sign Up</Button>  
+        {right_list.map((item, index) => (
+          <div key={index} onClick={item.onClick} className={styles.nav_item}>
+            {item.item}
+          </div>
+        ))}
       </div>
     </nav>
   );
 }
 
 export default NavBar;
+export type { NavItem };

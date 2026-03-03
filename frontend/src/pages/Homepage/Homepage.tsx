@@ -4,9 +4,11 @@ import NavBar from "../../components/NavBar/Navbar";
 import LandingPhoto from "../../assets/landing_photo.png";
 import Feature1 from "../../assets/Feature1.png";
 import Feature2 from "../../assets/Feature2.png";
+import Button from "../../components/Button/Button";
 import Logo from "../../assets/logo.png";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+import type { NavItem } from "../../components/NavBar/Navbar";
 
 function Message() {
   return (
@@ -58,7 +60,7 @@ function UsageIntro(){
     return (
       <>
         <h2>Kanban Board</h2>
-        <p>A Kanban Board divided big project into smaller tasks</p>
+        <p>A Kanban Board divides big project into smaller tasks</p>
         <p>Each task goes through a workflow, typically To-Do, In Progress, Testing, Done </p>
         <p>Complete tasks to slowly build up your project!</p>
       </>
@@ -112,9 +114,19 @@ function HomePage() {
     document.getElementById("about")?.scrollIntoView({behavior: "smooth"});
   }
 
+  const left_list: NavItem[] = [
+    {item: <Button priority="third" onClick={click_feature}>Features</Button>, onClick: click_feature},
+    {item: <Button priority="third" onClick={click_about}>About</Button>, onClick: click_about},
+  ];
+
+  const right_list: NavItem[] = [
+    {item: <Button priority="second" onClick={click_sign_in}>Sign In</Button>, onClick: click_sign_in},
+    {item: <Button priority="first" onClick={click_sign_up}>Sign Up</Button>, onClick: click_sign_up},
+  ];
+
   return (  
     <>
-      <NavBar feature={click_feature} about={click_about} sign_up={click_sign_up} sign_in={click_sign_in}/>
+      <NavBar left_list={left_list} right_list={right_list}/>
       <div className={styles.landingPhotoContainer}>
         <img src={LandingPhoto} alt="Task Board Photo" className={styles.landingPhoto}></img>
         {<Message />}

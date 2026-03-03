@@ -5,6 +5,8 @@
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
+  border: none;
+  outline: none;
   border-radius: 10px;
   height: 45px;
   transition:
@@ -43,7 +45,7 @@
 }
 
 .third {
-  color: white;
+  color: black;
   font-size: medium;
   background-color: transparent;
 }
