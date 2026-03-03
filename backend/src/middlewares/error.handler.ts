@@ -1,9 +1,10 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 
 export const errorHandler = (
   err: unknown,
   req: Request,
   res: Response,
+  next: NextFunction,
 ): void => {
   let stat = 500;
   let msg = 'An unexpected error occurred';
@@ -29,4 +30,6 @@ export const errorHandler = (
     status: 'error',
     msg,
   });
+  
+  next();
 };

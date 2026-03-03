@@ -9,14 +9,16 @@ export interface JWTPayload {
   jti: string; // Refresh_token -> id
   type: TokenType;
   email: string;
-  role: string;
+}
+
+export interface AuthenticatedRequest extends Request {
+  user: JWTPayload;
 }
 
 export interface RegisterBody {
   name: string;
   email: string;
   password: string;
-  role: string;
 }
 
 export interface LoginBody {

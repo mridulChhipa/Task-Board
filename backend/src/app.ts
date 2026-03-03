@@ -1,21 +1,26 @@
 import express from 'express';
+import cors from 'cors';
 import type { Application, Request, Response } from 'express';
+import cookieParser from 'cookie-parser';
 import { authRouter } from './routes/auth.route';
 import { errorHandler } from './middlewares/error.handler';
-import cookieParser from 'cookie-parser';
+import { projectRouter } from './routes/project.route';
 
 const app: Application = express();
+
+app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.get('/', (req: Request, res: Response) => {
-  console.log(req.body);
+  console.log("Route: /");
   res.json({ message: 'Hello, Start your Task Board Journey!' });
 });
 
 app.use('/api/auth', authRouter);
+app.use('/api/project', projectRouter);
 
 app.use(errorHandler);
 

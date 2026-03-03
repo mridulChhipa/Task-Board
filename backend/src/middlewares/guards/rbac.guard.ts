@@ -7,7 +7,7 @@ export function authorizeGlobalAdmin(
 ): void {
   const user = req.user;
 
-  if (!user || user.role != 'GLOBAL_ADMIN') {
+  if (!user /* Also check for global priviledges here */) {
     return next(
       new Error('Access Denied: Global Admin level priviledges are required'),
     );

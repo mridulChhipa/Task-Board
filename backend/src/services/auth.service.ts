@@ -7,6 +7,7 @@ import { TokenType } from '../types/auth.types';
 import type { LoginBody, AuthToken, RegisterBody } from '../types/auth.types';
 
 import { generateAuthTokens, verifyToken } from '../utils/jwt';
+import { GlobalRole } from '../../generated/prisma/enums';
 
 export class AuthService {
   async register(body: RegisterBody): Promise<AuthToken> {
@@ -26,7 +27,7 @@ export class AuthService {
           name: body.name,
           email: body.email,
           password: hashedPassword,
-          role: body.role,
+          globalRole: GlobalRole.USER,
         },
       });
 
@@ -58,12 +59,7 @@ export class AuthService {
       }
 
       const sessionId = randomUUID();
-      const tokens = generateAuthTokens(
-        user.id,
-        user.email,
-        user.role,
-        sessionId,
-      );
+      const tokens = generateAuthTokens(user.id, user.email, sessionId);
 
       await db.session.create({
         data: {
@@ -133,7 +129,6 @@ export class AuthService {
       const tokens = generateAuthTokens(
         session.user.id,
         session.user.email,
-        session.user.role,
         session.id,
       );
 

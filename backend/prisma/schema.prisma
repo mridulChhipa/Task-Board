@@ -13,23 +13,27 @@ datasource db {
   provider = "postgresql"
 }
 
-model Project {
-  id           Int      @id @default(autoincrement())
-  name         String
-  description  String?
-  createdAt    DateTime @default(now())
-  lastModified DateTime @updatedAt
+enum GlobalRole {
+  USER
+  GLOBAL_ADMIN
+}
+
+enum ProjectLevelRole {
+  PROJECT_ADMIN
+  PROJECT_MEMBER
+  PROJECT_VIEWER
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  name     String
-  password String
-  email    String  @unique
-  avatar   String?
-  role     String
+  id         Int        @id @default(autoincrement())
+  name       String
+  password   String
+  email      String     @unique
+  avatar     String?
+  globalRole GlobalRole @default(USER)
 
   sessions Session[]
+  projects ProjectMember[]
 }
 
 model Session {
@@ -40,4 +44,29 @@ model Session {
   expiresAt DateTime
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Project {
+  id           String   @id @default(uuid())
+  name         String
+  description  String?
+  createdAt    DateTime @default(now())
+  lastModified DateTime @updatedAt
+  isArchived   Boolean  @default(false)
+
+  members ProjectMember[]
+}
+
+model ProjectMember {
+  id String @id @default(uuid())
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  role ProjectLevelRole
+
+  @@unique([projectId, userId], name: "uniqueUser")
 }

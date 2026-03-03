@@ -1,14 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
-import { JWTPayload, TokenType } from '../../types/auth.types';
+import { TokenType } from '../../types/auth.types';
+import type { AuthenticatedRequest } from '../../types/auth.types';
 import { verifyToken } from '../../utils/jwt';
-
-declare global {
-  namespace Express {
-    interface Request {
-      user?: JWTPayload;
-    }
-  }
-}
 
 export function authenticateToken(
   req: Request,
@@ -26,7 +19,9 @@ export function authenticateToken(
       throw new Error('Invalid Token Type');
     }
 
-    req.user = payload;
+    const authReq = req as unknown as AuthenticatedRequest;
+    authReq.user = payload;
+    next();
   } catch (err) {
     next(err);
   }

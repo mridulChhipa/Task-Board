@@ -21,7 +21,7 @@ export class AuthController {
 
       res.status(201).json({
         message: 'User registered successfully',
-        refreshToken
+        refreshToken,
       });
     } catch (error) {
       next(error);
@@ -56,7 +56,8 @@ export class AuthController {
   ): Promise<void> {
     try {
       const { refreshToken: oldRefreshToken } = req.body;
-      const { accessToken, refreshToken } = await authService.refresh(oldRefreshToken);
+      const { accessToken, refreshToken } =
+        await authService.refresh(oldRefreshToken);
 
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
