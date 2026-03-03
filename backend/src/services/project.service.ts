@@ -1,3 +1,4 @@
+import type { Project } from '../../generated/prisma/client';
 import { db } from '../config/db';
 import type {
   ArchiveBody,
@@ -147,6 +148,45 @@ export class ProjectService {
             projectId,
             userId,
           },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async getProject(projectId: string): Promise<Project> {
+    try {
+      const project = await db.project.findUnique({
+        where: {
+          id: projectId,
+        },
+      });
+
+      if (!project) {
+        throw new Error('Project not found');
+      }
+      return project;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async deleteProject(projectId: string): Promise<void> {
+    try {
+      const project = await db.project.findUnique({
+        where: { id: projectId },
+      });
+
+      if (!project) {
+        throw new Error('Project not found');
+      }
+
+      await db.project.delete({
+        where: {
+          id: projectId,
         },
       });
     } catch (error) {

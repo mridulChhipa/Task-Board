@@ -117,6 +117,54 @@ export class ProjectController {
       next(error);
     }
   }
+
+  async getProject(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const projectId = req.params.projectId;
+
+      if (typeof projectId !== 'string') {
+        throw new Error('Invalid Project ID format');
+      }
+
+      const currProject = await projectService.getProject(projectId);
+      if (!currProject) {
+        throw new Error('Cannot find project with the given id');
+      }
+
+      res.status(200).json({
+        status: 'Success',
+        data: currProject,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async deleteProject(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const projectId = req.params.projectId;
+
+      if (typeof projectId !== 'string') {
+        throw new Error('Invalid Project ID format');
+      }
+
+      await projectService.deleteProject(projectId);
+
+      res.status(204).json({
+        stauts: 'Delete successful',
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 export const projectController = new ProjectController();

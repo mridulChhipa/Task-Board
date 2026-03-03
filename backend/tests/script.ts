@@ -3,10 +3,11 @@ import { AuthTest } from './auth.test';
 import { ProjectTest } from './project.test';
 
 async function main() {
-  const authTest = new AuthTest();
-  await authTest.fetchUsers(db);
-  const projectTest = new ProjectTest();
-  await projectTest.fetchProjects(db);
+  const authTest = new AuthTest(db);
+  await authTest.seedTaskBoardGlobalAdmin();
+  await authTest.fetchUsers();
+  const projectTest = new ProjectTest(db);
+  await projectTest.fetchProjects();
 }
 
 main()
