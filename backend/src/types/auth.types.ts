@@ -1,5 +1,5 @@
 import type { Request } from 'express';
-import { ProjectDetails } from './project.types';
+import type { ProjectDetails } from './project.types';
 export enum TokenType {
   ACCESS,
   REFRESH,

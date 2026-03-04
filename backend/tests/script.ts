@@ -1,6 +1,7 @@
 import { prisma as db } from '../lib/prisma';
 import { AuthTest } from './auth.test';
 import { ProjectTest } from './project.test';
+import { TaskTest } from './task.test';
 
 async function main() {
   const authTest = new AuthTest(db);
@@ -8,6 +9,8 @@ async function main() {
   await authTest.fetchUsers();
   const projectTest = new ProjectTest(db);
   await projectTest.fetchProjects();
+  const taskTest = new TaskTest(db);
+  await taskTest.fetchTasks();
 }
 
 main()

@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import { authRouter } from './routes/auth.route';
 import { errorHandler } from './middlewares/error.handler';
 import { projectRouter } from './routes/project.route';
+import { taskRouter } from './routes/task.route';
 
 const app: Application = express();
 
@@ -21,6 +22,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/api/auth', authRouter);
 app.use('/api/project', projectRouter);
+app.use('/api/task', taskRouter);
 
 app.use(errorHandler);
 
