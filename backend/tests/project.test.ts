@@ -1,11 +1,17 @@
-import type { PrismaClient } from "../generated/prisma/client";
+import type { PrismaClient } from '../generated/prisma/client';
 
 export class ProjectTest {
-  async fetchProjects(db: PrismaClient): Promise<void> {
-    const allProjects = await db.project.findMany({
+  db: PrismaClient;
+  constructor(db: PrismaClient) {
+    this.db = db;
+  }
+
+  async fetchProjects(): Promise<void> {
+    const allProjects = await this.db.project.findMany({
       include: {
-        members: true
-      }
+        members: true,
+        boards: true,
+      },
     });
     console.log('All Projects:', JSON.stringify(allProjects, null, 2));
   }

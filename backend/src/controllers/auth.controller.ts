@@ -87,6 +87,20 @@ export class AuthController {
       next(error);
     }
   }
+
+  async fetchUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = Number(req.params.userId);
+
+      const fetchedUser = await authService.userDetails(userId);
+      res.status(200).json({
+        status: 'success',
+        data: fetchedUser,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const authController = new AuthController();

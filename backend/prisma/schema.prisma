@@ -55,18 +55,115 @@ model Project {
   isArchived   Boolean  @default(false)
 
   members ProjectMember[]
+  boards  Board[]
 }
 
 model ProjectMember {
-  id String @id @default(uuid())
-
+  id        String           @id @default(uuid())
   projectId String
-  project   Project @relation(fields: [projectId], references: [id])
-
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
-
-  role ProjectLevelRole
+  project   Project          @relation(fields: [projectId], references: [id])
+  userId    Int
+  user      User             @relation(fields: [userId], references: [id])
+  role      ProjectLevelRole
 
   @@unique([projectId, userId], name: "uniqueUser")
+}
+
+model Board {
+  id        String     @id @default(uuid())
+  name      String
+  projectId String
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workflows Workflow[]
+}
+
+model Workflow {
+  id       String @id @default(uuid())
+  name     String
+  orderIdx Int
+  boardId  String
+  board    Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  limit    Int    @default(5)
+
+  tasks Task[]
+}
+
+enum TaskType {
+  STORY
+  TASK
+  BUG
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model Task {
+  id            String    @id @default(uuid())
+  title         String
+  description   String?
+  type          TaskType  @default(TASK)
+  priority      Priority  @default(MEDIUM)
+  assignee      Int
+  reporter      Int
+  due_date      DateTime?
+  statusId      String
+  status        Workflow  @relation(fields: [statusId], references: [id])
+  created_time  DateTime  @default(now())
+  updated_time  DateTime  @updatedAt
+  resolved_time DateTime?
+  closed_time   DateTime?
+
+  comments      Comment[]
+  statusLogs    StatusChanges[]
+  assigneeLogs  AssigneeChanges[]
+  commentTrails CommentTrail[]
+}
+
+model StatusChanges {
+  id          String   @id @default(uuid())
+  oldStatusId String
+  newStatusId String
+  timestamp   DateTime @default(now())
+  taskId      String
+  task        Task     @relation(fields: [taskId], references: [id])
+}
+
+model AssigneeChanges {
+  id            String   @id @default(uuid())
+  oldAssigneeId Int
+  newAssigneeId Int
+  timestamp     DateTime @default(now())
+  taskId        String
+  task          Task     @relation(fields: [taskId], references: [id])
+}
+
+model Comment {
+  id      String @id @default(uuid())
+  content String
+  taskId  String
+  task    Task   @relation(fields: [taskId], references: [id])
+
+  commentLogs CommentTrail[]
+}
+
+enum CommentTrailType {
+  ADDED
+  EDITED
+  DELETED
+}
+
+model CommentTrail {
+  id           String           @id @default(uuid())
+  type         CommentTrailType
+  oldCommentId String
+  newCommentId String
+  timestamp    DateTime         @default(now())
+  commentId    String
+  task         Task?            @relation(fields: [taskId], references: [id])
+  taskId       String?
+  comment      Comment          @relation(fields: [commentId], references: [id])
 }

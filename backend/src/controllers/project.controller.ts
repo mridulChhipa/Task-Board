@@ -35,7 +35,12 @@ export class ProjectController {
   ): Promise<void> {
     try {
       const body: UpdateBody = req.body;
-      await projectService.update(body);
+      const projectId = req.params.projectId;
+      if (typeof projectId !== 'string') {
+        throw new Error('Invalid type for projectId');
+      }
+
+      await projectService.update(projectId, body);
 
       res.status(200).json({
         message: 'Project updation Successful',
@@ -53,7 +58,11 @@ export class ProjectController {
   ): Promise<void> {
     try {
       const body: ArchiveBody = req.body;
-      await projectService.setArchiveStatus(body);
+      const projectId = req.params.projectId;
+      if (typeof projectId !== 'string') {
+        throw new Error('Invalid type for projectId');
+      }
+      await projectService.setArchiveStatus(projectId, body);
 
       res.status(200).json({
         message: 'Updated archive status',
@@ -71,7 +80,12 @@ export class ProjectController {
   ): Promise<void> {
     try {
       const body: AssignUserBody = req.body;
-      await projectService.assignUser(body);
+      const projectId = req.params.projectId;
+      if (typeof projectId !== 'string') {
+        throw new Error('Invalid type for projectId');
+      }
+
+      await projectService.assignUser(projectId, body);
 
       res.status(200).json({
         message: 'Assigned user',
@@ -89,7 +103,12 @@ export class ProjectController {
   ): Promise<void> {
     try {
       const body: RemoveUserBody = req.body;
-      await projectService.removeUser(body);
+      const projectId = req.params.projectId;
+      if (typeof projectId !== 'string') {
+        throw new Error('Invalid type for projectId');
+      }
+
+      await projectService.removeUser(projectId, body);
 
       res.status(200).json({
         message: 'Removed user',
@@ -107,7 +126,12 @@ export class ProjectController {
   ): Promise<void> {
     try {
       const body: UpdateRoleBody = req.body;
-      await projectService.updateUserRole(body);
+      const projectId = req.params.projectId;
+      if (typeof projectId !== 'string') {
+        throw new Error('Invalid type for projectId');
+      }
+
+      await projectService.updateUserRole(projectId, body);
 
       res.status(200).json({
         message: 'Updated the role',
@@ -115,6 +139,54 @@ export class ProjectController {
     } catch (error) {
       console.log(error);
       next(error);
+    }
+  }
+
+  async getProject(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const projectId = req.params.projectId;
+
+      if (typeof projectId !== 'string') {
+        throw new Error('Invalid Project ID format');
+      }
+
+      const currProject = await projectService.getProject(projectId);
+      if (!currProject) {
+        throw new Error('Cannot find project with the given id');
+      }
+
+      res.status(200).json({
+        status: 'Success',
+        data: currProject,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async deleteProject(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const projectId = req.params.projectId;
+
+      if (typeof projectId !== 'string') {
+        throw new Error('Invalid Project ID format');
+      }
+
+      await projectService.deleteProject(projectId);
+
+      res.status(204).json({
+        stauts: 'Delete successful',
+      });
+    } catch (err) {
+      next(err);
     }
   }
 }
