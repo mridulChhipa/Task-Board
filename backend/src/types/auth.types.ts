@@ -1,4 +1,5 @@
 import type { Request } from 'express';
+import { ProjectDetails } from './project.types';
 export enum TokenType {
   ACCESS,
   REFRESH,
@@ -30,4 +31,15 @@ export interface LoginBody {
 export interface AuthToken {
   accessToken: string;
   refreshToken: string;
+}
+
+export interface UserDetails {
+  name: string;
+  email: string;
+  avatar: string | null;
+}
+
+export interface UserWithProjs {
+  personalData: UserDetails;
+  projectData: ProjectDetails[];
 }

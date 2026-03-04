@@ -4,10 +4,11 @@ import { db } from '../config/db';
 import { compare, hash } from '../utils/hash';
 
 import { TokenType } from '../types/auth.types';
-import type { LoginBody, AuthToken, RegisterBody } from '../types/auth.types';
+import type { LoginBody, AuthToken, RegisterBody, UserDetails, UserWithProjs } from '../types/auth.types';
 
 import { generateAuthTokens, verifyToken } from '../utils/jwt';
 import { GlobalRole } from '../../generated/prisma/enums';
+import { ProjectDetails, ProjectRole } from '../types/project.types';
 
 export class AuthService {
   async register(body: RegisterBody): Promise<AuthToken> {
@@ -145,6 +146,68 @@ export class AuthService {
       return tokens;
     } catch (error) {
       console.error('Error refreshing token:', error);
+      throw error;
+    }
+  }
+
+  async userDetails(userId: number): Promise<UserWithProjs> {
+    try {
+      const rawUserData = await db.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          name: true,
+          email: true,
+          projects: true,
+          avatar: true,
+        }
+      });
+
+      if (!rawUserData) {
+        throw new Error("User not found");
+      }
+
+      let allProjs: ProjectDetails[] = [];
+
+      for (const membership of rawUserData.projects) {
+        const currProj = await db.project.findUnique({
+          where: {
+            id: membership.projectId,
+          },
+          include: {
+            members: true,
+          }
+        });
+
+        if (!currProj) {
+          throw new Error('');
+        }
+
+        let allMembers: number[] = [];
+        for (const member of currProj.members) {
+          allMembers.push(member.userId);
+        }
+
+        allProjs.push({
+          name: currProj.name,
+          description: currProj.description ?? "",
+          role: membership.role as unknown as ProjectRole,
+          members: allMembers,
+        });
+      }
+
+      const userData: UserWithProjs = {
+        personalData: {
+          name: rawUserData.name,
+          email: rawUserData.email,
+          avatar: rawUserData.avatar,
+        },
+        projectData: allProjs,
+      };
+
+      return userData;
+    } catch (error) {
       throw error;
     }
   }

@@ -1,4 +1,5 @@
 import type { ProjectLevelRole } from '../../generated/prisma/enums';
+import { UserDetails } from './auth.types';
 
 export enum ProjectRole {
   PROJECT_ADMIN = 'PROJECT_ADMIN',
@@ -17,29 +18,31 @@ export interface CreateBody {
 }
 
 export interface UpdateBody {
-  projectId: string;
   name: string;
   description: string;
 }
 
 export interface ArchiveBody {
-  projectId: string;
   isArchived: boolean;
 }
 
 export interface AssignUserBody {
-  projectId: string;
   userId: number;
   role: ProjectLevelRole;
 }
 
 export interface RemoveUserBody {
-  projectId: string;
   userId: number;
 }
 
 export interface UpdateRoleBody {
-  projectId: string;
   userId: number;
   role: ProjectLevelRole;
+}
+
+export interface ProjectDetails {
+  name: string;
+  description: string;
+  role: ProjectRole;
+  members: number [];
 }

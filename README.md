@@ -1,7 +1,26 @@
 # Task Board
 
 ## 1. Setup
+- Follow the given instruction separately for backend:
+  1. `cd backend`
+  2. `npm install`
+  3. `npx prisma init --datasource-provider postgresql --output ../generated/prisma`
+      - This will generate some files and .env 
+      - update the .env file [PORT=3000, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET, DATABASE_URL]
+  4. `npx prisma migrate reset`
+  5. `npx prisma migrate dev`
+  6. `npx prisma migrate`
 
+## 2. Running the server
+- The server resided in the backend
+  1. `cd backend`
+  2. `npm run dev` -> this runs the server
+
+- Below are some useful commands 
+  - `npm run test`-> this runs tests
+  - `npm run format` -> applies prettier
+  - `npm run lint` -> return a lint check
+  
 ## 2. Directory Structure
 ```
 backend/

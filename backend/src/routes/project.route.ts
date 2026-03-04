@@ -4,24 +4,27 @@ import { authenticateToken } from '../middlewares/guards/auth.guard';
 import { authorizeProjectRole } from '../middlewares/guards/project.guard';
 import { ProjectRole } from '../types/project.types';
 import { authorizeGlobalAdmin } from '../middlewares/guards/rbac.guard';
+import { boardRouter } from './board.route';
 
 const projectRouter = Router();
 projectRouter.use(authenticateToken);
+
+projectRouter.use('/:projectId/board', boardRouter);
 
 projectRouter.post('/create', authorizeGlobalAdmin(), (req, res, next) => {
   projectController.createProject(req, res, next);
 });
 
-projectRouter.post(
-  '/update',
+projectRouter.patch(
+  '/update/:projectId',
   authorizeProjectRole([ProjectRole.PROJECT_ADMIN]),
   (req, res, next) => {
     projectController.updateProject(req, res, next);
   },
 );
 
-projectRouter.post(
-  '/set-archive-status',
+projectRouter.patch(
+  '/set-archive-status/:projectId',
   authorizeProjectRole([ProjectRole.PROJECT_ADMIN]),
   (req, res, next) => {
     projectController.setArchiveStatus(req, res, next);
@@ -29,7 +32,7 @@ projectRouter.post(
 );
 
 projectRouter.post(
-  '/assign-user',
+  '/assign-user/:projectId',
   authorizeProjectRole([ProjectRole.PROJECT_ADMIN]),
   (req, res, next) => {
     projectController.assignUser(req, res, next);
@@ -37,15 +40,15 @@ projectRouter.post(
 );
 
 projectRouter.post(
-  '/remove-user',
+  '/remove-user/:projectId',
   authorizeProjectRole([ProjectRole.PROJECT_ADMIN]),
   (req, res, next) => {
     projectController.removeUser(req, res, next);
   },
 );
 
-projectRouter.post(
-  '/update-role',
+projectRouter.patch(
+  '/update-role/:projectId',
   authorizeProjectRole([ProjectRole.PROJECT_ADMIN]),
   (req, res, next) => {
     projectController.updateUserRole(req, res, next);

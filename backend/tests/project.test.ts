@@ -10,6 +10,7 @@ export class ProjectTest {
     const allProjects = await this.db.project.findMany({
       include: {
         members: true,
+        boards: true,
       },
     });
     console.log('All Projects:', JSON.stringify(allProjects, null, 2));

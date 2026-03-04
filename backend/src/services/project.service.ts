@@ -24,7 +24,10 @@ export class ProjectService {
     }
   }
 
-  async update({ projectId, name, description }: UpdateBody): Promise<void> {
+  async update(
+    projectId: string,
+    { name, description }: UpdateBody,
+  ): Promise<void> {
     try {
       await db.project.update({
         data: {
@@ -41,10 +44,10 @@ export class ProjectService {
     }
   }
 
-  async setArchiveStatus({
-    projectId,
-    isArchived,
-  }: ArchiveBody): Promise<void> {
+  async setArchiveStatus(
+    projectId: string,
+    { isArchived }: ArchiveBody,
+  ): Promise<void> {
     try {
       await db.project.update({
         data: {
@@ -61,7 +64,10 @@ export class ProjectService {
   }
 
   // Membership related services
-  async assignUser({ projectId, userId, role }: AssignUserBody): Promise<void> {
+  async assignUser(
+    projectId: string,
+    { userId, role }: AssignUserBody,
+  ): Promise<void> {
     try {
       const existingMember = await db.projectMember.findUnique({
         where: {
@@ -89,7 +95,10 @@ export class ProjectService {
     }
   }
 
-  async removeUser({ projectId, userId }: RemoveUserBody): Promise<void> {
+  async removeUser(
+    projectId: string,
+    { userId }: RemoveUserBody,
+  ): Promise<void> {
     try {
       const existingMember = await db.projectMember.findUnique({
         where: {
@@ -118,11 +127,10 @@ export class ProjectService {
     }
   }
 
-  async updateUserRole({
-    projectId,
-    userId,
-    role,
-  }: UpdateRoleBody): Promise<void> {
+  async updateUserRole(
+    projectId: string,
+    { userId, role }: UpdateRoleBody,
+  ): Promise<void> {
     try {
       const existingMember = await db.projectMember.findUnique({
         where: {
