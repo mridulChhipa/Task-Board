@@ -4,11 +4,16 @@ import { db } from '../config/db';
 import { compare, hash } from '../utils/hash';
 
 import { TokenType } from '../types/auth.types';
-import type { LoginBody, AuthToken, RegisterBody, UserDetails, UserWithProjs } from '../types/auth.types';
+import type {
+  LoginBody,
+  AuthToken,
+  RegisterBody,
+  UserWithProjs,
+} from '../types/auth.types';
 
 import { generateAuthTokens, verifyToken } from '../utils/jwt';
 import { GlobalRole } from '../../generated/prisma/enums';
-import { ProjectDetails, ProjectRole } from '../types/project.types';
+import type { ProjectDetails, ProjectRole } from '../types/project.types';
 
 export class AuthService {
   async register(body: RegisterBody): Promise<AuthToken> {
@@ -161,14 +166,14 @@ export class AuthService {
           email: true,
           projects: true,
           avatar: true,
-        }
+        },
       });
 
       if (!rawUserData) {
-        throw new Error("User not found");
+        throw new Error('User not found');
       }
 
-      let allProjs: ProjectDetails[] = [];
+      const allProjs: ProjectDetails[] = [];
 
       for (const membership of rawUserData.projects) {
         const currProj = await db.project.findUnique({
@@ -177,21 +182,21 @@ export class AuthService {
           },
           include: {
             members: true,
-          }
+          },
         });
 
         if (!currProj) {
           throw new Error('');
         }
 
-        let allMembers: number[] = [];
+        const allMembers: number[] = [];
         for (const member of currProj.members) {
           allMembers.push(member.userId);
         }
 
         allProjs.push({
           name: currProj.name,
-          description: currProj.description ?? "",
+          description: currProj.description ?? '',
           role: membership.role as unknown as ProjectRole,
           members: allMembers,
         });
@@ -208,6 +213,7 @@ export class AuthService {
 
       return userData;
     } catch (error) {
+      console.log('User Details Catch: ', error);
       throw error;
     }
   }

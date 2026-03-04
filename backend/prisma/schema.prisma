@@ -109,14 +109,16 @@ model Task {
   priority      Priority  @default(MEDIUM)
   assignee      Int
   reporter      Int
-  due_date      DateTime?
+  stackPosition Int
+  dueDate       DateTime?
   statusId      String
   status        Workflow  @relation(fields: [statusId], references: [id])
-  created_time  DateTime  @default(now())
-  updated_time  DateTime  @updatedAt
-  resolved_time DateTime?
-  closed_time   DateTime?
-
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  resolvedAt    DateTime?
+  closedAt      DateTime?
+  parentId      String?
+  childrenIds   String[]
   comments      Comment[]
   statusLogs    StatusChanges[]
   assigneeLogs  AssigneeChanges[]

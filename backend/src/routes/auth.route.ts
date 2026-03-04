@@ -39,6 +39,4 @@ authRouter.get(
   },
 );
 
-
-
 export { authRouter };

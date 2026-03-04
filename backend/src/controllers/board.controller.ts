@@ -10,7 +10,7 @@ export class BoardController {
     try {
       const projectId = req.params.projectId;
       if (typeof projectId !== 'string') {
-        console.log("Params", req.params);
+        console.log('Params', req.params);
         throw new Error('Invalid type for projectId');
       }
 
@@ -33,12 +33,13 @@ export class BoardController {
   ): Promise<void> {
     try {
       const boardId = req.params.boardId;
-      console.log(req.params);
-      if (typeof boardId !== 'string') {
+      // const projectId = req.params.projectId;
+      if (typeof boardId !== 'string' /*|| typeof projectId !== 'string'*/) {
         throw new Error('Invalid type for boardId');
       }
 
       await boardService.update(boardId, req.body.name);
+      // await boardService.update(boardId, projectId, req.body.name);
       res.status(200).json({
         status: 'success',
         msg: 'Board updated Successfully',
@@ -80,11 +81,20 @@ export class BoardController {
   ): Promise<void> {
     try {
       const columnId = req.params.columnId;
-      if (typeof columnId !== 'string') {
+      const boardId = req.params.boardId;
+
+      // if (typeof columnId !== 'string') {
+      if (typeof columnId !== 'string' || typeof boardId !== 'string') {
         throw new Error('Invalid type for projectId');
       }
 
-      await boardService.updateColumn(columnId, req.body.name, req.body.limit, req.body.orderIdx);
+      await boardService.updateColumn(
+        columnId,
+        boardId,
+        req.body.name,
+        req.body.limit,
+        req.body.orderIdx,
+      );
       res.status(200).json({
         status: 'success',
         msg: 'Column updated Successfully',
@@ -103,14 +113,17 @@ export class BoardController {
   ): Promise<void> {
     try {
       const columnId = req.params.columnId;
-      if (typeof columnId !== 'string') {
+      const boardId = req.params.boardId;
+
+      // if (typeof columnId !== 'string') {
+      if (typeof columnId !== 'string' || typeof boardId !== 'string') {
         throw new Error('Invalid type for projectId');
       }
 
-      await boardService.deleteColumn(columnId);
+      await boardService.deleteColumn(columnId, boardId);
       res.status(200).json({
         status: 'success',
-        msg: 'Column updated Successfully',
+        msg: 'Column deleted Successfully',
       });
 
       next();
@@ -119,6 +132,28 @@ export class BoardController {
     }
   }
 
+  async deleteBoard(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const boardId = req.params.boardId;
+      if (typeof boardId !== 'string') {
+        throw new Error('Invalid type for boardid');
+      }
+
+      await boardService.deleteBoard(boardId);
+      res.status(200).json({
+        status: 'success',
+        msg: 'Board deleted Successfully',
+      });
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const boardController = new BoardController();

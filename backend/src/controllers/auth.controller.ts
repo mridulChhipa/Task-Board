@@ -88,7 +88,11 @@ export class AuthController {
     }
   }
 
-  async fetchUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async fetchUser(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const userId = Number(req.params.userId);
 

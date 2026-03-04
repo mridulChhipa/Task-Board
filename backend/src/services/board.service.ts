@@ -30,7 +30,10 @@ export class BoardService {
     }
   }
 
-  async update(boardId: string, name: string): Promise<void> {
+  async update(
+    boardId: string /*, projectId: string*/,
+    name: string,
+  ): Promise<void> {
     try {
       const existingBoard = await db.board.findFirst({
         where: {
@@ -41,6 +44,10 @@ export class BoardService {
       if (!existingBoard) {
         throw new Error('Trying to update non-existent board');
       }
+
+      // if (existingBoard.projectId !== projectId) {
+      //   throw new Error('This board does not exists in this project');
+      // }
 
       await db.board.update({
         data: {
@@ -56,7 +63,11 @@ export class BoardService {
     }
   }
 
-  async addColumn(boardId: string, columnName: string, limit: number): Promise<void> {
+  async addColumn(
+    boardId: string,
+    columnName: string,
+    limit: number,
+  ): Promise<void> {
     try {
       await db.workflow.create({
         data: {
@@ -72,8 +83,28 @@ export class BoardService {
     }
   }
 
-  async updateColumn(columnId: string, columnName: string, limit: number, position: number): Promise<void> {
+  async updateColumn(
+    columnId: string,
+    boardId: string,
+    columnName: string,
+    limit: number,
+    position: number,
+  ): Promise<void> {
     try {
+      const existingColumn = await db.workflow.findFirst({
+        where: {
+          id: columnId,
+        },
+      });
+
+      if (!existingColumn) {
+        throw new Error('Non-existent column');
+      }
+
+      if (existingColumn.boardId !== boardId) {
+        throw new Error('This column does not exists in this board');
+      }
+
       await db.workflow.update({
         data: {
           name: columnName,
@@ -90,15 +121,42 @@ export class BoardService {
     }
   }
 
-  async deleteColumn(columnId: string): Promise<void> {
+  async deleteColumn(columnId: string, boardId: string): Promise<void> {
     try {
+      const existingColumn = await db.workflow.findFirst({
+        where: {
+          id: columnId,
+        },
+      });
+
+      if (!existingColumn) {
+        throw new Error('Non-existent column');
+      }
+
+      if (existingColumn.boardId !== boardId) {
+        throw new Error('This board does not exists in this project');
+      }
+
       await db.workflow.delete({
         where: {
           id: columnId,
         },
       });
     } catch (error) {
-      console.log('Adding column...Failed with: ', error);
+      console.log('Column Deletion...Failed with: ', error);
+      throw error;
+    }
+  }
+
+  async deleteBoard(boardId: string): Promise<void> {
+    try {
+      await db.board.delete({
+        where: {
+          id: boardId,
+        },
+      });
+    } catch (error) {
+      console.log('Board Deletions...Failed with: ', error);
       throw error;
     }
   }
