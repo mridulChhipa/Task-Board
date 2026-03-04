@@ -1,11 +1,41 @@
-.loginpage{
+.loginform{
     color: black;
+    background-color: beige;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.input{
+    text-align: left;
+    font-size: 1.1em;
+    width: 400px;
 }
 
 .inputfield{
-    text-align: left;
+    width: 300px;
+    height: 30px;
+    font-size: 1em;
+    padding: 15px;
+    width: 400px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-radius: 20px;
+}
+
+.formcontainer{
+    background-color: white;
+    padding: 50px;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
 }

@@ -1,0 +1,2 @@
+backend throws errors or prints errors to console for invalid register user cases.
+Instead throw 4xx codes so that it is easy for frontend to show user the errors by processing backend responses.
