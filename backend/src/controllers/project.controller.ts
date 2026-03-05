@@ -17,10 +17,11 @@ export class ProjectController {
   ): Promise<void> {
     try {
       const body: CreateBody = req.body;
-      await projectService.create(body);
+      const project = await projectService.create(body);
 
       res.status(201).json({
         message: 'Project Creation Successful',
+        data: project,
       });
     } catch (error) {
       console.log(error);
@@ -40,10 +41,11 @@ export class ProjectController {
         throw new Error('Invalid type for projectId');
       }
 
-      await projectService.update(projectId, body);
+      const project = await projectService.update(projectId, body);
 
       res.status(200).json({
         message: 'Project updation Successful',
+        data: project,
       });
     } catch (error) {
       console.log(error);
