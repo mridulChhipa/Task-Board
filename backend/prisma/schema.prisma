@@ -102,23 +102,24 @@ enum Priority {
 }
 
 model Task {
-  id            String    @id @default(uuid())
+  id            String            @id @default(uuid())
   title         String
   description   String?
-  type          TaskType  @default(TASK)
-  priority      Priority  @default(MEDIUM)
+  type          TaskType          @default(TASK)
+  priority      Priority          @default(MEDIUM)
   assignee      Int
   reporter      Int
   stackPosition Int
   dueDate       DateTime?
   statusId      String
-  status        Workflow  @relation(fields: [statusId], references: [id])
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  status        Workflow          @relation(fields: [statusId], references: [id])
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
   resolvedAt    DateTime?
   closedAt      DateTime?
   parentId      String?
-  childrenIds   String[]
+  parent        Task?             @relation("TaskToTask", fields: [parentId], references: [id], onDelete: Cascade)
+  children      Task[]            @relation("TaskToTask")
   comments      Comment[]
   statusLogs    StatusChanges[]
   assigneeLogs  AssigneeChanges[]

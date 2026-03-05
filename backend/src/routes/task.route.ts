@@ -17,4 +17,8 @@ taskRouter.delete('/delete/:taskId', (req, res, next) => {
   taskController.delete(req, res, next);
 });
 
+taskRouter.get('/:taskId', (req, res, next) => {
+  taskController.getTask(req, res, next);
+});
+
 export { taskRouter };

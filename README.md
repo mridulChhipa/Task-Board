@@ -20,8 +20,14 @@
   - `npm run test`-> this runs tests
   - `npm run format` -> applies prettier
   - `npm run lint` -> return a lint check
-  
-## 2. Directory Structure
+
+## Rigourous Testing Requirements
+- Checking about audit trail and story status consistencies
+- Manual setting of status consistency
+- Implementing guards
+- Resolved and closed timestamp also need to be implemented (mp update function mein unko bhi include krna padega i.e. the TaskBody and send sirf frontend ke through hoga).
+
+## 4. Directory Structure
 ```
 backend/
 ├── src/

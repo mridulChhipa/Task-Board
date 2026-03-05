@@ -11,7 +11,40 @@ export enum PriorityType {
   CRITICAL = 'CRITICAL',
 }
 
-export interface TaskBody {
+export interface CreateTaskBody {
+  title: string;
+  type: TaskType;
+  description: string | null;
+  priority: PriorityType;
+  assignee: number;
+  reporter: number;
+  dueDate: Date;
+  stackPosition: number;
+  statusId: string;
+  parentId: string | null;
+}
+
+export interface TaskDTO {
+  id: string;
+  title: string;
+  description: string | null;
+  type: TaskType;
+  priority: PriorityType;
+  assignee: number;
+  reporter: number;
+  dueDate: Date | null;
+  stackPosition: number;
+  statusId: string;
+  parentId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  resolvedAt: Date | null;
+  closedAt: Date | null;
+  children: TaskDTO[];
+}
+
+export interface TaskResponseBody {
+  id: string;
   title: string;
   type: TaskType;
   description: string;
@@ -20,5 +53,7 @@ export interface TaskBody {
   reporter: number;
   dueDate: Date;
   stackPosition: number;
-  statusId: string; // -> workflow.id
+  statusId: string;
+  parentId: string | null;
+  children: TaskResponseBody[];
 }
