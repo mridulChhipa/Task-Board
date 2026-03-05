@@ -158,10 +158,11 @@ model Activity {
 model Thread {
   id        String    @id @default(uuid())
   title     String
+  content   String?
   comments  Comment[]
   authorId  Int
   author    User      @relation(fields: [authorId], references: [id])
-  isDeleted Boolean
+  isDeleted Boolean   @default(false)
 }
 
 model Comment {
@@ -171,5 +172,5 @@ model Comment {
   thread    Thread  @relation(fields: [threadId], references: [id])
   authorId  Int
   author    User    @relation(fields: [authorId], references: [id])
-  isDeleted Boolean
+  isDeleted Boolean @default(false)
 }

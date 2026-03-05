@@ -100,7 +100,7 @@ export class TaskService {
         if (existingTask.statusId !== statusId) {
           await db.activity.create({
             data: {
-              type: "TASK_STATUS_UPDATED",
+              type: 'TASK_STATUS_UPDATED',
               taskId,
               oldStatusId: existingTask.statusId,
               newStatusId: statusId,
@@ -114,7 +114,7 @@ export class TaskService {
           await db.activity.create({
             data: {
               taskId,
-              type: "TASK_ASSIGNEE_CHANGED",
+              type: 'TASK_ASSIGNEE_CHANGED',
               oldAssignee: existingTask.assignee,
               newAssignee: assignee,
             },

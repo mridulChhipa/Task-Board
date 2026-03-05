@@ -10,7 +10,8 @@ export class AuthController {
   ): Promise<void> {
     try {
       const body: RegisterBody = req.body;
-      const { accessToken, refreshToken, userId } = await authService.register(body);
+      const { accessToken, refreshToken, userId } =
+        await authService.register(body);
 
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
@@ -32,12 +33,13 @@ export class AuthController {
   async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const body: LoginBody = req.body;
-      const { accessToken, refreshToken, userId } = await authService.login(body);
+      const { accessToken, refreshToken, userId } =
+        await authService.login(body);
 
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
         secure: process.env.MODE === 'PRODUCTION',
-        sameSite: 'strict',
+        sameSite: process.env.MODE === 'PRODUCTION' ? 'none' : 'lax',
         maxAge: 15 * 60 * 1000,
       });
 
