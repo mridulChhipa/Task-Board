@@ -1,2 +1,10 @@
 backend throws errors or prints errors to console for invalid register user cases.
 Instead throw 4xx codes so that it is easy for frontend to show user the errors by processing backend responses.
+
+backend needs to add avatar field to get user details and frontend needs to edit avatar.
+
+pass name, description as json attributes to create a new project.
+to update, pass the project id through url and updated name, description as json in request body.
+setarchive: project id in url and archive status in request body as json.
+
+insert sorting functionality in table headers if time permits.

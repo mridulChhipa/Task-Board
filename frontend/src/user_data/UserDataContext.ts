@@ -1,22 +1,26 @@
 import { createContext } from 'react';
 
 export const initialUserData: UserDataType = {
+    userId: 0,
     name: "",
     email: "",
-    role: "PROJECT_VIEWER",
+    role: "USER",
     projects: [],
-    avatar: ""
+    avatar: "",
+    refreshToken: ""
 }
 
 export const UserContext = createContext(initialUserData);
 export const UserDispatchContext = createContext<React.Dispatch<UserDataDispatchType>>(() => {});
 
 export type UserDataType = {
-    name: string;
-    email: string;
-    role: "GLOBAL_ADMIN" | "PROJECT_ADMIN" | "PROJECT_MEMBER" | "PROJECT_VIEWER";
-    projects: string[];
-    avatar: string;
+    userId: number;
+    name?: string;
+    email?: string;
+    role?: "GLOBAL_ADMIN" | "USER";
+    projects?: string[];
+    avatar?: string;
+    refreshToken?: string;
 };
 
 export type UserDataDispatchType = 

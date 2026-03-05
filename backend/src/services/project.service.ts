@@ -10,14 +10,15 @@ import type {
 } from '../types/project.types';
 
 export class ProjectService {
-  async create({ name, description }: CreateBody): Promise<void> {
+  async create({ name, description }: CreateBody): Promise<Project> {
     try {
-      await db.project.create({
+      const project = await db.project.create({
         data: {
           name,
           description,
         },
       });
+      return project;
     } catch (error) {
       console.log(error);
       throw error;

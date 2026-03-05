@@ -1,7 +1,7 @@
 import styles from "./Loginpage.module.css";
 import Button from "../../components/Button/Button";
 import type { SubmitEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function SignupPage() {
   const Navigate = useNavigate();
@@ -56,7 +56,7 @@ function SignupPage() {
             <Button priority="first" type="submit">Sign Up</Button>
           </form>
           <div style={{ height: "20px" }}></div>
-          <p style={{ fontSize: "1.1em" }}>Already have an account? <a href="/signin">Log in here</a>.</p>
+          <p style={{ fontSize: "1.1em" }}>Already have an account? <Link to="/signin">Log in here</Link>.</p>
         </div>
       </div>
   );

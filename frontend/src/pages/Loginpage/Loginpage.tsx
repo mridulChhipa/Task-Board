@@ -1,13 +1,15 @@
 import styles from "./Loginpage.module.css";
 import Button from "../../components/Button/Button";
 import type { SubmitEvent } from "react";
-import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { UserDispatchContext } from "../../user_data/UserDataContext";
 
 function LoginPage() {
   const Navigate = useNavigate();
   const [resetForm, setResetForm] = useState(false);
   const [attempted, setAttempted] = useState(false);
+  const userDataDispatch = useContext(UserDispatchContext);
 
   async function submitLogin(e: SubmitEvent) {
     e.preventDefault(); // To prevent default form behaviour
@@ -17,14 +19,36 @@ function LoginPage() {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({
         email: form_data.get("email"),
-        password: form_data.get("password"),
+        password: form_data.get("password")
       }),
     });
     if(response.ok){
       const data = await response.json();
       console.log(data);
+      const userResponse = await fetch(`http://localhost:3000/api/auth/${data.userId}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const userData = await userResponse.json();
+      console.log(userData);
+      userDataDispatch({
+        action_type: "LOGIN",
+        data: {
+          userId: data.userId,
+          name: userData.data.personalData.name,
+          email: userData.data.personalData.email,
+          role: userData.data.personalData.email === "admin@taskboard.com" ? "GLOBAL_ADMIN" : "USER",
+          projects: userData.data.projectData,
+          avatar: userData.data.personalData.avatar,
+          refreshToken: data.refreshToken
+        }
+      });
       Navigate("/dashboard");
     }
     else{
@@ -57,7 +81,7 @@ function LoginPage() {
             <Button priority="first" type="submit">Log In</Button>
           </form>
           <div style={{ height: "20px" }}></div>
-          <p style={{ fontSize: "1.1em" }}>Don't have an account? <a href="/signup">Register here</a>.</p>
+          <p style={{ fontSize: "1.1em" }}>Don't have an account? <Link to="/signup">Register here</Link>.</p>
         </div>
       </div>
   );
