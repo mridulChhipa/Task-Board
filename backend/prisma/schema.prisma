@@ -32,6 +32,8 @@ model User {
   avatar     String?
   globalRole GlobalRole @default(USER)
 
+  comments Comment[]
+  threads  Thread[]
   sessions Session[]
   projects ProjectMember[]
 }
@@ -102,71 +104,72 @@ enum Priority {
 }
 
 model Task {
-  id            String            @id @default(uuid())
+  id            String    @id @default(uuid())
   title         String
   description   String?
-  type          TaskType          @default(TASK)
-  priority      Priority          @default(MEDIUM)
+  type          TaskType  @default(TASK)
+  priority      Priority  @default(MEDIUM)
   assignee      Int
   reporter      Int
   stackPosition Int
   dueDate       DateTime?
   statusId      String
-  status        Workflow          @relation(fields: [statusId], references: [id])
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  status        Workflow  @relation(fields: [statusId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   resolvedAt    DateTime?
   closedAt      DateTime?
   parentId      String?
-  parent        Task?             @relation("TaskToTask", fields: [parentId], references: [id], onDelete: Cascade)
-  children      Task[]            @relation("TaskToTask")
-  comments      Comment[]
-  statusLogs    StatusChanges[]
-  assigneeLogs  AssigneeChanges[]
-  commentTrails CommentTrail[]
+  parent        Task?     @relation("TaskToTask", fields: [parentId], references: [id], onDelete: Cascade)
+  children      Task[]    @relation("TaskToTask")
 }
 
-model StatusChanges {
-  id          String   @id @default(uuid())
-  oldStatusId String
-  newStatusId String
-  timestamp   DateTime @default(now())
-  taskId      String
-  task        Task     @relation(fields: [taskId], references: [id])
+enum ActivityType {
+  TASK_CREATED
+  TASK_STATUS_UPDATED
+  TASK_ASSIGNEE_CHANGED
+  COMMENT_ADDED
+  COMMENT_EDITED
+  COMMENT_DELETED
+  THREAD_ADDED
+  THREAD_EDITED
+  THREAD_DELETED
 }
 
-model AssigneeChanges {
-  id            String   @id @default(uuid())
-  oldAssigneeId Int
-  newAssigneeId Int
-  timestamp     DateTime @default(now())
-  taskId        String
-  task          Task     @relation(fields: [taskId], references: [id])
+model Activity {
+  id             String       @id @default(uuid())
+  type           ActivityType
+  taskId         String
+  threadId       String?
+  commentId      String?
+  oldStatusId    String?
+  newStatusId    String?
+  oldAssignee    Int?
+  newAssignee    Int?
+  editedThread   Boolean?
+  deletedThread  Boolean?
+  editedComment  Boolean?
+  deletedComment Boolean?
+  assignedTask   Boolean?
+  updatedStatus  Boolean?
+  timestamp      DateTime     @default(now())
+}
+
+model Thread {
+  id        String    @id @default(uuid())
+  title     String
+  comments  Comment[]
+  authorId  Int
+  author    User      @relation(fields: [authorId], references: [id])
+  isDeleted Boolean
 }
 
 model Comment {
-  id      String @id @default(uuid())
-  content String
-  taskId  String
-  task    Task   @relation(fields: [taskId], references: [id])
-
-  commentLogs CommentTrail[]
-}
-
-enum CommentTrailType {
-  ADDED
-  EDITED
-  DELETED
-}
-
-model CommentTrail {
-  id           String           @id @default(uuid())
-  type         CommentTrailType
-  oldCommentId String
-  newCommentId String
-  timestamp    DateTime         @default(now())
-  commentId    String
-  task         Task?            @relation(fields: [taskId], references: [id])
-  taskId       String?
-  comment      Comment          @relation(fields: [commentId], references: [id])
+  id        String  @id @default(uuid())
+  content   String
+  threadId  String
+  thread    Thread  @relation(fields: [threadId], references: [id])
+  authorId  Int
+  author    User    @relation(fields: [authorId], references: [id])
+  isDeleted Boolean
 }
