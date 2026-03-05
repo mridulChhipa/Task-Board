@@ -31,6 +31,7 @@ export interface LoginBody {
 export interface AuthToken {
   accessToken: string;
   refreshToken: string;
+  userId: number;
 }
 
 export interface UserDetails {

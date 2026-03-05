@@ -10,7 +10,7 @@ export class AuthController {
   ): Promise<void> {
     try {
       const body: RegisterBody = req.body;
-      const { accessToken, refreshToken } = await authService.register(body);
+      const { accessToken, refreshToken, userId } = await authService.register(body);
 
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
@@ -22,6 +22,7 @@ export class AuthController {
       res.status(201).json({
         message: 'User registered successfully',
         refreshToken,
+        userId,
       });
     } catch (error) {
       next(error);
@@ -31,7 +32,7 @@ export class AuthController {
   async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const body: LoginBody = req.body;
-      const { accessToken, refreshToken } = await authService.login(body);
+      const { accessToken, refreshToken, userId } = await authService.login(body);
 
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
@@ -43,6 +44,7 @@ export class AuthController {
       res.status(200).json({
         message: 'User Login successful',
         refreshToken,
+        userId,
       });
     } catch (error) {
       next(error);

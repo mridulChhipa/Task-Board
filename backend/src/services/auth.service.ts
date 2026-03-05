@@ -76,6 +76,7 @@ export class AuthService {
         },
       });
 
+      tokens.userId = user.id;
       return tokens;
     } catch (error) {
       console.error('Error logging in user:', error);
