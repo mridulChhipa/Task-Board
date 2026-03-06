@@ -1,7 +1,7 @@
-import type { Priority, TaskType } from '../../generated/prisma/enums';
 import { db } from '../config/db';
-import type { CreateTaskBody, TaskDTO } from '../types/task.types';
 import { syncStatusWithChildren, toTaskDTO } from '../utils/task.utils';
+import type { Priority, TaskType } from '../../generated/prisma/enums';
+import type { CreateTaskBody, TaskDTO } from '../types/task.types';
 
 export class TaskService {
   async create({
@@ -15,9 +15,9 @@ export class TaskService {
     statusId,
     parentId,
     stackPosition,
-  }: CreateTaskBody): Promise<void> {
+  }: CreateTaskBody): Promise<string> {
     try {
-      await db.task.create({
+      const createdTask = await db.task.create({
         data: {
           title,
           description,
@@ -35,8 +35,10 @@ export class TaskService {
       if (parentId) {
         await syncStatusWithChildren(parentId);
       }
+
+      return createdTask.id;
     } catch (error) {
-      console.log(error);
+      throw new Error('Error creating Task: ', { cause: error });
     }
   }
 

@@ -10,4 +10,29 @@ commentRouter.post('/create-comment', (req, res, next) => {
   commentController.createComment(req, res, next);
 });
 
+commentRouter.post('/update-thread/:tid', (req, res, next) => {
+  commentController.updateThread(req, res, next);
+});
+
+commentRouter.post('/update-comment/:cid', (req, res, next) => {
+  commentController.updateComment(req, res, next);
+});
+
+commentRouter.post('/delete-thread/:tid', (req, res, next) => {
+  commentController.deleteThread(req, res, next);
+});
+
+commentRouter.post('/delete-comment/:cid', (req, res, next) => {
+  commentController.deleteComment(req, res, next);
+});
+
+commentRouter.get('/:cid', (req, res, next) => {
+  commentController.fetchComment(req, res, next);
+});
+
+commentRouter.get('/:tid', (req, res, next) => {
+  commentController.fetchThread(req, res, next);
+});
+
+
 export { commentRouter };

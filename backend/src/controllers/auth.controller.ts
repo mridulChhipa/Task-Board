@@ -25,6 +25,8 @@ export class AuthController {
         refreshToken,
         userId,
       });
+
+      next();
     } catch (error) {
       next(error);
     }
@@ -48,6 +50,8 @@ export class AuthController {
         refreshToken,
         userId,
       });
+
+      next();
     } catch (error) {
       next(error);
     }
@@ -74,6 +78,8 @@ export class AuthController {
         message: 'Token Refresh Successfull',
         refreshToken,
       });
+
+      next();
     } catch (error) {
       next(error);
     }
@@ -87,6 +93,8 @@ export class AuthController {
       res.status(200).json({
         message: 'User Logout Successfull',
       });
+
+      next();
     } catch (error) {
       next(error);
     }
@@ -105,6 +113,8 @@ export class AuthController {
         status: 'success',
         data: fetchedUser,
       });
+
+      next();
     } catch (error) {
       next(error);
     }

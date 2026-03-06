@@ -1,27 +1,56 @@
-import { db } from "../config/db";
-import type { CommentBody, ThreadBody, UpdateCommentBody, UpdateThreadBody } from "../types/comment.types";
+import { db } from '../config/db';
+import type {
+  CommentBody,
+  CommentDTO,
+  ThreadBody,
+  ThreadDTO,
+  UpdateCommentBody,
+  UpdateThreadBody,
+} from '../types/comment.types';
+import { toCommentDTO, toThreadDTO } from '../utils/comment.utils';
 
 export class CommentService {
-  async createThread({ title, authorId, content }: ThreadBody): Promise<void> {
+  async createThread({
+    title,
+    authorId,
+    content,
+    taskId,
+  }: ThreadBody): Promise<string> {
     try {
-      await db.thread.create({
+      const createdThread = await db.thread.create({
         data: {
           title,
           authorId,
           content,
+          taskId: taskId,
         },
       });
+
+      if (createdThread) {
+        await db.activity.create({
+          data: {
+            type: 'THREAD_ADDED',
+            threadId: createdThread.id,
+            taskId: taskId,
+          },
+        });
+      }
+
+      return createdThread.id;
     } catch (error) {
-      throw new Error("Error creating thread: ", { cause: error });
+      throw new Error('Error creating thread: ', { cause: error });
     }
   }
 
-  async updateThread(id: string, { title, content, isDeleted }: UpdateThreadBody): Promise<void> {
+  async updateThread(
+    id: string,
+    { title, content, isDeleted }: UpdateThreadBody,
+  ): Promise<void> {
     try {
-      const existingThread = db.thread.findUnique({
+      const existingThread = await db.thread.findUnique({
         where: {
           id,
-        }
+        },
       });
 
       if (!existingThread) {
@@ -36,55 +65,89 @@ export class CommentService {
         },
         where: {
           id,
-        }
+        },
       });
     } catch (error) {
-      throw new Error("Error creating thread: ", { cause: error });
+      throw new Error('Error creating thread: ', { cause: error });
     }
   }
+
   async deleteThread(id: string): Promise<void> {
     try {
-      const existingThread = db.thread.findUnique({
+      const existingThread = await db.thread.findUnique({
         where: {
           id,
-        }
+        },
       });
 
       if (!existingThread) {
         throw new Error('Thread DNE');
       }
 
-      await db.thread.delete({
+      await db.thread.update({
         where: {
           id,
-        }
+        },
+        data: {
+          isDeleted: true,
+        },
+      });
+
+      await db.activity.create({
+        data: {
+          type: 'THREAD_DELETED',
+          threadId: id,
+          taskId: existingThread.taskId,
+        },
       });
     } catch (error) {
-      throw new Error("Error deleting thread: ", { cause: error });
+      throw new Error('Error deleting thread: ', { cause: error });
     }
   }
 
-  async createComment({ threadId, authorId, content }: CommentBody): Promise<void> {
+  async createComment({
+    threadId,
+    authorId,
+    content,
+    taskId,
+    parentId,
+  }: CommentBody): Promise<string> {
     try {
-      await db.comment.create({
+      const createdComment = await db.comment.create({
         data: {
           threadId,
           authorId,
           content,
+          parentId,
         },
       });
+
+      if (createdComment) {
+        await db.activity.create({
+          data: {
+            type: 'THREAD_ADDED',
+            threadId: createdComment.id,
+            taskId: taskId,
+          },
+        });
+      }
+
+      return createdComment.id;
     } catch (error) {
-      throw new Error("Error creating thread: ", { cause: error });
+      throw new Error('Error creating thread: ', { cause: error });
     }
   }
 
-  async updateComment(id: string, { content, isDeleted, threadId }: UpdateCommentBody): Promise<void> {
+  async updateComment(
+    id: string,
+    { content, isDeleted, threadId }: UpdateCommentBody,
+  ): Promise<void> {
     try {
-      const existingComment = db.comment.findUnique({
+      const existingComment = await db.comment.findUnique({
         where: {
           id,
           threadId,
-        }
+        },
       });
 
       if (!existingComment) {
@@ -99,20 +162,20 @@ export class CommentService {
         where: {
           id,
           threadId,
-        }
+        },
       });
     } catch (error) {
-      throw new Error("Error updating comment: ", { cause: error });
+      throw new Error('Error updating comment: ', { cause: error });
     }
   }
 
-  async deleteComment(id: string, { threadId }: UpdateCommentBody): Promise<void> {
+  async deleteComment(id: string, threadId: string): Promise<void> {
     try {
-      const existingComment = db.comment.findUnique({
+      const existingComment = await db.comment.findUnique({
         where: {
           id,
           threadId,
-        }
+        },
       });
 
       if (!existingComment) {
@@ -126,10 +189,51 @@ export class CommentService {
         where: {
           id,
           threadId,
-        }
+        },
       });
     } catch (error) {
-      throw new Error("Error deleting comment: ", { cause: error });
+      throw new Error('Error deleting comment: ', { cause: error });
+    }
+  }
+
+  async fetchComment(id: string): Promise<CommentDTO> {
+    try {
+      const existingComment = await db.comment.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          replies: true,
+        },
+      });
+
+      if (!existingComment) {
+        throw new Error();
+      }
+
+      return toCommentDTO(existingComment);
+    } catch (err) {
+      throw new Error("Can't fetch comment: ", { cause: err });
+    }
+  }
+
+  async fetchThread(id: string): Promise<ThreadDTO> {
+    try {
+      const existingThread = await db.thread.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          comments: true,
+        },
+      });
+
+      if (!existingThread) {
+        throw new Error();
+      }
+      return toThreadDTO(existingThread);
+    } catch (err) {
+      throw new Error("Can't fetch thread: ", { cause: err });
     }
   }
 }

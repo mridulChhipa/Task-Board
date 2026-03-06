@@ -23,6 +23,8 @@ export class ProjectController {
         message: 'Project Creation Successful',
         data: project,
       });
+
+      next();
     } catch (error) {
       console.log(error);
       next(error);
@@ -47,6 +49,8 @@ export class ProjectController {
         message: 'Project updation Successful',
         data: project,
       });
+
+      next();
     } catch (error) {
       console.log(error);
       next(error);
@@ -69,6 +73,8 @@ export class ProjectController {
       res.status(200).json({
         message: 'Updated archive status',
       });
+
+      next();
     } catch (error) {
       console.log(error);
       next(error);
@@ -92,6 +98,8 @@ export class ProjectController {
       res.status(200).json({
         message: 'Assigned user',
       });
+
+      next();
     } catch (error) {
       console.log(error);
       next(error);
@@ -115,6 +123,8 @@ export class ProjectController {
       res.status(200).json({
         message: 'Removed user',
       });
+
+      next();
     } catch (error) {
       console.log(error);
       next(error);
@@ -138,6 +148,8 @@ export class ProjectController {
       res.status(200).json({
         message: 'Updated the role',
       });
+
+      next();
     } catch (error) {
       console.log(error);
       next(error);
@@ -165,6 +177,8 @@ export class ProjectController {
         status: 'Success',
         data: currProject,
       });
+
+      next();
     } catch (err) {
       next(err);
     }
@@ -187,6 +201,8 @@ export class ProjectController {
       res.status(204).json({
         stauts: 'Delete successful',
       });
+
+      next();
     } catch (err) {
       next(err);
     }

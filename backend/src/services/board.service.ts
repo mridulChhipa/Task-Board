@@ -1,7 +1,8 @@
 import { db } from '../config/db';
+import type { BoardDTO, ColumnDTO } from '../types/board.types';
 
 export class BoardService {
-  async create(projectId: string, name: string): Promise<void> {
+  async create(projectId: string, name: string): Promise<string> {
     try {
       const createdBoard = await db.board.create({
         data: {
@@ -24,9 +25,10 @@ export class BoardService {
           },
         });
       }
+
+      return createdBoard.id;
     } catch (error) {
-      console.log('Board Creation failed: ', error);
-      throw error;
+      throw new Error('Error creating Board: ', { cause: error });
     }
   }
 
@@ -67,9 +69,9 @@ export class BoardService {
     boardId: string,
     columnName: string,
     limit: number,
-  ): Promise<void> {
+  ): Promise<string> {
     try {
-      await db.workflow.create({
+      const createdColumn = await db.workflow.create({
         data: {
           boardId,
           name: columnName,
@@ -77,9 +79,10 @@ export class BoardService {
           limit,
         },
       });
+
+      return createdColumn.id;
     } catch (error) {
-      console.log('Adding column...Failed with: ', error);
-      throw error;
+      throw new Error('Error adding workflow/column: ', { cause: error });
     }
   }
 
@@ -155,6 +158,67 @@ export class BoardService {
           id: boardId,
         },
       });
+    } catch (error) {
+      console.log('Board Deletions...Failed with: ', error);
+      throw error;
+    }
+  }
+
+  async fetchBoard(boardId: string): Promise<BoardDTO> {
+    try {
+      const board = await db.board.findUnique({
+        where: {
+          id: boardId,
+        },
+        include: {
+          workflows: true,
+        },
+      });
+
+      if (!board) {
+        throw new Error('Error fetching board');
+      }
+
+      const allCols: string[] = [];
+      for (const col of board.workflows) {
+        allCols.push(col.id);
+      }
+
+      const bdto: BoardDTO = {
+        id: board.id,
+        projectId: board.projectId,
+        name: board.name,
+        columns: allCols,
+      };
+
+      return bdto;
+    } catch (error) {
+      console.log('Board Deletions...Failed with: ', error);
+      throw error;
+    }
+  }
+
+  async fetchCol(colId: string): Promise<ColumnDTO> {
+    try {
+      const col = await db.workflow.findUnique({
+        where: {
+          id: colId,
+        },
+      });
+
+      if (!col) {
+        throw new Error('Error fetching board');
+      }
+
+      const coldto: ColumnDTO = {
+        id: col.id,
+        boardId: col.boardId,
+        name: col.name,
+        orderIdx: col.orderIdx,
+        limit: col.limit,
+      };
+
+      return coldto;
     } catch (error) {
       console.log('Board Deletions...Failed with: ', error);
       throw error;

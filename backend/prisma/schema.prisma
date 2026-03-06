@@ -122,10 +122,10 @@ model Task {
   parentId      String?
   parent        Task?     @relation("TaskToTask", fields: [parentId], references: [id], onDelete: Cascade)
   children      Task[]    @relation("TaskToTask")
+  threads       Thread[]
 }
 
 enum ActivityType {
-  TASK_CREATED
   TASK_STATUS_UPDATED
   TASK_ASSIGNEE_CHANGED
   COMMENT_ADDED
@@ -146,12 +146,14 @@ model Activity {
   newStatusId    String?
   oldAssignee    Int?
   newAssignee    Int?
-  editedThread   Boolean?
-  deletedThread  Boolean?
-  editedComment  Boolean?
-  deletedComment Boolean?
-  assignedTask   Boolean?
-  updatedStatus  Boolean?
+  threadAdded    Boolean      @default(false)
+  commentAdded   Boolean      @default(false)
+  editedThread   Boolean      @default(false)
+  deletedThread  Boolean      @default(false)
+  editedComment  Boolean      @default(false)
+  deletedComment Boolean      @default(false)
+  assignedTask   Boolean      @default(false)
+  updatedStatus  Boolean      @default(false)
   timestamp      DateTime     @default(now())
 }
 
@@ -163,14 +165,23 @@ model Thread {
   authorId  Int
   author    User      @relation(fields: [authorId], references: [id])
   isDeleted Boolean   @default(false)
+  taskId    String
+  task      Task      @relation(fields: [taskId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Comment {
-  id        String  @id @default(uuid())
+  id        String    @id @default(uuid())
   content   String
   threadId  String
-  thread    Thread  @relation(fields: [threadId], references: [id])
+  thread    Thread    @relation(fields: [threadId], references: [id])
   authorId  Int
-  author    User    @relation(fields: [authorId], references: [id])
-  isDeleted Boolean @default(false)
+  author    User      @relation(fields: [authorId], references: [id])
+  isDeleted Boolean   @default(false)
+  parentId  String?
+  parent    Comment?  @relation("C2R", fields: [parentId], references: [id])
+  replies   Comment[] @relation("C2R")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }

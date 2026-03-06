@@ -14,10 +14,10 @@ export class BoardController {
         throw new Error('Invalid type for projectId');
       }
 
-      await boardService.create(projectId, req.body.name);
+      const bid = await boardService.create(projectId, req.body.name);
       res.status(201).json({
         status: 'success',
-        msg: 'Board Created Successfully',
+        bid,
       });
 
       next();
@@ -62,10 +62,10 @@ export class BoardController {
         throw new Error('Invalid type for boardId');
       }
 
-      await boardService.addColumn(boardId, req.body.name, req.body.limit);
+      const comId = await boardService.addColumn(boardId, req.body.name, req.body.limit);
       res.status(201).json({
         status: 'success',
-        msg: 'Column added Successfully',
+        comId,
       });
 
       next();
@@ -147,6 +147,52 @@ export class BoardController {
       res.status(200).json({
         status: 'success',
         msg: 'Board deleted Successfully',
+      });
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async fetchBoard(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const boardId = req.params.boardId;
+      if (typeof boardId !== 'string') {
+        throw new Error('Invalid type for boardid');
+      }
+
+      const fbd = await boardService.fetchBoard(boardId);
+      res.status(200).json({
+        status: 'success',
+        fbd,
+      });
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async fetchCol(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const colId = req.params.colId;
+      if (typeof colId !== 'string') {
+        throw new Error('Invalid type for boardid');
+      }
+
+      const fcol = await boardService.fetchBoard(colId);
+      res.status(200).json({
+        status: 'success',
+        fcol,
       });
 
       next();

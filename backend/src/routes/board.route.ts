@@ -29,4 +29,13 @@ boardRouter.put('/:boardId/update-column/:columnId', (req, res, next) => {
   boardController.updateColumn(req, res, next);
 });
 
+boardRouter.get('/:boardId', (req, res, next) => {
+  boardController.fetchBoard(req, res, next);
+});
+
+boardRouter.get('/:colId', (req, res, next) => {
+  boardController.fetchCol(req, res, next);
+});
+
+
 export { boardRouter };

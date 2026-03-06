@@ -6,12 +6,10 @@ export class TaskController {
   async create(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const body: CreateTaskBody = req.body;
-
-      await taskService.create(body);
-
+      const taskId = await taskService.create(body);
       res.status(201).json({
         status: 'success',
-        msg: 'Task created successfully',
+        taskId,
       });
 
       next();
