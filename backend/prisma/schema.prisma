@@ -32,10 +32,11 @@ model User {
   avatar     String?
   globalRole GlobalRole @default(USER)
 
-  comments Comment[]
-  threads  Thread[]
-  sessions Session[]
-  projects ProjectMember[]
+  comments      Comment[]
+  threads       Thread[]
+  sessions      Session[]
+  projects      ProjectMember[]
+  notifications UserNotification[]
 }
 
 model Session {
@@ -184,4 +185,37 @@ model Comment {
   replies   Comment[] @relation("C2R")
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+}
+
+model Notification {
+  id         String             @id @default(uuid())
+  type       NotifType
+  read       Boolean            @default(false)
+  recipients UserNotification[]
+  senderId   Int
+  taskId     String?
+  commentId  String?
+  threadId   String?
+}
+
+enum NotifType {
+  TASK_ASSIGNED // Personal
+  STATUS_CHANGED // Broadcast
+  COMMENT_ADDED // Boardcast
+  MENTIONED // Personal
+  REPLY // Personal
+  THREAD_STARTED
+}
+
+model UserNotification {
+  id             String       @id @default(cuid())
+  userId         Int
+  notificationId String
+  timestamp      DateTime     @default(now())
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, notificationId])
+  @@index([userId])
+  @@index([notificationId])
 }

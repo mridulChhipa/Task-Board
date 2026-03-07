@@ -26,13 +26,12 @@ commentRouter.post('/delete-comment/:cid', (req, res, next) => {
   commentController.deleteComment(req, res, next);
 });
 
-commentRouter.get('/:cid', (req, res, next) => {
+commentRouter.get('t/:cid', (req, res, next) => {
   commentController.fetchComment(req, res, next);
 });
 
 commentRouter.get('/:tid', (req, res, next) => {
   commentController.fetchThread(req, res, next);
 });
-
 
 export { commentRouter };

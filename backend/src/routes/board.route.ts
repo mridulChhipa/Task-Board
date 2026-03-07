@@ -37,5 +37,4 @@ boardRouter.get('/:colId', (req, res, next) => {
   boardController.fetchCol(req, res, next);
 });
 
-
 export { boardRouter };

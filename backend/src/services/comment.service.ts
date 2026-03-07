@@ -7,7 +7,9 @@ import type {
   UpdateCommentBody,
   UpdateThreadBody,
 } from '../types/comment.types';
+// import { NotifType } from '../types/notifcation.types';
 import { toCommentDTO, toThreadDTO } from '../utils/comment.utils';
+// import { notifcationService } from './notification.service';
 
 export class CommentService {
   async createThread({
@@ -34,6 +36,15 @@ export class CommentService {
             taskId: taskId,
           },
         });
+
+        // await notifcationService.createNotification({
+        //   taskId,
+        //   type: NotifType.THREAD_STARTED,
+        //   senderId: authorId,
+        //   userId: recId,
+        //   commentId: null,
+        //   threadId: createdThread.id,
+        // });
       }
 
       return createdThread.id;
@@ -130,6 +141,15 @@ export class CommentService {
             taskId: taskId,
           },
         });
+
+        // await notifcationService.createNotification({
+        //   taskId,
+        //   type: NotifType.COMMENT_ADDED,
+        //   senderId: authorId,
+        //   userId: recId,
+        //   commentId: createdComment.id,
+        //   threadId: null,
+        // });
       }
 
       return createdComment.id;

@@ -62,7 +62,11 @@ export class BoardController {
         throw new Error('Invalid type for boardId');
       }
 
-      const comId = await boardService.addColumn(boardId, req.body.name, req.body.limit);
+      const comId = await boardService.addColumn(
+        boardId,
+        req.body.name,
+        req.body.limit,
+      );
       res.status(201).json({
         status: 'success',
         comId,
