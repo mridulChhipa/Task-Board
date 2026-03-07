@@ -40,14 +40,14 @@ function DashBoard() {
     const [modalContent, setModalContent] = useState<JSX.Element>(<></>);
     const [projects, setProjects] = useState<Project[]>([]);
 
-    async function button_click() {
-        console.log(userData.name);
-        console.log(userData.email);
-        console.log(userData.role);
-        console.log(userData.projects);
-        console.log(userData.avatar);
-        console.log(userData.refreshToken);
-    }
+    // async function button_click() {
+    //     console.log(userData.name);
+    //     console.log(userData.email);
+    //     console.log(userData.role);
+    //     console.log(userData.projects);
+    //     console.log(userData.avatar);
+    //     console.log(userData.refreshToken);
+    // }
 
     async function logout() {
         const response = await fetch("http://localhost:3000/api/auth/logout", {
@@ -60,6 +60,58 @@ function DashBoard() {
         const data = await response.json();
         navigate('/');
         console.log(data);
+    }
+
+    async function project_settings(project_id: string) {
+        setShowModal(true);
+        console.log("Project ID: ", project_id);
+        setModalContent(
+            <div>
+                <h2 style={{textAlign: "center"}}>Project Settings</h2>
+                <form className={styles.form}>
+                    <div className={styles.inputArea}>
+                        <label htmlFor="manager">Assign Project Manager</label>
+                        <input list="user_list" name="manager" />
+                        <datalist id="user_list">
+                            {/*
+                                users.map((user) => (
+                                    <option value={user.id}>{user.name}</option>
+                                ))
+                            */}
+                            <option value="John Doe ID:0">John Doe</option>
+                            <option value="Jane Smith ID:1">Jane Smith</option>
+                            <option value="Alice Johnson ID:2">Alice Johnson</option>
+                        </datalist>
+                    </div>
+                    <div className={styles.boxForm}>
+                        <input type="checkbox" name="archive" value="Archive" style={{width:"30px", marginTop:"8px"}}/>
+                        <label htmlFor="archive">Archive Project</label>
+                    </div>
+                     <div className={styles.inputArea}>
+                        <label htmlFor="projectName">Update Project Name:</label>
+                        <input type="text" id="projectName" name="projectName" required />
+                    </div>
+                    <div className={styles.inputArea}>
+                        <label htmlFor="projectDescription">Project Description:</label>
+                        <input type="text" id="projectDescription" name="projectDescription" required />
+                    </div>
+                    <div className={styles.inputArea}>
+                        <label htmlFor="manager">Assign Project Manager</label>
+                        <input list="user_list" name="manager" />
+                        <datalist id="user_list">
+                            {/*
+                                users.map((user) => (
+                                    <option value={user.id}>{user.name}</option>
+                                ))
+                            */}
+                            <option value="John Doe ID:0">John Doe</option>
+                            <option value="Jane Smith ID:1">Jane Smith</option>
+                            <option value="Alice Johnson ID:2">Alice Johnson</option>
+                        </datalist>
+                    </div>
+                </form>
+            </div>
+        );
     }
 
     function createProject() {
@@ -126,15 +178,13 @@ function DashBoard() {
         setModalContent(
             <div>
                 <h2 style={{textAlign: "center"}}>Create a new Project</h2>
-                <form className={styles.createProjectForm} onSubmit={submitProject}>
+                <form className={styles.form} onSubmit={submitProject}>
                     <div className={styles.inputArea}>
                         <label htmlFor="projectName">Project Name:</label>
-                        <br />
                         <input type="text" id="projectName" name="projectName" required />
                     </div>
                     <div className={styles.inputArea}>
                         <label htmlFor="projectDescription">Project Description:</label>
-                        <br />
                         <input type="text" id="projectDescription" name="projectDescription" required />
                     </div>
                     <div style={{ height: "20px" }}></div>
@@ -148,7 +198,7 @@ function DashBoard() {
     }
 
     const left_list = [
-        {item: <Button priority="second" onClick={button_click} disabled={!(userData.role === "GLOBAL_ADMIN")}>Create Project</Button>, onClick: createProject},
+        {item: <Button priority="second" onClick={createProject} disabled={!(userData.role === "GLOBAL_ADMIN")}>Create Project</Button>, onClick: createProject},
     ];
 
     const right_list = [
@@ -199,7 +249,7 @@ function DashBoard() {
                                 <td>John Doe</td>
                                 <td>2023-10-01</td>
                                 <td>2023-10-05</td>
-                                <td><img src={settings_icon} alt="settings" style={{height: "25px"}} onClick={() => {setShowModal(true)}} /></td>
+                                <td><img src={settings_icon} alt="settings" style={{height: "25px"}} onClick={() => {project_settings("")}} /></td>
                             </tr>
                             <tr className={styles.oddRow}>
                                 <td>Project 1</td>
