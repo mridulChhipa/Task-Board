@@ -72,7 +72,7 @@ const generateAuthTokens = (
     expiresIn: 7 * 24 * 60 * 60,
   });
 
-  return { accessToken, refreshToken };
+  return { accessToken, refreshToken, userId };
 };
 
 export { signToken, verifyToken, generateAuthTokens };
