@@ -38,6 +38,7 @@ export interface UserDetails {
   name: string;
   email: string;
   avatar: string | null;
+  globalRole: string;
 }
 
 export interface UserWithProjs {

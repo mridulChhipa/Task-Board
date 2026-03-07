@@ -162,11 +162,8 @@ export class AuthService {
         where: {
           id: userId,
         },
-        select: {
-          name: true,
-          email: true,
+        include: {
           projects: true,
-          avatar: true,
         },
       });
 
@@ -196,9 +193,10 @@ export class AuthService {
         }
 
         allProjs.push({
+          id: currProj.id,
           name: currProj.name,
           description: currProj.description ?? '',
-          role: membership.role as unknown as ProjectRole,
+          role: membership.role as ProjectRole,
           members: allMembers,
         });
       }
@@ -208,6 +206,7 @@ export class AuthService {
           name: rawUserData.name,
           email: rawUserData.email,
           avatar: rawUserData.avatar,
+          globalRole: rawUserData.globalRole,
         },
         projectData: allProjs,
       };

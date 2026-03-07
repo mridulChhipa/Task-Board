@@ -1,20 +1,22 @@
 .button {
-  padding-left: 20px;
-  padding-right: 20px;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
+  padding: 14px 36px;
+  font-size: 16px;
+  font-weight: 600;
   border: none;
-  outline: none;
-  border-radius: 10px;
-  height: 45px;
-  transition:
-    background-color 0.2s ease,
-    transform 0.1s ease;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
-.button:active {
+.button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.button:active:not(:disabled) {
   transform: scale(0.97);
 }
 
@@ -26,26 +28,29 @@
 
 .first {
   color: white;
-  font-size: medium;
-  background-color: #a00000;
+  background-color: #2563eb;
 }
 
-.first:hover {
-  background-color: #700000;
+.first:hover:not(:disabled) {
+  background-color: #1d4ed8;
 }
 
 .second {
   color: white;
-  font-size: medium;
-  background-color: #0000ff;
+  background-color: #4f46e5;
 }
 
-.second:hover {
-  background-color: #0000a0;
+.second:hover:not(:disabled) {
+  background-color: #3730a3;
 }
 
 .third {
-  color: black;
-  font-size: medium;
+  color: #2563eb;
   background-color: transparent;
+  border: 2px solid #2563eb;
+}
+
+.third:hover:not(:disabled) {
+  background-color: #2563eb;
+  color: white;
 }

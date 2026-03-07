@@ -1,42 +1,97 @@
 import styles from "./Navbar.module.css";
 import logo from "../../assets/logo.png";
-import type { ReactNode } from "react";
-import { useNavigate } from "react-router";
+import { Link, NavLink } from "react-router";
+import { useContext, useState } from "react";
+import { UserContext } from "../../user_data/UserDataContext";
 
-type NavItem = {
-    item: ReactNode;
-    onClick: () => void;
-}
+function NavBar() {
+  const [open, setOpen] = useState(false);
+  const userData = useContext(UserContext);
 
-type NavProps = {
-    left_list: NavItem[];
-    right_list: NavItem[];
-}
-
-function NavBar({left_list, right_list}: NavProps) {
-  const navigate = useNavigate();
   return (
     <nav className={styles.navbar}>
-      <div className={styles.left}>
-        <img src={logo} alt="Task Board Logo" style={{ height: "60px" }} onClick={() => {navigate("/")}} />
-        <h3 style={{ fontSize: "1.5rem", fontWeight: "bold", marginLeft: "0.5rem" }} onClick={() => {navigate("/")}}>Task Board</h3>
-        <div style={{ width: "2rem" }}></div>
-        {left_list.map((item, index) => (
-          <div key={index} onClick={item.onClick} className={styles.nav_item}>
-            {item.item}
+      <div className={styles.containerFluid}>
+        <Link className={styles.navLogo} to='/'>
+          <img src={logo} alt="Task Board Logo" />
+          <button className={styles.navbarToggler} onClick={() => setOpen(!open)}>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              width="24"
+              height="24"
+            >
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </Link>
+        <div
+          className={`${styles.collapse} ${styles.navbarCollapse} ${open ? styles.show : ""
+            }`}
+        >
+          <div className={styles.navbarNav}>
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `${styles.navLink} ${isActive ? styles.active : ""}`
+              }
+            >
+              Home
+            </NavLink>
+
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `${styles.navLink} ${isActive ? styles.active : ""}`
+              }
+
+              onClick={() => {
+                document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              Features
+            </NavLink>
+
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `${styles.navLink} ${isActive ? styles.active : ""}`
+              }
+
+              onClick={() => {
+                document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              About
+            </NavLink>
+
+            <NavLink
+              to="/signin"
+              className={({ isActive }) =>
+                `${styles.navLink} ${isActive ? styles.active : ""}`
+              }
+            >
+              Login
+            </NavLink>
+
+            <NavLink
+              to="/signup"
+              className={({ isActive }) =>
+                `${styles.navLink} ${isActive ? styles.active : ""}`
+              }
+            >
+              Signup
+            </NavLink>
           </div>
-        ))}
-      </div>
-      <div className={styles.right}>
-        {right_list.map((item, index) => (
-          <div key={index} onClick={item.onClick} className={styles.nav_item}>
-            {item.item}
-          </div>
-        ))}
+        </div>
       </div>
     </nav>
   );
 }
 
 export default NavBar;
-export type { NavItem };

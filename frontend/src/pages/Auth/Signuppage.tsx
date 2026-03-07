@@ -1,4 +1,4 @@
-import styles from "./Loginpage.module.css";
+import styles from "./auth.module.css";
 import Button from "../../components/Button/Button";
 import type { SubmitEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,7 +7,7 @@ function SignupPage() {
   const Navigate = useNavigate();
 
   async function submitRegister(e: SubmitEvent) {
-    e.preventDefault(); // To prevent default form behaviour
+    e.preventDefault(); 
     const form_data = new FormData(e.currentTarget as HTMLFormElement);
     const response = await fetch("http://localhost:3000/api/auth/register", {
         method: "POST",

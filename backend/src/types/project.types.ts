@@ -40,8 +40,9 @@ export interface UpdateRoleBody {
 }
 
 export interface ProjectDetails {
+  id: string;
   name: string;
-  description: string;
+  description: string | null;
   role: ProjectRole;
   members: number[];
 }

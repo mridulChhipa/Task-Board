@@ -207,6 +207,19 @@ export class ProjectController {
       next(err);
     }
   }
+
+  async fetchGlobalAdminProjects(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const allProjects = await projectService.fetchGlobalAdminProjects();
+      res.status(200).json({
+        allProjects,
+      });
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const projectController = new ProjectController();

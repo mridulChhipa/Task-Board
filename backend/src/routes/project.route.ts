@@ -75,4 +75,12 @@ projectRouter.delete(
   },
 );
 
+projectRouter.get(
+  '/all-projects',
+  authorizeGlobalAdmin,
+  (req, res, next) => {
+    projectController.fetchGlobalAdminProjects(req, res, next);
+  },
+);
+
 export { projectRouter };

@@ -1,12 +1,14 @@
 import type { Project } from '../../generated/prisma/client';
 import { db } from '../config/db';
-import type {
-  ArchiveBody,
-  AssignUserBody,
-  CreateBody,
-  RemoveUserBody,
-  UpdateBody,
-  UpdateRoleBody,
+import {
+  ProjectRole,
+  type ArchiveBody,
+  type AssignUserBody,
+  type CreateBody,
+  type ProjectDetails,
+  type RemoveUserBody,
+  type UpdateBody,
+  type UpdateRoleBody,
 } from '../types/project.types';
 
 export class ProjectService {
@@ -201,6 +203,31 @@ export class ProjectService {
     } catch (error) {
       console.log(error);
       throw error;
+    }
+  }
+
+  async fetchGlobalAdminProjects(): Promise<ProjectDetails[]> {
+    try {
+      const allGlobalProjects: ProjectDetails[] = [];
+      const allFetches = await db.project.findMany({
+        include: {
+          members: true,
+        }
+      });
+      if (allFetches) {
+        for (const project of allFetches) {
+          allGlobalProjects.push({
+            id: project.id,
+            name: project.name,
+            description: project.description,
+            role: ProjectRole.PROJECT_ADMIN,
+            members: project.members.map(member => member.userId),
+          });
+        }
+      }
+      return allGlobalProjects;
+    } catch (error) {
+      throw new Error("Can't fetch projects for global admin", { cause: error });
     }
   }
 }

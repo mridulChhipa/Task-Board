@@ -116,6 +116,7 @@ export class TaskService {
             senderId: reporter,
             userId: assignee,
             commentId: null,
+            threadId: null,
           });
         }
       }
@@ -137,6 +138,7 @@ export class TaskService {
             senderId: reporter,
             userId: assignee,
             commentId: null,
+            threadId: null,
           });
         }
       }

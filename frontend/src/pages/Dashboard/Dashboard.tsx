@@ -1,8 +1,7 @@
 import Button from "../../components/Button/Button";
 import styles from "./Dashboard.module.css";
-import NavBar from "../../components/NavBar/Navbar";
 import { useContext, useState } from "react";
-import type {JSX} from "react";
+import type { JSX } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../user_data/UserDataContext";
 import default_avatar from "../../assets/default_avatar.png";
@@ -67,7 +66,7 @@ function DashBoard() {
         console.log("Project ID: ", project_id);
         setModalContent(
             <div>
-                <h2 style={{textAlign: "center"}}>Project Settings</h2>
+                <h2 style={{ textAlign: "center" }}>Project Settings</h2>
                 <form className={styles.form}>
                     <div className={styles.inputArea}>
                         <label htmlFor="manager">Assign Project Manager</label>
@@ -84,10 +83,10 @@ function DashBoard() {
                         </datalist>
                     </div>
                     <div className={styles.boxForm}>
-                        <input type="checkbox" name="archive" value="Archive" style={{width:"30px", marginTop:"8px"}}/>
+                        <input type="checkbox" name="archive" value="Archive" style={{ width: "30px", marginTop: "8px" }} />
                         <label htmlFor="archive">Archive Project</label>
                     </div>
-                     <div className={styles.inputArea}>
+                    <div className={styles.inputArea}>
                         <label htmlFor="projectName">Update Project Name:</label>
                         <input type="text" id="projectName" name="projectName" required />
                     </div>
@@ -133,14 +132,14 @@ function DashBoard() {
                     description: projectDescription,
                 }),
             });
-            if(response.ok){
+            if (response.ok) {
                 console.log("Project created successfully");
                 const data = await response.json();
                 const project = data.data;
                 console.log(project);
                 setProjects([...projects, project]);
             }
-            else{
+            else {
                 // refresh token and try again.
                 await fetch("http://localhost:3000/api/auth/refresh", {
                     method: "PATCH",
@@ -163,7 +162,7 @@ function DashBoard() {
                             description: projectDescription,
                         }),
                     });
-                    if(retryResponse.ok){
+                    if (retryResponse.ok) {
                         console.log("Project created successfully");
                         const data = await response.json();
                         const project = data.data;
@@ -177,7 +176,7 @@ function DashBoard() {
 
         setModalContent(
             <div>
-                <h2 style={{textAlign: "center"}}>Create a new Project</h2>
+                <h2 style={{ textAlign: "center" }}>Create a new Project</h2>
                 <form className={styles.form} onSubmit={submitProject}>
                     <div className={styles.inputArea}>
                         <label htmlFor="projectName">Project Name:</label>
@@ -188,8 +187,8 @@ function DashBoard() {
                         <input type="text" id="projectDescription" name="projectDescription" required />
                     </div>
                     <div style={{ height: "20px" }}></div>
-                    <div style={{display: "flex", gap: "1rem"}}>
-                        <Button priority="first" type="submit" onClick={() => {}}>Create</Button>
+                    <div style={{ display: "flex", gap: "1rem" }}>
+                        <Button priority="first" type="submit" onClick={() => { }}>Create</Button>
                         <Button priority="second" onClick={() => setShowModal(false)}>Cancel</Button>
                     </div>
                 </form>
@@ -198,32 +197,35 @@ function DashBoard() {
     }
 
     const left_list = [
-        {item: <Button priority="second" onClick={createProject} disabled={!(userData.role === "GLOBAL_ADMIN")}>Create Project</Button>, onClick: createProject},
+        { item: <Button priority="second" onClick={createProject} disabled={!(userData.role === "GLOBAL_ADMIN")}>Create Project</Button>, onClick: createProject },
     ];
 
     const right_list = [
-        {item: <Button priority="first" onClick={logout}>Logout</Button>, onClick: logout},
-        {item: <img src={userData.avatar === null ? default_avatar : userData.avatar} alt="profile" style={{height: "50px"}}></img>, onClick: () => {navigate('/profile')}},
-        {item: <div className={styles.usernameBlock}> 
-          {<p>{userData.name}</p>}
-          {<p>{userData.email}</p>}
-        </div>, onClick: () => {}},
-        {item: <div>
-            <p>Role: {userData.role}</p>
-        </div>, onClick: () => {}},
-        {item: <img src={settings_icon} alt="settings" style={{height: "35px"}}></img>, onClick: () => {navigate('/settings')}},
+        { item: <Button priority="first" onClick={logout}>Logout</Button>, onClick: logout },
+        { item: <img src={userData.avatar === null ? default_avatar : userData.avatar} alt="profile" style={{ height: "50px" }}></img>, onClick: () => { navigate('/profile') } },
+        {
+            item: <div className={styles.usernameBlock}>
+                {<p>{userData.name}</p>}
+                {<p>{userData.email}</p>}
+            </div>, onClick: () => { }
+        },
+        {
+            item: <div>
+                <p>Role: {userData.role}</p>
+            </div>, onClick: () => { }
+        },
+        { item: <img src={settings_icon} alt="settings" style={{ height: "35px" }}></img>, onClick: () => { navigate('/settings') } },
     ]
 
     return (
         <>
-            <NavBar left_list={left_list} right_list={right_list} />
             {showModal && <Modal onclick={() => setShowModal(false)}>{modalContent}</Modal>}
             <div className={styles.mainContainer}>
                 <div className={styles.dashboard}>
                     <h1>Dashboard</h1>
                     <h2>Welcome, {userData.name}!</h2>
                     <h2>Your Projects</h2>
-                    <div style={{height: "20px"}}></div>
+                    <div style={{ height: "20px" }}></div>
                     <table className={styles.projectTable}>
                         <thead>
                             <tr>
@@ -249,28 +251,28 @@ function DashBoard() {
                                 <td>John Doe</td>
                                 <td>2023-10-01</td>
                                 <td>2023-10-05</td>
-                                <td><img src={settings_icon} alt="settings" style={{height: "25px"}} onClick={() => {project_settings("")}} /></td>
+                                <td><img src={settings_icon} alt="settings" style={{ height: "25px" }} onClick={() => { project_settings("") }} /></td>
                             </tr>
                             <tr className={styles.oddRow}>
                                 <td>Project 1</td>
                                 <td>John Doe</td>
                                 <td>2023-10-01</td>
                                 <td>2023-10-05</td>
-                                <td><img src={settings_icon} alt="settings" style={{height: "25px"}} onClick={() => {setShowModal(true)}} /></td>
+                                <td><img src={settings_icon} alt="settings" style={{ height: "25px" }} onClick={() => { setShowModal(true) }} /></td>
                             </tr>
                             <tr className={styles.evenRow}>
                                 <td>Project 1</td>
                                 <td>John Doe</td>
                                 <td>2023-10-01</td>
                                 <td>2023-10-05</td>
-                                <td><img src={settings_icon} alt="settings" style={{height: "25px"}} onClick={() => {setShowModal(true)}} /></td>
+                                <td><img src={settings_icon} alt="settings" style={{ height: "25px" }} onClick={() => { setShowModal(true) }} /></td>
                             </tr>
                             <tr className={styles.oddRow}>
                                 <td>Project 1</td>
                                 <td>John Doe</td>
                                 <td>2023-10-01</td>
                                 <td>2023-10-05</td>
-                                <td><img src={settings_icon} alt="settings" style={{height: "25px"}} onClick={() => {setShowModal(true)}} /></td>
+                                <td><img src={settings_icon} alt="settings" style={{ height: "25px" }} onClick={() => { setShowModal(true) }} /></td>
                             </tr>
                         </tbody>
                     </table>
