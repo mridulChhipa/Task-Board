@@ -41,7 +41,7 @@ authRouter.get(
     console.log(" ================ \n In the /me route \n ==============");
     if (!authReq.user) return res.status(401).json({ error: 'Not authenticated' });
 
-    res.json({ user: authReq.user });
+    res.json(authReq.user);
   });
 
 authRouter.get(

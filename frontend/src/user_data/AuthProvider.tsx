@@ -60,8 +60,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           credentials: 'include',
         });
 
-        const user: User = await meRes.json();
+        const user = await meRes.json();
         dispatch({ type: 'LOGIN', data: { user, isLoading: false } });
+        console.log(user.user);
       }
       catch (err) {
         console.log('Could not restore user', err);
@@ -75,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <DispatchContext.Provider value={dispatch}>
-      <AuthContext.Provider value={{ user: authData.user, isLoading }}>
+      <AuthContext.Provider value={authData}>
         {children}
       </AuthContext.Provider>
     </DispatchContext.Provider>

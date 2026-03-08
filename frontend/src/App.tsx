@@ -5,11 +5,13 @@ import LoginPage from "./pages/Auth/Loginpage.tsx";
 import DashBoard from "./pages/Dashboard/Dashboard.tsx";
 import NavBar from "./components/NavBar/Navbar.tsx";
 import { AuthProvider } from "./user_data/AuthProvider.tsx";
+import Loader from "./components/ui/Loader.tsx";
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <Loader />
         <NavBar />
 
         <Routes>

@@ -9,6 +9,7 @@ function NavBar() {
   const userData = useContext(AuthContext);
 
   console.log("From Nav,", userData);
+
   return (
     <nav className={styles.navbar}>
       <div className={styles.containerFluid}>
@@ -80,7 +81,7 @@ function NavBar() {
                     `${styles.navLink} ${isActive ? styles.active : ""}`
                   }
                 >
-                  Login
+                  Login {userData.user?.email}
                 </NavLink>
 
                 <NavLink
