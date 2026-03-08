@@ -3,7 +3,7 @@ import styles from "./Dashboard.module.css";
 import { useContext, useState } from "react";
 import type { JSX } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../../user_data/UserDataContext";
+import { AuthContext } from "../../user_data/AuthContext";
 import default_avatar from "../../assets/default_avatar.png";
 import settings_icon from "../../assets/settings_icon.png";
 import Modal from "../../components/Modal/Modal";
@@ -32,20 +32,20 @@ interface Project {
 
 function DashBoard() {
 
-    const userData = useContext(UserContext);
-    // const userDataDispatch = useContext(UserDispatchContext);
+    const authData = useContext(AuthContext);
+    // const userDataDispatch = useContext(DispatchContext);
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
     const [modalContent, setModalContent] = useState<JSX.Element>(<></>);
     const [projects, setProjects] = useState<Project[]>([]);
 
     // async function button_click() {
-    //     console.log(userData.name);
-    //     console.log(userData.email);
-    //     console.log(userData.role);
-    //     console.log(userData.projects);
-    //     console.log(userData.avatar);
-    //     console.log(userData.refreshToken);
+    //     console.log(authData.user.name);
+    //     console.log(authData.user.email);
+    //     console.log(authData.user.role);
+    //     console.log(authData.user.projects);
+    //     console.log(authData.user.avatar);
+    //     console.log(authData.user.refreshToken);
     // }
 
     async function logout() {
@@ -147,10 +147,10 @@ function DashBoard() {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        refreshToken: userData.refreshToken,
+                        // refreshToken: authData.user.refreshToken,
                     }),
                 }).then(async (refreshData) => {
-                    userData.refreshToken = (await refreshData.json()).refreshToken;
+                    // authData.user.refreshToken = (await refreshData.json()).refreshToken;
                     const retryResponse = await fetch("http://localhost:3000/api/project/create", {
                         method: "POST",
                         credentials: "include",
@@ -196,26 +196,26 @@ function DashBoard() {
         );
     }
 
-    const left_list = [
-        { item: <Button priority="second" onClick={createProject} disabled={!(userData.role === "GLOBAL_ADMIN")}>Create Project</Button>, onClick: createProject },
-    ];
+    // const left_list = [
+    //     { item: <Button priority="second" onClick={createProject} disabled={!(authData.user.role === "GLOBAL_ADMIN")}>Create Project</Button>, onClick: createProject },
+    // ];
 
-    const right_list = [
-        { item: <Button priority="first" onClick={logout}>Logout</Button>, onClick: logout },
-        { item: <img src={userData.avatar === null ? default_avatar : userData.avatar} alt="profile" style={{ height: "50px" }}></img>, onClick: () => { navigate('/profile') } },
-        {
-            item: <div className={styles.usernameBlock}>
-                {<p>{userData.name}</p>}
-                {<p>{userData.email}</p>}
-            </div>, onClick: () => { }
-        },
-        {
-            item: <div>
-                <p>Role: {userData.role}</p>
-            </div>, onClick: () => { }
-        },
-        { item: <img src={settings_icon} alt="settings" style={{ height: "35px" }}></img>, onClick: () => { navigate('/settings') } },
-    ]
+    // const right_list = [
+    //     { item: <Button priority="first" onClick={logout}>Logout</Button>, onClick: logout },
+    //     { item: <img src={authData.user.avatar === null ? default_avatar : authData.user.avatar} alt="profile" style={{ height: "50px" }}></img>, onClick: () => { navigate('/profile') } },
+    //     {
+    //         item: <div className={styles.usernameBlock}>
+    //             {<p>{authData.user?.name}</p>}
+    //             {<p>{authData.user?.email}</p>}
+    //         </div>, onClick: () => { }
+    //     },
+    //     {
+    //         item: <div>
+    //             <p>Role: {authData.user.role}</p>
+    //         </div>, onClick: () => { }
+    //     },
+    //     { item: <img src={settings_icon} alt="settings" style={{ height: "35px" }}></img>, onClick: () => { navigate('/settings') } },
+    // ]
 
     return (
         <>
@@ -223,7 +223,7 @@ function DashBoard() {
             <div className={styles.mainContainer}>
                 <div className={styles.dashboard}>
                     <h1>Dashboard</h1>
-                    <h2>Welcome, {userData.name}!</h2>
+                    <h2>Welcome, {authData.user?.email}!</h2>
                     <h2>Your Projects</h2>
                     <div style={{ height: "20px" }}></div>
                     <table className={styles.projectTable}>

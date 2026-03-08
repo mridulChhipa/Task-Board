@@ -1,13 +1,13 @@
 import { useState, useContext } from "react";
 import styles from "./auth.module.css";
 import Button from "../../components/Button/Button";
-import { UserDispatchContext } from "../../user_data/UserDataContext";
+import { DispatchContext } from "../../user_data/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import type { SubmitEvent } from "react";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const dispatch = useContext(UserDispatchContext);
+  const dispatch = useContext(DispatchContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,6 +32,8 @@ export default function LoginPage() {
         throw new Error(`Login failed (${loginRes.status})`);
       }
 
+      // console.log("Hello World!");
+
       const loginData = await loginRes.json();
 
       const userRes = await fetch(`http://localhost:3000/api/auth/${loginData.userId}`, {
@@ -40,6 +42,8 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
       });
 
+      console.log("Hello World!");
+
       if (!userRes.ok) {
         throw new Error("Failed to fetch user data");
       }
@@ -47,15 +51,18 @@ export default function LoginPage() {
       const userData = await userRes.json();
 
       dispatch({
-        action_type: "LOGIN",
+        type: "LOGIN",
         data: {
-          userId: loginData.userId,
-          name: userData.data.personalData.name,
-          email: userData.data.personalData.email,
-          role: userData.data.personalData.globalRole,
-          projects: userData.data.projectData,
-          avatar: userData.data.personalData.avatar,
-          refreshToken: loginData.refreshToken,
+          user: {
+            userId: loginData.userId,
+            name: userData.data.personalData.name,
+            email: userData.data.personalData.email,
+            role: userData.data.personalData.globalRole,
+            projects: userData.data.projectData,
+            avatar: userData.data.personalData.avatar,
+          }, isLoading: false,
+          // refreshToken: loginData.refreshToken,
+          // authenticated: true,
         },
       });
 

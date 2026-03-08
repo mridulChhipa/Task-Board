@@ -13,16 +13,16 @@ export class AuthController {
       const { accessToken, refreshToken, userId } =
         await authService.register(body);
 
-      res.cookie('accessToken', accessToken, {
+      res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: process.env.MODE === 'PRODUCTION',
-        sameSite: process.env.MODE === 'PRODUCTION' ? 'none' : 'lax',
-        maxAge: 15 * 60 * 1000,
+        sameSite: process.env.MODE === 'PRODUCTION' ? 'strict' : 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
       res.status(201).json({
         message: 'User registered successfully',
-        refreshToken,
+        accessToken,
         userId,
       });
 
@@ -38,16 +38,16 @@ export class AuthController {
       const { accessToken, refreshToken, userId } =
         await authService.login(body);
 
-      res.cookie('accessToken', accessToken, {
+      res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: process.env.MODE === 'PRODUCTION',
         sameSite: process.env.MODE === 'PRODUCTION' ? 'none' : 'lax',
-        maxAge: 15 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
       res.status(200).json({
         message: 'User Login successful',
-        refreshToken,
+        accessToken,
         userId,
       });
 
@@ -63,20 +63,27 @@ export class AuthController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const { refreshToken: oldRefreshToken } = req.body;
-      const { accessToken, refreshToken } =
+      const oldRefreshToken = req.cookies.refreshToken
+      if (!oldRefreshToken) {
+        res.status(401).json({ error: 'No refresh token' });
+      }
+
+      // console.log("Old Refresh Token", oldRefreshToken);
+      
+      const { accessToken, refreshToken, userId } =
         await authService.refresh(oldRefreshToken);
 
-      res.cookie('accessToken', accessToken, {
+      res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: process.env.MODE === 'PRODUCTION',
         sameSite: 'strict',
-        maxAge: 15 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
       res.status(200).json({
         message: 'Token Refresh Successfull',
-        refreshToken,
+        accessToken,
+        userId,
       });
 
       next();

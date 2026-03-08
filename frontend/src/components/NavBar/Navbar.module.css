@@ -24,10 +24,16 @@
 .navLogo {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   text-decoration: none;
   font-size: 20px;
   font-weight: 600;
   color: #212529;
+}
+
+.logo_link {
+  display: flex;
+  align-items: center;
 }
 
 .navLogo img {
@@ -75,6 +81,10 @@
 @media (max-width: 992px) {
   .navbarToggler {
     display: block;
+  }
+
+  .navLogo {
+    width: 100%;
   }
 
   .collapse {

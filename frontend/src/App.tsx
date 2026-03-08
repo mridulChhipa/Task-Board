@@ -2,13 +2,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/Homepage/Homepage.tsx";
 import SignupPage from "./pages/Auth/Signuppage.tsx";
 import LoginPage from "./pages/Auth/Loginpage.tsx";
-import UserDataProvider from "./user_data/UserDataWrapper.tsx";
 import DashBoard from "./pages/Dashboard/Dashboard.tsx";
 import NavBar from "./components/NavBar/Navbar.tsx";
+import { AuthProvider } from "./user_data/AuthProvider.tsx";
 
 function App() {
   return (
-    <UserDataProvider>
+    <AuthProvider>
       <BrowserRouter>
         <NavBar />
 
@@ -19,7 +19,7 @@ function App() {
           <Route path="/dashboard" element={<DashBoard />} />
         </Routes>
       </BrowserRouter>
-    </UserDataProvider>
+    </AuthProvider>
   );
 }
 
