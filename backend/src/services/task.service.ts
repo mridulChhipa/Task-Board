@@ -2,7 +2,7 @@ import { db } from '../config/db';
 import { syncStatusWithChildren, toTaskDTO } from '../utils/task.utils';
 import type { Priority, TaskType } from '../../generated/prisma/enums';
 import type { CreateTaskBody, TaskDTO } from '../types/task.types';
-import { notifcationService } from './notification.service';
+import { notificationService } from './notification.service';
 import { NotifType } from '../types/notifcation.types';
 
 export class TaskService {
@@ -110,7 +110,7 @@ export class TaskService {
             },
           });
 
-          await notifcationService.createNotification({
+          await notificationService.createNotification({
             taskId,
             type: NotifType.STATUS_CHANGED,
             senderId: reporter,
@@ -132,7 +132,7 @@ export class TaskService {
             },
           });
 
-          await notifcationService.createNotification({
+          await notificationService.createNotification({
             taskId,
             type: NotifType.TASK_ASSIGNED,
             senderId: reporter,

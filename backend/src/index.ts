@@ -1,19 +1,19 @@
 import 'dotenv/config';
 import { app } from './app';
 import http from 'http';
-import { wsServer } from './websocket/WSServer';
+import { initWSServer, shutdownWSServer } from './websocket/WebsocketsService';
 
 const PORT = process.env.PORT;
 
 const httpServer = http.createServer(app);
-wsServer.init(httpServer);
+initWSServer(httpServer);
 
 httpServer.listen(PORT, () => {
   console.log('Server running on port 3000');
 });
 
 process.on('SIGTERM', () => {
-  wsServer.shutdown();
+  shutdownWSServer();
   httpServer.close();
 });
 

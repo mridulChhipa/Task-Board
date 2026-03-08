@@ -1,6 +1,7 @@
 import { db } from '../config/db';
 import type { NotifBody, NotificationDTO } from '../types/notifcation.types';
 import { toNotifDTO } from '../utils/notification.utils';
+import { sendNotif } from '../websocket/WebsocketsService';
 
 export class NotificationService {
   async createNotification({
@@ -26,6 +27,8 @@ export class NotificationService {
           notificationId: notif.id,
         },
       });
+
+      sendNotif(senderId, [userId], notif.type);
 
       return linkage.id;
     } catch (error) {
@@ -57,4 +60,4 @@ export class NotificationService {
   }
 }
 
-export const notifcationService = new NotificationService();
+export const notificationService = new NotificationService();

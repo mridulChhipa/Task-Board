@@ -212,7 +212,7 @@ export class ProjectService {
       const allFetches = await db.project.findMany({
         include: {
           members: true,
-        }
+        },
       });
       if (allFetches) {
         for (const project of allFetches) {
@@ -221,13 +221,15 @@ export class ProjectService {
             name: project.name,
             description: project.description,
             role: ProjectRole.PROJECT_ADMIN,
-            members: project.members.map(member => member.userId),
+            members: project.members.map((member) => member.userId),
           });
         }
       }
       return allGlobalProjects;
     } catch (error) {
-      throw new Error("Can't fetch projects for global admin", { cause: error });
+      throw new Error("Can't fetch projects for global admin", {
+        cause: error,
+      });
     }
   }
 }
