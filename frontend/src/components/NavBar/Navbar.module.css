@@ -1,11 +1,9 @@
 .navbar {
   width: 100%;
   /* background: #ffffff; */
-  background: linear-gradient(
-    to bottom,
-    rgba(200, 213, 255, 0.35),
-    rgba(137, 143, 255, 0.15)
-  );
+  background: linear-gradient(to bottom,
+      rgba(200, 213, 255, 0.35),
+      rgba(137, 143, 255, 0.15));
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid #ddd;
@@ -78,6 +76,72 @@
 .active {
   font-weight: 600;
   color: #000;
+}
+
+.userSettings {
+  outline: none;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+}
+
+.userSettings:focus {
+  outline: none;
+  border: none;
+  background: transparent;
+}
+
+.userSettingsContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.userSettings:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  list-style: none;
+  padding: 6px;
+  margin: 0;
+  z-index: 10;
+}
+
+.dropItem {
+  margin: 2px 0;
+}
+
+.dropItem a,
+.logout {
+  display: block;
+  padding: 10px 12px;
+  text-decoration: none;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.dropItem a:hover,
+.logout:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.dropdown hr {
+  border: 0;
+  border-top: 1px solid #f1f5f9;
+  margin: 6px 0;
 }
 
 @media (max-width: 992px) {

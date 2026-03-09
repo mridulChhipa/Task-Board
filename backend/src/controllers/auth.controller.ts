@@ -69,7 +69,7 @@ export class AuthController {
       }
 
       // console.log("Old Refresh Token", oldRefreshToken);
-      
+
       const { accessToken, refreshToken, userId } =
         await authService.refresh(oldRefreshToken);
 
@@ -94,9 +94,12 @@ export class AuthController {
 
   async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { refreshToken } = req.body;
+      const refreshToken = req.cookies.refreshToken;
+      // console.log("============\nInside logout controller:", refreshToken, "\n==============");
       await authService.logout(refreshToken);
-      res.clearCookie('accessToken');
+      // console.log("============\nAfter fetching service\n==============");
+
+      res.clearCookie('refreshToken');
       res.status(200).json({
         message: 'User Logout Successfull',
       });

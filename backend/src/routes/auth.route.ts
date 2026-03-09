@@ -21,6 +21,7 @@ authRouter.post(
   '/logout',
   authenticateToken,
   (req: Request, res: Response, next: NextFunction) => {
+    // console.log("=============\nIn logout route\n==============");
     authController.logout(req, res, next);
   },
 );

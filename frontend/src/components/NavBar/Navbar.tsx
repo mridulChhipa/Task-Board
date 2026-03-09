@@ -3,10 +3,13 @@ import logo from '../../assets/logo.png';
 import { Link, NavLink } from 'react-router';
 import { useContext, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
+import settingsIcon from '../../assets/settingsIcon.svg';
+import { useLogout } from '../../utils/auth.utils';
 
 function NavBar() {
   const [open, setOpen] = useState(false);
   const userData = useContext(AuthContext);
+  const logout = useLogout();
 
   console.log('From Nav,', userData);
 
@@ -38,9 +41,8 @@ function NavBar() {
           </button>
         </div>
         <div
-          className={`${styles.collapse} ${styles.navbarCollapse} ${
-            open ? styles.show : ''
-          }`}
+          className={`${styles.collapse} ${styles.navbarCollapse} ${open ? styles.show : ''
+            }`}
         >
           <div className={styles.navbarNav}>
             <NavLink
@@ -110,6 +112,24 @@ function NavBar() {
                 >
                   Dashboard
                 </NavLink>
+
+                <span className={styles.userSettingsContainer}>
+                  <button className={styles.userSettings}>
+                    <img src={settingsIcon} />
+                  </button>
+                  <ul className={styles.dropdown}>
+                    <li className={styles.dropItem}>
+                      <NavLink to='/account'>Account</NavLink>
+                    </li>
+                    <li className={styles.dropItem}>
+                      <NavLink to='/projects'>Projects</NavLink>
+                    </li>
+                    <hr />
+                    <li className={styles.dropItem}>
+                      <span className={styles.logout} onClick={logout}>Logout</span>
+                    </li>
+                  </ul>
+                </span>
               </>
             )}
           </div>
