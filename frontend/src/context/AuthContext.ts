@@ -27,7 +27,7 @@ export interface DispatchType {
 }
 
 export const DispatchContext = createContext<React.Dispatch<DispatchType>>(
-  () => {},
+  () => { },
 );
 
 export function authReducer(
@@ -38,7 +38,13 @@ export function authReducer(
     case 'LOGIN':
       return { ...action.payload };
     case 'LOGOUT':
-      return defaultAuth;
+      return { ...action.payload };
+    case 'LOADING':
+      return { ...action.payload };
+    case 'LOGOUT_FAILURE':
+      return { ...action.payload };
+    case 'REFRESH_FAILURE':
+      return { ...action.payload };
     default:
       return state;
   }

@@ -22,9 +22,11 @@ async function tryRefreshToken(): Promise<Record<string, unknown> | null> {
   })
     .then((res) => {
       if (!res.ok) {
-        return null;
+        throw new Error("No response");
       }
       return res.json();
+    }).catch((err) => {
+      throw err;
     })
     .finally(() => {
       isRefreshing = false;
@@ -59,25 +61,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         // const { accessToken } = await refreshRes.json();
         // const { accessToken } = refreshed;
-        const meRes = await fetch('http://localhost:3000/api/auth/me', {
-          // headers: {
-          //   Authorization: `Bearer ${accessToken}`,
-          // },
-          // method: "GET",
-          credentials: 'include',
-        });
-
-        const user = await meRes.json();
-        dispatch({
-          type: 'LOGIN',
-          payload: {
-            user,
-            isLoading: false,
-          },
-        });
-        console.log(user);
+        await fetch('http://localhost:3000/api/auth/me', { credentials: 'include' })
+          .then((res) => res.json()) // Return the promise here
+          .then((user) => {          // This 'user' is now the actual object
+            dispatch({
+              type: 'LOGIN',
+              payload: { user, isLoading: false },
+            });
+          });
       } catch (err) {
         console.log('Could not restore user', err);
+        
+        dispatch({
+          type: "REFRESH_FAILURE",
+          payload: { ...defaultAuth, isLoading: false },
+        });
       } finally {
         setIsLoading(false);
       }
