@@ -9,6 +9,15 @@ import { boardRouter } from './board.route';
 const projectRouter = Router();
 projectRouter.use(authenticateToken);
 
+projectRouter.get(
+  '/all-projects/global',
+  authorizeGlobalAdmin(),
+  (req, res, next) => {
+    console.log('===========\nIn all projects route\n=============');
+    projectController.fetchGlobalAdminProjects(req, res, next);
+  },
+);
+
 projectRouter.use('/:projectId/board', boardRouter);
 
 projectRouter.post('/create', authorizeGlobalAdmin(), (req, res, next) => {
@@ -74,9 +83,5 @@ projectRouter.delete(
     projectController.deleteProject(req, res, next);
   },
 );
-
-projectRouter.get('/all-projects', authorizeGlobalAdmin, (req, res, next) => {
-  projectController.fetchGlobalAdminProjects(req, res, next);
-});
 
 export { projectRouter };

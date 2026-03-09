@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { authController } from '../controllers/auth.controller';
 import type { Request, Response, NextFunction } from 'express';
 import { authenticateToken } from '../middlewares/guards/auth.guard';
-import { AuthenticatedRequest } from '../types/auth.types';
+import type { AuthenticatedRequest } from '../types/auth.types';
 
 const authRouter = Router();
 
@@ -39,9 +39,10 @@ authRouter.get(
   (req: Request, res: Response, next: NextFunction) => {
     const authReq = req as AuthenticatedRequest;
     console.log(' ================ \n In the /me route \n ==============');
-    if (!authReq.user)
+    if (!authReq.user) {
       return res.status(401).json({ error: 'Not authenticated' });
-
+    }
+    void next;
     res.json(authReq.user);
   },
 );

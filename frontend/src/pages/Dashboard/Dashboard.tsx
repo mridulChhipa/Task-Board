@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState, type SubmitEvent } from 'react';
-import { AuthContext } from '../../context/AuthContext';
+import { AuthContext, DispatchContext } from '../../context/AuthContext';
 import { useFetchUser } from '../../utils/auth.utils';
 import { Link } from 'react-router-dom';
 import type { Project } from '../../types/project.types';
@@ -13,6 +13,8 @@ import CreateProject from '../../components/Projects/CreateProject';
 
 function DashBoard() {
   const { user } = useContext(AuthContext);
+  const dispatch = useContext(DispatchContext);
+
   const [showCreateModal, setShowCreateModal] = useState(false);
   // const [projects, setProjects] = useState<Project[]>([]);
   const [name, setName] = useState('');
@@ -26,12 +28,13 @@ function DashBoard() {
     if (userId) {
       fetchUser();
     }
+    void user;
     // console.log("From dashboard", userId);
     // if (user) {
     //   setProjects(user.projects as Project[]);
     // }
     // using useState in a useEffect causes performance issues due to re-renders
-  }, [userId, fetchUser]);
+  }, [userId, user, fetchUser]);
 
   async function handleCreate(e: SubmitEvent) {
     e.preventDefault();
@@ -50,22 +53,50 @@ function DashBoard() {
       })
         .then((res) => res.json())
         .then((resJson) => {
-          console.log(resJson);
-          // const project = resJson.data;
-          // fetchUser();
-          // setProjects([...projects, project]);
+          // console.log(resJson);
+          const project: Project = resJson.data;
+          // console.log(project);
+
+          const newProj: Project = {
+            name: project.name,
+            description: project.description,
+            role: 'PROJECT_ADMIN',
+            members: [],
+            id: project.id,
+            isArchived: false,
+          };
+
+          if (user) {
+            const updatedUser = {
+              ...user,
+              projects: [...user.projects, newProj],
+            };
+
+            console.log(updatedUser);
+
+            dispatch({
+              type: 'PROJECT_CREATED',
+              payload: {
+                user: updatedUser,
+                isLoading: false,
+              },
+            });
+          }
         })
         .catch((err) => {
           throw new Error('Error creating project', { cause: err });
         })
-        .finally(() => setShowCreateModal(false));
+        .finally(() => {
+          setShowCreateModal(false);
+          setName('');
+          setDescription('');
+        });
     } catch (err) {
-      throw new Error("Can createz: ", { cause: err });
+      throw new Error('Can createz: ', { cause: err });
     } finally {
       setShowCreateModal(false);
     }
   }
-
 
   return (
     <>
@@ -86,7 +117,9 @@ function DashBoard() {
         <div className={styles.dashboard}>
           <div className={styles.projectHeader}>
             <h2>Projects</h2>
-            <Button onClick={() => setShowCreateModal(true)}>Create Project</Button>
+            <Button onClick={() => setShowCreateModal(true)}>
+              Create Project
+            </Button>
           </div>
           <table className={styles.projectTable}>
             <thead>
@@ -131,7 +164,7 @@ function DashBoard() {
                       src={settingsIcon}
                       alt="settings"
                       style={{ height: '25px' }}
-                    // onClick={() => setShowModal(true)}
+                      // onClick={() => setShowModal(true)}
                     />
                   </td>
                 </tr>

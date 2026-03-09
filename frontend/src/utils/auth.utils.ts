@@ -4,6 +4,7 @@ import {
   defaultAuth,
   DispatchContext,
 } from '../context/AuthContext';
+import type { Project } from '../types/project.types';
 
 export function useLogout() {
   const dispatch = useContext(DispatchContext);
@@ -62,7 +63,7 @@ export function useFetchUser() {
       payload: { user, isLoading: true },
     });
 
-    console.log(user);
+    // console.log(user);
     try {
       const userRes = await fetch(
         `http://localhost:3000/api/auth/${user?.userId}`,
@@ -78,6 +79,28 @@ export function useFetchUser() {
       }
 
       const userData = await userRes.json();
+      let allProjects: Project[] = userData.data.projectData;
+
+      if (userData.data.personalData.globalRole === 'GLOBAL_ADMIN') {
+        // console.log('Trying to fetch global admin project');
+        const globalRes = await fetch(
+          'http://localhost:3000/api/project/all-projects/global',
+          {
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+          },
+        );
+
+        if (!globalRes.ok) {
+          throw new Error("Can't Fetch all projects");
+        }
+        // console.log('Done fetching');
+
+        const data = await globalRes.json();
+        allProjects = await data.allProjects;
+        // console.log('All Projects', allProjects);
+        userData.data.personalData.projectData = allProjects;
+      }
 
       dispatch({
         type: 'LOGIN',
@@ -88,14 +111,14 @@ export function useFetchUser() {
             name: userData.data.personalData.name,
             email: userData.data.personalData.email,
             role: userData.data.personalData.globalRole,
-            projects: userData.data.projectData,
+            projects: allProjects,
             avatar: userData.data.personalData.avatar,
           },
           isLoading: false,
         },
       });
     } catch (err) {
-      console.error('Logout Error:', err);
+      console.error('Fetch User Error:', err);
 
       dispatch({
         type: 'REFRESH_FAILURE',

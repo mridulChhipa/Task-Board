@@ -46,6 +46,8 @@ export function authReducer(
       return { ...action.payload };
     case 'REFRESH_FAILURE':
       return { ...action.payload };
+    case 'PROJECT_CREATED':
+      return { ...action.payload };
     default:
       return state;
   }

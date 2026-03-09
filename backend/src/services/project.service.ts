@@ -176,7 +176,7 @@ export class ProjectService {
       });
 
       if (!project) {
-        throw new Error('Project not found');
+        throw new Error('Project not found from get');
       }
       return project;
     } catch (error) {
@@ -192,7 +192,7 @@ export class ProjectService {
       });
 
       if (!project) {
-        throw new Error('Project not found');
+        throw new Error('Project not found from delete');
       }
 
       await db.project.delete({

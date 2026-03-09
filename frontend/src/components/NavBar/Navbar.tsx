@@ -12,7 +12,7 @@ function NavBar() {
   const userData = useContext(AuthContext);
   const logout = useLogout();
 
-  console.log('From Nav,', userData);
+  // console.log('From Nav,', userData);
 
   return (
     <nav className={styles.navbar}>
