@@ -154,10 +154,6 @@ function About() {
   );
 }
 
-// function End() {
-//   return <div style={{ height: "50px" }}></div>;
-// }
-
 function HomePage() {
   return (
     <>
@@ -165,25 +161,20 @@ function HomePage() {
       <div style={{ height: '30px' }}></div>
 
       <div id="features">
-        {
-          <Features
-            children={<Collaboration />}
-            imgSrc={Feature1}
-            imgLoc="right"
-          />
-        }
-        {<Features children={<UsageIntro />} imgSrc={Feature2} imgLoc="left" />}
-        {
-          <Features
-            children={<Notifications />}
-            imgSrc={Feature1}
-            imgLoc="right"
-          />
-        }
+        <Features imgSrc={Feature1} imgLoc="right">
+          <Collaboration />
+        </Features>
+        <Features imgSrc={Feature2} imgLoc="left">
+          <UsageIntro />
+        </Features>
+        <Features imgSrc={Feature1} imgLoc="right">
+          <Notifications />
+        </Features>
       </div>
 
-      <div id="about">{<About />}</div>
-      {/* {<End />} */}
+      <div id="about">
+        <About />
+      </div>
     </>
   );
 }

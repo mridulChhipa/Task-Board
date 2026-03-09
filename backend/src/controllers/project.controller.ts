@@ -208,7 +208,11 @@ export class ProjectController {
     }
   }
 
-  async fetchGlobalAdminProjects(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async fetchGlobalAdminProjects(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const allProjects = await projectService.fetchGlobalAdminProjects();
       res.status(200).json({

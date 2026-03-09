@@ -22,10 +22,11 @@ async function tryRefreshToken(): Promise<Record<string, unknown> | null> {
   })
     .then((res) => {
       if (!res.ok) {
-        throw new Error("No response");
+        throw new Error('No response');
       }
       return res.json();
-    }).catch((err) => {
+    })
+    .catch((err) => {
       throw err;
     })
     .finally(() => {
@@ -61,20 +62,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         // const { accessToken } = await refreshRes.json();
         // const { accessToken } = refreshed;
-        await fetch('http://localhost:3000/api/auth/me', { credentials: 'include' })
+        await fetch('http://localhost:3000/api/auth/me', {
+          credentials: 'include',
+        })
           .then((res) => res.json()) // Return the promise here
-          .then((user) => {          // This 'user' is now the actual object
+          .then((user) => {
+            // This 'user' is now the actual object
             dispatch({
               type: 'LOGIN',
               payload: {
                 user: {
                   userId: user.sub,
                   email: user.email,
-                  name: "",
+                  name: '',
                   projects: [],
-                  avatar: "",
+                  avatar: '',
                   role: user.role,
-                }, isLoading: false
+                },
+                isLoading: false,
               },
             });
           });
@@ -82,7 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.log('Could not restore user', err);
 
         dispatch({
-          type: "REFRESH_FAILURE",
+          type: 'REFRESH_FAILURE',
           payload: { ...defaultAuth, isLoading: false },
         });
       } finally {

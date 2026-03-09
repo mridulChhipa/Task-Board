@@ -42,8 +42,9 @@ function NavBar() {
           </button>
         </div>
         <div
-          className={`${styles.collapse} ${styles.navbarCollapse} ${open ? styles.show : ''
-            }`}
+          className={`${styles.collapse} ${styles.navbarCollapse} ${
+            open ? styles.show : ''
+          }`}
         >
           <div className={styles.navbarNav}>
             <NavLink
@@ -115,26 +116,31 @@ function NavBar() {
                 </NavLink>
 
                 <span className={styles.userSettingsContainer}>
-                  <button className={styles.userSettings} onClick={() => {
-                    setDropOpen(!dropOpen);
-                  }}>
+                  <button
+                    className={styles.userSettings}
+                    onClick={() => {
+                      setDropOpen(!dropOpen);
+                    }}
+                  >
                     <img src={settingsIcon} />
                   </button>
 
-                  {dropOpen &&
+                  {dropOpen && (
                     <ul className={styles.dropdown}>
                       <li className={styles.dropItem}>
-                        <NavLink to='/account'>Account</NavLink>
+                        <NavLink to="/account">Account</NavLink>
                       </li>
                       <li className={styles.dropItem}>
-                        <NavLink to='/projects'>Projects</NavLink>
+                        <NavLink to="/projects">Projects</NavLink>
                       </li>
                       <hr />
                       <li className={styles.dropItem}>
-                        <span className={styles.logout} onClick={logout}>Logout</span>
+                        <span className={styles.logout} onClick={logout}>
+                          Logout
+                        </span>
                       </li>
                     </ul>
-                  }
+                  )}
                 </span>
               </>
             )}

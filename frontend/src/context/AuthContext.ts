@@ -28,7 +28,7 @@ export interface DispatchType {
 }
 
 export const DispatchContext = createContext<React.Dispatch<DispatchType>>(
-  () => { },
+  () => {},
 );
 
 export function authReducer(

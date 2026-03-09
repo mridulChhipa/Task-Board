@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { authService } from '../services/auth.service';
-import type { LoginBody, RegisterBody } from '../types/auth.types';
+import type { LoginBody, RegisterBody, UserDetails } from '../types/auth.types';
 
 export class AuthController {
   async register(
@@ -63,7 +63,7 @@ export class AuthController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const oldRefreshToken = req.cookies.refreshToken
+      const oldRefreshToken = req.cookies.refreshToken;
       if (!oldRefreshToken) {
         res.status(401).json({ error: 'No refresh token' });
       }
@@ -117,12 +117,30 @@ export class AuthController {
   ): Promise<void> {
     try {
       const userId = Number(req.params.userId);
-      console.log("Params console: ", req.params.userId);
+      console.log('Params console: ', req.params.userId);
 
       const fetchedUser = await authService.userDetails(userId);
       res.status(200).json({
         status: 'success',
         data: fetchedUser,
+      });
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateUser(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const body: UserDetails = req.body;
+      await authService.updateUser(body);
+      res.status(200).json({
+        status: 'success',
       });
 
       next();

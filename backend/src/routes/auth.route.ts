@@ -33,17 +33,18 @@ authRouter.patch(
   },
 );
 
-
 authRouter.get(
   '/me',
   authenticateToken,
   (req: Request, res: Response, next: NextFunction) => {
     const authReq = req as AuthenticatedRequest;
-    console.log(" ================ \n In the /me route \n ==============");
-    if (!authReq.user) return res.status(401).json({ error: 'Not authenticated' });
+    console.log(' ================ \n In the /me route \n ==============');
+    if (!authReq.user)
+      return res.status(401).json({ error: 'Not authenticated' });
 
     res.json(authReq.user);
-  });
+  },
+);
 
 authRouter.get(
   '/:userId',
@@ -53,5 +54,12 @@ authRouter.get(
   },
 );
 
+authRouter.patch(
+  '/update-user',
+  authenticateToken,
+  (req: Request, res: Response, next: NextFunction) => {
+    authController.updateUser(req, res, next);
+  },
+);
 
 export { authRouter };

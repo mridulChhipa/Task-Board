@@ -9,6 +9,7 @@ import type {
   AuthToken,
   RegisterBody,
   UserWithProjs,
+  UserDetails,
 } from '../types/auth.types';
 
 import { generateAuthTokens, verifyToken } from '../utils/jwt';
@@ -107,19 +108,23 @@ export class AuthService {
 
   async refresh(refreshToken: string): Promise<AuthToken> {
     try {
-      console.log("================ \n Refresh Token from service for refresh: ", refreshToken, "\n===============");
+      console.log(
+        '================ \n Refresh Token from service for refresh: ',
+        refreshToken,
+        '\n===============',
+      );
 
       const payload = verifyToken(
         refreshToken,
         process.env.JWT_REFRESH_SECRET ?? '',
       );
 
-      console.log("Token \n Verified, ", TokenType.REFRESH, payload.type);
+      console.log('Token \n Verified, ', TokenType.REFRESH, payload.type);
       if (payload.type !== TokenType.REFRESH) {
         throw new Error('Invalid token type');
       }
 
-      console.log("Payload \n Type \nVerified");
+      console.log('Payload \n Type \nVerified');
 
       const session = await db.session.findUnique({
         where: {
@@ -130,7 +135,12 @@ export class AuthService {
         },
       });
 
-      console.log("=======================\nPayload Verified\n", session, refreshToken, "\n=================");
+      console.log(
+        '=======================\nPayload Verified\n',
+        session,
+        refreshToken,
+        '\n=================',
+      );
 
       if (
         !session ||
@@ -165,7 +175,11 @@ export class AuthService {
 
   async userDetails(userId: number): Promise<UserWithProjs> {
     try {
-      console.log("================ \n UserId: ", userId, " \n ==================");
+      console.log(
+        '================ \n UserId: ',
+        userId,
+        ' \n ==================',
+      );
       const rawUserData = await db.user.findUnique({
         where: {
           id: userId,
@@ -222,6 +236,33 @@ export class AuthService {
       return userData;
     } catch (error) {
       console.log('User Details Catch: ', error);
+      throw error;
+    }
+  }
+
+  async updateUser(body: UserDetails): Promise<void> {
+    try {
+      const user = await db.user.findUnique({
+        where: {
+          email: body.email,
+        },
+      });
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      await db.user.update({
+        where: {
+          email: body.email,
+        },
+        data: {
+          name: body.name,
+          avatar: body.avatar,
+        },
+      });
+    } catch (error) {
+      console.error('Error updating user:', error);
       throw error;
     }
   }
