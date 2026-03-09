@@ -1,14 +1,14 @@
-import styles from "./Navbar.module.css";
-import logo from "../../assets/logo.png";
-import { Link, NavLink } from "react-router";
-import { useContext, useState } from "react";
-import { AuthContext } from "../../user_data/AuthContext";
+import styles from './Navbar.module.css';
+import logo from '../../assets/logo.png';
+import { Link, NavLink } from 'react-router';
+import { useContext, useState } from 'react';
+import { AuthContext } from '../../user_data/AuthContext';
 
 function NavBar() {
   const [open, setOpen] = useState(false);
   const userData = useContext(AuthContext);
 
-  console.log("From Nav,", userData);
+  console.log('From Nav,', userData);
 
   return (
     <nav className={styles.navbar}>
@@ -16,7 +16,11 @@ function NavBar() {
         <div className={styles.navLogo}>
           <Link className={styles.logo_link} to="/">
             <img src={logo} alt="Task Board Logo" />
-          </Link>          <button className={styles.navbarToggler} onClick={() => setOpen(!open)}>
+          </Link>{' '}
+          <button
+            className={styles.navbarToggler}
+            onClick={() => setOpen(!open)}
+          >
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -34,14 +38,15 @@ function NavBar() {
           </button>
         </div>
         <div
-          className={`${styles.collapse} ${styles.navbarCollapse} ${open ? styles.show : ""
-            }`}
+          className={`${styles.collapse} ${styles.navbarCollapse} ${
+            open ? styles.show : ''
+          }`}
         >
           <div className={styles.navbarNav}>
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `${styles.navLink} ${isActive ? styles.active : ""}`
+                `${styles.navLink} ${isActive ? styles.active : ''}`
               }
             >
               Home
@@ -50,11 +55,12 @@ function NavBar() {
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `${styles.navLink} ${isActive ? styles.active : ""}`
+                `${styles.navLink} ${isActive ? styles.active : ''}`
               }
-
               onClick={() => {
-                document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
+                document
+                  .getElementById('features')
+                  ?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
               Features
@@ -63,11 +69,12 @@ function NavBar() {
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `${styles.navLink} ${isActive ? styles.active : ""}`
+                `${styles.navLink} ${isActive ? styles.active : ''}`
               }
-
               onClick={() => {
-                document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
+                document
+                  .getElementById('about')
+                  ?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
               About
@@ -78,7 +85,7 @@ function NavBar() {
                 <NavLink
                   to="/signin"
                   className={({ isActive }) =>
-                    `${styles.navLink} ${isActive ? styles.active : ""}`
+                    `${styles.navLink} ${isActive ? styles.active : ''}`
                   }
                 >
                   Login {userData.user?.email}
@@ -87,7 +94,7 @@ function NavBar() {
                 <NavLink
                   to="/signup"
                   className={({ isActive }) =>
-                    `${styles.navLink} ${isActive ? styles.active : ""}`
+                    `${styles.navLink} ${isActive ? styles.active : ''}`
                   }
                 >
                   Signup
@@ -98,14 +105,13 @@ function NavBar() {
                 <NavLink
                   to="/dashboard"
                   className={({ isActive }) =>
-                    `${styles.navLink} ${isActive ? styles.active : ""}`
+                    `${styles.navLink} ${isActive ? styles.active : ''}`
                   }
                 >
                   Dashboard
                 </NavLink>
               </>
             )}
-
           </div>
         </div>
       </div>

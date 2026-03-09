@@ -1,16 +1,16 @@
-import { useState, useContext } from "react";
-import styles from "./auth.module.css";
-import Button from "../../components/Button/Button";
-import { DispatchContext } from "../../user_data/AuthContext";
-import { useNavigate, Link } from "react-router-dom";
-import type { SubmitEvent } from "react";
+import { useState, useContext } from 'react';
+import styles from './auth.module.css';
+import Button from '../../components/Button/Button';
+import { DispatchContext } from '../../user_data/AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
+import type { SubmitEvent } from 'react';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useContext(DispatchContext);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -21,10 +21,10 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const loginRes = await fetch("http://localhost:3000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+      const loginRes = await fetch('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
 
@@ -36,23 +36,26 @@ export default function LoginPage() {
 
       const loginData = await loginRes.json();
 
-      const userRes = await fetch(`http://localhost:3000/api/auth/${loginData.userId}`, {
-        method: "GET",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-      });
+      const userRes = await fetch(
+        `http://localhost:3000/api/auth/${loginData.userId}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
 
-      console.log("Hello World!");
+      console.log('Hello World!');
 
       if (!userRes.ok) {
-        throw new Error("Failed to fetch user data");
+        throw new Error('Failed to fetch user data');
       }
 
       const userData = await userRes.json();
 
       dispatch({
-        type: "LOGIN",
-        data: {
+        type: 'LOGIN',
+        payload: {
           user: {
             userId: loginData.userId,
             name: userData.data.personalData.name,
@@ -60,32 +63,35 @@ export default function LoginPage() {
             role: userData.data.personalData.globalRole,
             projects: userData.data.projectData,
             avatar: userData.data.personalData.avatar,
-          }, isLoading: false,
+          },
+          isLoading: false,
           // refreshToken: loginData.refreshToken,
           // authenticated: true,
         },
       });
 
-      navigate("/dashboard");
+      navigate('/dashboard');
     } catch (err) {
       console.error(err);
-      setError("Login failed. Please check your credentials and try again.");
+      setError('Login failed. Please check your credentials and try again.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
   return (
     <div className={styles.loginform}>
       <div className={styles.formcontainer}>
         <h1>Log in to Task Board</h1>
-        <p style={{ fontSize: "1.1em" }}>
+        <p style={{ fontSize: '1.1em' }}>
           Enter your email and password in the given fields.
         </p>
-        <div style={{ height: "30px" }} />
+        <div style={{ height: '30px' }} />
 
         <form className={styles.form} onSubmit={handleSubmit}>
-          {error && <p style={{ color: "red", marginBottom: "1rem" }}>{error}</p>}
+          {error && (
+            <p style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>
+          )}
 
           <div className={styles.input}>
             <label htmlFor="email">Email:</label>
@@ -102,7 +108,7 @@ export default function LoginPage() {
             />
           </div>
 
-          <div style={{ height: "20px" }} />
+          <div style={{ height: '20px' }} />
 
           <div className={styles.input}>
             <label htmlFor="password">Password:</label>
@@ -119,19 +125,15 @@ export default function LoginPage() {
             />
           </div>
 
-          <div style={{ height: "40px" }} />
+          <div style={{ height: '40px' }} />
 
-          <Button
-            priority="first"
-            type="submit"
-            disabled={isLoading}
-          >
-            {isLoading ? "Logging in..." : "Log In"}
+          <Button priority="first" type="submit" disabled={isLoading}>
+            {isLoading ? 'Logging in...' : 'Log In'}
           </Button>
         </form>
 
-        <div style={{ height: "20px" }} />
-        <p style={{ fontSize: "1.1em" }}>
+        <div style={{ height: '20px' }} />
+        <p style={{ fontSize: '1.1em' }}>
           Don't have an account? <Link to="/signup">Register here</Link>.
         </p>
       </div>

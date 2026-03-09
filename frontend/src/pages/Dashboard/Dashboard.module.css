@@ -1,110 +1,110 @@
-.usernameBlock{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.usernameBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.usernameBlock p{
-    margin: 0;
+.usernameBlock p {
+  margin: 0;
 }
 
-.form{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
 }
 
-.form input{
-    height: 30px;
-    font-size: 1em;
-    width: 400px;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    border-radius: 20px;
+.form input {
+  height: 30px;
+  font-size: 1em;
+  width: 400px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border-radius: 20px;
 }
 
-.form label{
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    margin-top: 8px;
-    /* padding-bottom: 0px; */
-    display: block;
+.form label {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  margin-top: 8px;
+  /* padding-bottom: 0px; */
+  display: block;
 }
 
-.boxForm{
-    display: flex;
-    align-items: left;
-    gap: 10px;
+.boxForm {
+  display: flex;
+  align-items: left;
+  gap: 10px;
 }
 
-.dashboard{
-    display: flex;
-    flex-direction: column;
-    gap: 0rem;
-    padding: 20px;
-    width: 100px;
-    flex-grow: 4;
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 0rem;
+  padding: 20px;
+  width: 100px;
+  flex-grow: 4;
 }
 
-.dashboard h1{
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+.dashboard h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
 }
 
-.dashboard h2{
-    font-size: 1.5rem;
-    margin-bottom: 0.25rem;
+.dashboard h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
 }
 
-.dashboard td{
-    text-align: center;
-    font-size: 1rem;
-    padding-top: 7px;
-    padding-bottom: 7px;
+.dashboard td {
+  text-align: center;
+  font-size: 1rem;
+  padding-top: 7px;
+  padding-bottom: 7px;
 }
 
-.dashboard tr:hover{
-    background-color: #ffd5ff;
-    cursor: pointer;
+.dashboard tr:hover {
+  background-color: #ffd5ff;
+  cursor: pointer;
 }
 
 .dashboard th {
-    background-color: #ffd3ff;
-    font-size: 1.2rem;
-    padding-top: 10px;
-    padding-bottom: 10px;   
+  background-color: #ffd3ff;
+  font-size: 1.2rem;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
-.evenRow{
-    background-color: #fff0ff;
+.evenRow {
+  background-color: #fff0ff;
 }
 
-.oddRow{
-    background-color: #f7ddf7;
+.oddRow {
+  background-color: #f7ddf7;
 }
 
-.mainContainer{
-    display: flex;
-    gap: 20px;
-    flex-direction: row;
+.mainContainer {
+  display: flex;
+  gap: 20px;
+  flex-direction: row;
 }
 
-.sidebar{
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width:50px;
-    flex-grow: 1;
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 50px;
+  flex-grow: 1;
 }
 
-.notifications{
-    height: 40vh;
-    flex-grow: 1;
+.notifications {
+  height: 40vh;
+  flex-grow: 1;
 }
 
-.updates{
-    height: 40vh;
-    flex-grow: 1
+.updates {
+  height: 40vh;
+  flex-grow: 1;
 }

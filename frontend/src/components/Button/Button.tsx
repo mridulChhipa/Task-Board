@@ -1,18 +1,18 @@
-import styles from "./Button.module.css";
-import type { ReactNode } from "react";
+import styles from './Button.module.css';
+import type { ReactNode } from 'react';
 
-type ButtonProps = {
-  children: ReactNode;
-  priority?: "first" | "second" | "third";
-  type?: "button" | "submit" | "reset";
+interface ButtonProps {
+  children?: ReactNode;
+  priority?: string;
+  type?: 'button' | 'submit' | 'reset';
   onClick?: () => void;
   disabled?: boolean;
-};
+}
 
 function Button({
   children,
-  priority = "third",
-  type = "button",
+  priority = 'first',
+  type,
   onClick,
   disabled = false,
 }: ButtonProps) {
