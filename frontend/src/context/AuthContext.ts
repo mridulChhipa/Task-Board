@@ -1,11 +1,12 @@
 import { createContext } from 'react';
+import type { Project } from '../types/project.types';
 
 export interface User {
   userId: number;
   name: string;
   email: string;
   role: 'GLOBAL_ADMIN' | 'USER' | null;
-  projects: string[];
+  projects: Project[];
   avatar: string;
 }
 

@@ -8,6 +8,7 @@ import { useLogout } from '../../utils/auth.utils';
 
 function NavBar() {
   const [open, setOpen] = useState(false);
+  const [dropOpen, setDropOpen] = useState(false);
   const userData = useContext(AuthContext);
   const logout = useLogout();
 
@@ -114,21 +115,26 @@ function NavBar() {
                 </NavLink>
 
                 <span className={styles.userSettingsContainer}>
-                  <button className={styles.userSettings}>
+                  <button className={styles.userSettings} onClick={() => {
+                    setDropOpen(!dropOpen);
+                  }}>
                     <img src={settingsIcon} />
                   </button>
-                  <ul className={styles.dropdown}>
-                    <li className={styles.dropItem}>
-                      <NavLink to='/account'>Account</NavLink>
-                    </li>
-                    <li className={styles.dropItem}>
-                      <NavLink to='/projects'>Projects</NavLink>
-                    </li>
-                    <hr />
-                    <li className={styles.dropItem}>
-                      <span className={styles.logout} onClick={logout}>Logout</span>
-                    </li>
-                  </ul>
+
+                  {dropOpen &&
+                    <ul className={styles.dropdown}>
+                      <li className={styles.dropItem}>
+                        <NavLink to='/account'>Account</NavLink>
+                      </li>
+                      <li className={styles.dropItem}>
+                        <NavLink to='/projects'>Projects</NavLink>
+                      </li>
+                      <hr />
+                      <li className={styles.dropItem}>
+                        <span className={styles.logout} onClick={logout}>Logout</span>
+                      </li>
+                    </ul>
+                  }
                 </span>
               </>
             )}

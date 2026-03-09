@@ -117,6 +117,7 @@ export class AuthController {
   ): Promise<void> {
     try {
       const userId = Number(req.params.userId);
+      console.log("Params console: ", req.params.userId);
 
       const fetchedUser = await authService.userDetails(userId);
       res.status(200).json({

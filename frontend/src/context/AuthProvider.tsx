@@ -66,12 +66,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .then((user) => {          // This 'user' is now the actual object
             dispatch({
               type: 'LOGIN',
-              payload: { user, isLoading: false },
+              payload: {
+                user: {
+                  userId: user.sub,
+                  email: user.email,
+                  name: "",
+                  projects: [],
+                  avatar: "",
+                  role: user.role,
+                }, isLoading: false
+              },
             });
           });
       } catch (err) {
         console.log('Could not restore user', err);
-        
+
         dispatch({
           type: "REFRESH_FAILURE",
           payload: { ...defaultAuth, isLoading: false },
