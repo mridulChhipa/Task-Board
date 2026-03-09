@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { AuthContext } from '../../user_data/AuthContext';
+import { AuthContext } from '../../context/AuthContext';
 
 export default function Loader() {
   const authData = useContext(AuthContext);

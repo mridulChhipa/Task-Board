@@ -2,7 +2,7 @@ import styles from './Navbar.module.css';
 import logo from '../../assets/logo.png';
 import { Link, NavLink } from 'react-router';
 import { useContext, useState } from 'react';
-import { AuthContext } from '../../user_data/AuthContext';
+import { AuthContext } from '../../context/AuthContext';
 
 function NavBar() {
   const [open, setOpen] = useState(false);

@@ -3,7 +3,7 @@ import styles from './Dashboard.module.css';
 import { useContext, useState } from 'react';
 import type { JSX } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../user_data/AuthContext';
+import { AuthContext } from '../../context/AuthContext';
 import default_avatar from '../../assets/default_avatar.png';
 import settings_icon from '../../assets/settings_icon.png';
 import Modal from '../../components/Modal/Modal';

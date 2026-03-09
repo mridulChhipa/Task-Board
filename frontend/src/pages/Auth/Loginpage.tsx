@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import styles from './auth.module.css';
 import Button from '../../components/Button/Button';
-import { DispatchContext } from '../../user_data/AuthContext';
+import { DispatchContext } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import type { SubmitEvent } from 'react';
 
