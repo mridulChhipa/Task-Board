@@ -3,10 +3,12 @@ import type { Project } from '../types/project.types';
 
 export interface ProjectContextType {
   project: Project | null;
+  isLoading: boolean;
 }
 
 export const defaultProject: ProjectContextType = {
   project: null,
+  isLoading: true,
 };
 
 export const ProjectContext = createContext(defaultProject);

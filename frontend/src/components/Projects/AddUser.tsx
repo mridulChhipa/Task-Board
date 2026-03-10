@@ -19,11 +19,11 @@ export default function AddUser({
   operation,
   setOperation,
   userToAdd,
-  setUserToAdd,
-  newRole,
-  setNewRole,
-  handleAdd,
-  setAddUser,
+  // setUserToAdd,
+  // newRole,
+  // setNewRole,
+  // handleAdd,
+  // setAddUser,
 }: Props) {
   return (
     <>

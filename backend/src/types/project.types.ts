@@ -41,8 +41,8 @@ export interface UpdateRoleBody {
 }
 
 export interface Member {
-  id: number,
-  name: Member,
+  id: number;
+  name: Member;
 }
 
 export interface ProjectDetails {
