@@ -187,7 +187,6 @@ function DashBoard() {
 
   async function handleAdd(e: SubmitEvent) {
     // this function should handle both updating user role and adding users and removing users
-    // things are being done by email in frontend and Id in backend... fix irregularity.
     e.preventDefault();
     if(operation === 'Add') {
       try{
