@@ -11,6 +11,7 @@ import settingsIcon from '../../assets/settingsIcon.svg';
 import Modal from '../../components/Modal/Modal';
 import CreateProject from '../../components/Projects/CreateProject';
 import UpdateProject from '../../components/Projects/UpdateProject';
+import AddUser from '../../components/Projects/AddUser';
 
 function DashBoard() {
   const { user } = useContext(AuthContext);
@@ -22,6 +23,9 @@ function DashBoard() {
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [addUser, setAddUser] = useState(false);
+  const [userToAdd, setUserToAdd] = useState(0);
+  const [newRole, setNewRole] = useState('');
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -175,6 +179,78 @@ function DashBoard() {
       setDescription('');
     }
   }
+
+  async function handleAdd(e: SubmitEvent) {
+    e.preventDefault();
+
+    try {
+      const res = await fetch(
+        `http://localhost:3000/api/project/update/${currProject}`,
+        {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: updatedName,
+            description: updatedDesc,
+            isArchived: updatedIsArchived,
+          }),
+        },
+      );
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(
+          `Failed to update project: ${res.status} ${res.statusText} - ${text}`,
+        );
+      }
+
+      const resJson = await res.json();
+      const project: Project = resJson.data;
+
+      const updatedProj: Project = {
+        id: project.id,
+        name: project.name,
+        description: project.description,
+        role: project.role ?? 'PROJECT_ADMIN',
+        members: project.members ?? [],
+        isArchived: project.isArchived,
+      };
+
+      if (user) {
+        // replace the updated project in user's projects (don't append a duplicate)
+        const updatedUser = {
+          ...user,
+          projects: user.projects.map((p) =>
+            p.id === updatedProj.id ? updatedProj : p,
+          ),
+        };
+
+        console.log(updatedUser);
+
+        dispatch({
+          type: 'PROJECT_UPDATED',
+          payload: {
+            user: updatedUser,
+            isLoading: false,
+          },
+        });
+      }
+
+      return project;
+    } catch (err) {
+      console.error('Error updating project:', err);
+      throw err instanceof Error
+        ? err
+        : new Error('Error updating project', { cause: err as any });
+    } finally {
+      setShowUpdateModal(false);
+      setName('');
+      setDescription('');
+    }
+  }
   return (
     <>
       {showCreateModal && (
@@ -201,6 +277,19 @@ function DashBoard() {
             setUpdatedArc={setUpdatedIsArchived}
             setShowUpdateModal={setShowUpdateModal}
             handleUpdate={handleUpdate}
+          />
+        </Modal>
+      )}
+
+      {addUser && (
+        <Modal>
+          <AddUser
+            userToAdd={userToAdd}
+            setUserToAdd={setUserToAdd}
+            newRole={newRole}
+            setNewRole={setNewRole}
+            handleAdd={handleAdd}
+            setAddUser={setAddUser}
           />
         </Modal>
       )}
@@ -243,6 +332,9 @@ function DashBoard() {
                   <td>{project.description}</td>
                   {/* <td>{make_date(project.lastModified)}</td> */}
                   <td style={{ position: 'relative' }}>
+                    <span style={{ position: 'absolute' }}>
+                      <Button onClick={() => { setAddUser(true) }}>+</Button>
+                    </span>
                     <ul className={styles.userList}>
                       {project.members.map((member, memIdx) => (
                         <li className={styles.userListItem} key={memIdx}>
