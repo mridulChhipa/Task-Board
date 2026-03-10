@@ -27,16 +27,16 @@ export interface ArchiveBody {
 }
 
 export interface AssignUserBody {
-  userId: number;
+  userMail: string;
   role: ProjectLevelRole;
 }
 
 export interface RemoveUserBody {
-  userId: number;
+  userMail: string;
 }
 
 export interface UpdateRoleBody {
-  userId: number;
+  userMail: string;
   role: ProjectLevelRole;
 }
 

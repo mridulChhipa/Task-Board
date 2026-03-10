@@ -13,6 +13,8 @@ import CreateProject from '../../components/Projects/CreateProject';
 import UpdateProject from '../../components/Projects/UpdateProject';
 import AddUser from '../../components/Projects/AddUser';
 
+export type Operation = 'Add' | 'Edit' | 'Remove';
+
 function DashBoard() {
   const { user } = useContext(AuthContext);
   const dispatch = useContext(DispatchContext);
@@ -23,8 +25,9 @@ function DashBoard() {
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [operation, setOperation] = useState<Operation>('Add');
   const [addUser, setAddUser] = useState(false);
-  const [userToAdd, setUserToAdd] = useState(0);
+  const [userToAdd, setUserToAdd] = useState('');
   const [newRole, setNewRole] = useState('');
 
   const [name, setName] = useState('');
@@ -183,81 +186,124 @@ function DashBoard() {
   }
 
   async function handleAdd(e: SubmitEvent) {
+    // this function should handle both updating user role and adding users and removing users
+    // things are being done by email in frontend and Id in backend... fix irregularity.
     e.preventDefault();
-
-    try {
-      const res = await fetch(
-        `http://localhost:3000/api/project/update/${currProject}`,
-        {
-          method: 'PATCH',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
+    if(operation === 'Add') {
+      try{
+        const res = await fetch(
+          `http://localhost:3000/api/project/assign-user/${currProject}`,
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userMail: userToAdd,
+              role: newRole,
+            }),
           },
-          body: JSON.stringify({
-            name: updatedName,
-            description: updatedDesc,
-            isArchived: updatedIsArchived,
-          }),
-        },
-      );
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(
-          `Failed to update project: ${res.status} ${res.statusText} - ${text}`,
         );
+
+        if(!res.ok){
+          const test = await res.text();
+          throw new Error(`Failed to assign user: ${res.status} ${res.statusText} - ${test}`);
+        }
+
+        // Update 2 things
+        // added user's project list
+        // project's user list
+        // ask chuppa how to do...
       }
-
-      const resJson = await res.json();
-      const project: Project = resJson.data;
-
-      const updatedProj: Project = {
-        id: project.id,
-        name: project.name,
-        description: project.description,
-        role: project.role ?? 'PROJECT_ADMIN',
-        members: project.members ?? [],
-        isArchived: project.isArchived,
-        boards: [],
-      };
-
-      if (user) {
-        // replace the updated project in user's projects (don't append a duplicate)
-        const updatedUser = {
-          ...user,
-          projects: user.projects.map((p) =>
-            p.id === updatedProj.id ? updatedProj : p,
-          ),
-        };
-
-        console.log(updatedUser);
-
-        dispatch({
-          type: 'PROJECT_UPDATED',
-          payload: {
-            user: updatedUser,
-            isLoading: false,
+      catch(err){
+        throw new Error('Error adding user to project', { cause: err });
+      }
+      finally {
+        setAddUser(false);
+        setUserToAdd('');
+        setNewRole('');
+        setOperation('Add');
+      }
+    }
+    else if(operation === 'Edit') {
+      try{
+        const res = await fetch(
+          `http://localhost:3000/api/project/update-role/${currProject}`,
+          {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userMail: userToAdd,
+              role: newRole,
+            }),
           },
-        });
-      }
+        );
 
-      return project;
-    } catch (err) {
-      console.error('Error updating project:', err);
-      throw err instanceof Error
-        ? err
-        : new Error('Error updating project', { cause: err });
-    } finally {
-      setShowUpdateModal(false);
-      setName('');
-      setDescription('');
+        if(!res.ok){
+          const test = await res.text();
+          throw new Error(`Failed to edit user role: ${res.status} ${res.statusText} - ${test}`);
+        }
+
+        // Update 2 things
+        // edited user's project list: role update
+        // project's user list's role element
+        // ask chuppa how to do...
+      }
+      catch(err){
+        throw new Error('Error editing user role', { cause: err });
+      }
+      finally {
+        setAddUser(false);
+        setUserToAdd('');
+        setNewRole('');
+        setOperation('Add');
+      }
+    }
+    else{
+      try{
+        const res = await fetch(
+          `http://localhost:3000/api/project/remove-user/${currProject}`,
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userMail: userToAdd,
+            }),
+          },
+        );
+
+        if(!res.ok){
+          const test = await res.text();
+          throw new Error(`Failed to remove user: ${res.status} ${res.statusText} - ${test}`);
+        }
+
+        // Update 2 things
+        // added user's project list
+        // project's user list
+        // ask chuppa how to do...
+      }
+      catch(err){
+        throw new Error('Error reomving user from project', { cause: err });
+      }
+      finally {
+        setAddUser(false);
+        setUserToAdd('');
+        setNewRole('');
+        setOperation('Add');
+      }
     }
   }
   return (
     <>
       {showCreateModal && (
-        <Modal>
+        <Modal onclick={() => setShowCreateModal(false)}>
           <CreateProject
             name={name}
             setName={setName}
@@ -270,7 +316,7 @@ function DashBoard() {
       )}
 
       {showUpdateModal && (
-        <Modal>
+        <Modal onclick={() => setShowUpdateModal(false)}>
           <UpdateProject
             updatedName={updatedName}
             setUpdatedName={setUpdatedName}
@@ -285,8 +331,10 @@ function DashBoard() {
       )}
 
       {addUser && (
-        <Modal>
+        <Modal onclick={() => setAddUser(false)}>
           <AddUser
+            operation={operation}
+            setOperation={setOperation}
             userToAdd={userToAdd}
             setUserToAdd={setUserToAdd}
             newRole={newRole}
@@ -341,7 +389,7 @@ function DashBoard() {
                           setAddUser(true);
                         }}
                       >
-                        +
+                        Edit
                       </Button>
                     </span>
                     <ul className={styles.userList}>

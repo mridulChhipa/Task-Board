@@ -89,9 +89,18 @@ export class ProjectService {
   // Membership related services
   async assignUser(
     projectId: string,
-    { userId, role }: AssignUserBody,
+    { userMail, role }: AssignUserBody,
   ): Promise<void> {
     try {
+      const user = await db.user.findUnique({
+        where: {
+          email: userMail,
+        },
+      });
+      if (!user) {
+        throw new Error('User with given email does not exist');
+      }
+      const userId = user.id;
       const existingMember = await db.projectMember.findUnique({
         where: {
           uniqueUser: {
@@ -120,9 +129,18 @@ export class ProjectService {
 
   async removeUser(
     projectId: string,
-    { userId }: RemoveUserBody,
+    { userMail }: RemoveUserBody,
   ): Promise<void> {
     try {
+      const user = await db.user.findUnique({
+        where: {
+          email: userMail,
+        },
+      });
+      if(!user) {
+        throw new Error('User does not exist');
+      }
+      const userId = user.id;
       const existingMember = await db.projectMember.findUnique({
         where: {
           uniqueUser: {
@@ -152,9 +170,18 @@ export class ProjectService {
 
   async updateUserRole(
     projectId: string,
-    { userId, role }: UpdateRoleBody,
+    { userMail, role }: UpdateRoleBody,
   ): Promise<void> {
     try {
+      const user = await db.user.findUnique({
+        where: {
+          email: userMail,
+        },
+      });
+      if(!user) {
+        throw new Error('User does not exist');
+      }
+      const userId = user.id;
       const existingMember = await db.projectMember.findUnique({
         where: {
           uniqueUser: {

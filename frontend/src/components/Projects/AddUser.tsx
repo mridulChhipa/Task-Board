@@ -1,10 +1,14 @@
-import { use, type SubmitEventHandler } from 'react';
+import { type SubmitEventHandler } from 'react';
 import Button from '../Button/Button';
 import styles from './CreateProject.module.css';
+import type { Operation } from '../../pages/Dashboard/Dashboard';
+
 
 interface Props {
-  userToAdd: number;
-  setUserToAdd: React.Dispatch<React.SetStateAction<number>>;
+  operation: Operation;
+  setOperation: React.Dispatch<React.SetStateAction<Operation>>;
+  userToAdd: string;
+  setUserToAdd: React.Dispatch<React.SetStateAction<string>>;
   newRole: string;
   setNewRole: React.Dispatch<React.SetStateAction<string>>;
   handleAdd: SubmitEventHandler;
@@ -12,6 +16,8 @@ interface Props {
 }
 
 export default function AddUser({
+  operation,
+  setOperation,
   userToAdd,
   setUserToAdd,
   newRole,
@@ -19,5 +25,65 @@ export default function AddUser({
   handleAdd,
   setAddUser,
 }: Props) {
-  return <>{void userToAdd}</>;
+  return (
+    <>
+      <select value={operation} onChange={(e) => setOperation(e.target.value as Operation)}>
+        <option value='Add'>Add User</option>
+        <option value='Edit'>Edit User Role</option>
+        <option value='Remove'>Remove User</option>
+      </select>
+      <h2
+        style={{
+          textAlign: 'center',
+          marginBottom: '1.5rem',
+          fontWeight: '700',
+        }}
+      >
+        {operation === 'Add' && 'Add User'}
+        {operation === 'Edit' && 'Edit User Role'}
+        {operation === 'Remove' && 'Remove User'}
+      </h2>
+      <form className={styles.createForm} onSubmit={handleAdd}>
+        <div className={styles.inputArea}>
+          <label htmlFor="name" className={styles.label}>
+            User e-mail:
+          </label>
+          <input 
+            type='email' 
+            placeholder='e.g. john_doe@taskboard.com'
+            value={userToAdd} 
+            onChange={(e) => setUserToAdd(e.target.value)} 
+            required 
+            className={styles.formControl} 
+          />
+        </div>
+
+        {(operation !== 'Remove') && <div className={styles.inputArea}>
+          <label htmlFor="newRole" className={styles.label}>
+            Project Role:
+          </label>
+          <select value={newRole} onChange={(e) => setNewRole(e.target.value)}>
+            <option value="PROJECT_ADMIN">Admin</option>
+            <option value="PROJECT_MEMBER">Member</option>
+            <option value="PROJECT_VIEWER">Viewer</option>
+          </select>
+        </div>}
+
+        <div className={styles.buttonGroup}>
+          <Button
+            priority="second"
+            type="button"
+            onClick={() => setAddUser(false)}
+          >
+            Cancel
+          </Button>
+          <Button priority="first" type="submit">
+            {operation === 'Add' && 'Add User'}
+            {operation === 'Edit' && 'Edit User Role'}
+            {operation === 'Remove' && 'Remove User'}
+          </Button>
+        </div>
+      </form>
+    </>
+  );
 }

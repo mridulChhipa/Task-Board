@@ -8,3 +8,5 @@ to update, pass the project id through url and updated name, description as json
 setarchive: project id in url and archive status in request body as json.
 
 insert sorting functionality in table headers if time permits.
+
+incorporate try catch blocks to catch all these random errors we've been throwing everywhere.
