@@ -20,7 +20,7 @@ export interface ProjectDispatchType {
 
 export const ProjectDispatchContext = createContext<
   React.Dispatch<ProjectDispatchType>
->(() => { });
+>(() => {});
 
 export function projectReducer(
   state: ProjectContextType,

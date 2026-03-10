@@ -39,7 +39,6 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     }
 
     fetchProj();
-
   }, [pid]);
 
   return (

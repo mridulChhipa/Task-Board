@@ -1,6 +1,4 @@
-import { use, type SubmitEventHandler } from 'react';
-import Button from '../Button/Button';
-import styles from './CreateProject.module.css';
+import type { SubmitEventHandler } from 'react';
 
 interface Props {
   userToAdd: number;
@@ -13,11 +11,11 @@ interface Props {
 
 export default function AddUser({
   userToAdd,
-  setUserToAdd,
-  newRole,
-  setNewRole,
-  handleAdd,
-  setAddUser,
+  // setUserToAdd,
+  // newRole,
+  // setNewRole,
+  // handleAdd,
+  // setAddUser,
 }: Props) {
   return <>{void userToAdd}</>;
 }

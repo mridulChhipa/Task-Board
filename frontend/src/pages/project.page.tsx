@@ -6,8 +6,12 @@ import Modal from '../components/Modal/Modal';
 import AddBoard from '../components/Projects/AddBoard';
 import { fetchBoard } from '../utils/board.utils';
 import type { SubmitEvent } from 'react';
-import { ProjectContext, ProjectDispatchContext } from '../context/ProjectContext';
+import {
+  ProjectContext,
+  ProjectDispatchContext,
+} from '../context/ProjectContext';
 import type { Board, Project } from '../types/project.types';
+import Boards from '../components/Boards/Boards';
 
 export default function ProjectPage() {
   // const { pid } = useParams();
@@ -27,7 +31,6 @@ export default function ProjectPage() {
   // if (!project) {
   //   return <div>Loading...</div>;
   // }
-
 
   const dispatch = useContext(ProjectDispatchContext);
   const { project } = useContext(ProjectContext);
@@ -67,14 +70,14 @@ export default function ProjectPage() {
       const updatedProj: Project = {
         ...project,
         boards: updatedBoards,
-      }
+      };
 
       dispatch({
-        type: "APPEND_BOARD",
+        type: 'APPEND_BOARD',
         payload: {
           project: updatedProj,
           isLoading: false,
-        }
+        },
       });
 
       setShowAddModal(false);
@@ -85,9 +88,7 @@ export default function ProjectPage() {
   }
 
   if (!project) {
-    return (
-      <div>Loading</div>
-    );
+    return <div>Loading</div>;
   }
 
   return (
@@ -104,18 +105,12 @@ export default function ProjectPage() {
       )}
       <div className={styles.container}>
         <div className={styles.projectHeader}>
-          <h1>{project?.name}</h1>
-          <span className={styles.desc}>{project?.description}</span>
+          <h1>{project.name}</h1>
+          <span className={styles.desc}>{project.description}</span>
           <Button onClick={() => setShowAddModal(true)}>Add Board</Button>
         </div>
         <hr />
-        {project?.boards?.map((board, idx) => {
-          return (
-            <div key={idx} className={styles.board}>
-              {board.name}
-            </div>
-          );
-        })}
+        <Boards boards={project.boards ?? []} />
       </div>
     </>
   );

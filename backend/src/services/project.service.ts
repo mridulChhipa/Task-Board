@@ -50,7 +50,7 @@ export class ProjectService {
         throw new Error("Can't update");
       }
 
-      let retProj: ProjectDetails = {
+      const retProj: ProjectDetails = {
         id: updatedProject.id,
         name: updatedProject.name,
         description: updatedProject.description,
@@ -196,7 +196,7 @@ export class ProjectService {
         include: {
           members: true,
           boards: true,
-        }
+        },
       });
 
       if (!project) {
