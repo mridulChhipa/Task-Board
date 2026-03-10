@@ -10,13 +10,19 @@ import dummyAvater from '../../assets/dummyAvatar.svg';
 import settingsIcon from '../../assets/settingsIcon.svg';
 import Modal from '../../components/Modal/Modal';
 import CreateProject from '../../components/Projects/CreateProject';
+import UpdateProject from '../../components/Projects/UpdateProject';
 
 function DashBoard() {
   const { user } = useContext(AuthContext);
   const dispatch = useContext(DispatchContext);
+  const [currProject, setCurrProject] = useState('');
+  const [updatedName, setUpdatedName] = useState('');
+  const [updatedDesc, setUpdatedDesc] = useState('');
+  const [updatedIsArchived, setUpdatedIsArchived] = useState(false);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  // const [projects, setProjects] = useState<Project[]>([]);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
@@ -98,6 +104,77 @@ function DashBoard() {
     }
   }
 
+  async function handleUpdate(e: SubmitEvent) {
+    e.preventDefault();
+
+    try {
+      const res = await fetch(
+        `http://localhost:3000/api/project/update/${currProject}`,
+        {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: updatedName,
+            description: updatedDesc,
+            isArchived: updatedIsArchived,
+          }),
+        },
+      );
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(
+          `Failed to update project: ${res.status} ${res.statusText} - ${text}`,
+        );
+      }
+
+      const resJson = await res.json();
+      const project: Project = resJson.data;
+
+      const updatedProj: Project = {
+        id: project.id,
+        name: project.name,
+        description: project.description,
+        role: project.role ?? 'PROJECT_ADMIN',
+        members: project.members ?? [],
+        isArchived: project.isArchived,
+      };
+
+      if (user) {
+        // replace the updated project in user's projects (don't append a duplicate)
+        const updatedUser = {
+          ...user,
+          projects: user.projects.map((p) =>
+            p.id === updatedProj.id ? updatedProj : p,
+          ),
+        };
+
+        console.log(updatedUser);
+
+        dispatch({
+          type: 'PROJECT_UPDATED',
+          payload: {
+            user: updatedUser,
+            isLoading: false,
+          },
+        });
+      }
+
+      return project;
+    } catch (err) {
+      console.error('Error updating project:', err);
+      throw err instanceof Error
+        ? err
+        : new Error('Error updating project', { cause: err as any });
+    } finally {
+      setShowUpdateModal(false);
+      setName('');
+      setDescription('');
+    }
+  }
   return (
     <>
       {showCreateModal && (
@@ -109,6 +186,21 @@ function DashBoard() {
             setDescription={setDescription}
             setShowCreateModal={setShowCreateModal}
             handleCreate={handleCreate}
+          />
+        </Modal>
+      )}
+
+      {showUpdateModal && (
+        <Modal>
+          <UpdateProject
+            updatedName={updatedName}
+            setUpdatedName={setUpdatedName}
+            updatedDesc={updatedDesc}
+            setUpdatedDesc={setUpdatedDesc}
+            updatedArc={updatedIsArchived}
+            setUpdatedArc={setUpdatedIsArchived}
+            setShowUpdateModal={setShowUpdateModal}
+            handleUpdate={handleUpdate}
           />
         </Modal>
       )}
@@ -164,7 +256,12 @@ function DashBoard() {
                       src={settingsIcon}
                       alt="settings"
                       style={{ height: '25px' }}
-                      // onClick={() => setShowModal(true)}
+                      onClick={() => {
+                        setCurrProject(project.id);
+                        setUpdatedDesc(project.description);
+                        setUpdatedName(project.name);
+                        setShowUpdateModal(true);
+                      }}
                     />
                   </td>
                 </tr>

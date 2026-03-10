@@ -29,18 +29,38 @@ export class ProjectService {
 
   async update(
     projectId: string,
-    { name, description }: UpdateBody,
-  ): Promise<void> {
+    { name, description, isArchived }: UpdateBody,
+  ): Promise<ProjectDetails> {
     try {
-      await db.project.update({
+      const updatedProject = await db.project.update({
         data: {
           name,
           description,
+          isArchived,
         },
         where: {
           id: projectId,
         },
+        include: {
+          members: true,
+        },
       });
+
+      if (!updatedProject) {
+        throw new Error("Can't update");
+      }
+
+      let retProj: ProjectDetails = {
+        id: updatedProject.id,
+        name: updatedProject.name,
+        description: updatedProject.description,
+        isArchived: updatedProject.isArchived,
+        members: updatedProject.members.map((member) => {
+          return member.userId;
+        }),
+      };
+
+      return retProj;
     } catch (error) {
       console.log(error);
       throw error;
@@ -222,6 +242,7 @@ export class ProjectService {
             description: project.description,
             role: ProjectRole.PROJECT_ADMIN,
             members: project.members.map((member) => member.userId),
+            isArchived: project.isArchived,
           });
         }
       }

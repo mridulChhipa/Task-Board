@@ -35,20 +35,21 @@ export function authReducer(
   state: AuthContextType,
   action: DispatchType,
 ): AuthContextType {
-  switch (action.type) {
-    case 'LOGIN':
-      return { ...action.payload };
-    case 'LOGOUT':
-      return { ...action.payload };
-    case 'LOADING':
-      return { ...action.payload };
-    case 'LOGOUT_FAILURE':
-      return { ...action.payload };
-    case 'REFRESH_FAILURE':
-      return { ...action.payload };
-    case 'PROJECT_CREATED':
-      return { ...action.payload };
-    default:
-      return state;
-  }
+  // switch (action.type) {
+  //   case 'LOGIN':
+  //     return { ...action.payload };
+  //   case 'LOGOUT':
+  //     return { ...action.payload };
+  //   case 'LOADING':
+  //     return { ...action.payload };
+  //   case 'LOGOUT_FAILURE':
+  //     return { ...action.payload };
+  //   case 'REFRESH_FAILURE':
+  //     return { ...action.payload };
+  //   case 'PROJECT_CREATED':
+  //     return { ...action.payload };
+  //   default:
+  //     return state;
+  // }
+  return { ...action.payload };
 }

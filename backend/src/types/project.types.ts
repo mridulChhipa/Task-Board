@@ -19,6 +19,7 @@ export interface CreateBody {
 export interface UpdateBody {
   name: string;
   description: string;
+  isArchived: boolean;
 }
 
 export interface ArchiveBody {
@@ -43,6 +44,7 @@ export interface ProjectDetails {
   id: string;
   name: string;
   description: string | null;
-  role: ProjectRole;
+  role?: ProjectRole;
   members: number[];
+  isArchived: boolean;
 }
