@@ -66,11 +66,9 @@ function Collaboration() {
     <>
       <h2>Team Collaboration</h2>
       <p>
-        {' '}
         Work together in a team to complete big projects one task at a time.
       </p>
       <p>
-        {' '}
         Task Board offers roles like Global Admin, Project Admin, Project
         Member, and Project Viewer each having different permissions, to
         maintain smooth workflow and management.
@@ -86,7 +84,7 @@ function UsageIntro() {
       <p>A Kanban Board divides big project into smaller tasks</p>
       <p>
         Each task goes through a workflow, typically To-Do, In Progress,
-        Testing, Done{' '}
+        Testing, Done
       </p>
       <p>Complete tasks to slowly build up your project!</p>
     </>
@@ -129,7 +127,7 @@ function About() {
         </p>
 
         <p>
-          The source code is available on{' '}
+          The source code is available on
           <a
             href="https://github.com/mridulchippa/Task-Board"
             target="_blank"
@@ -137,7 +135,7 @@ function About() {
             className={styles.aboutLink}
           >
             GitHub
-          </a>{' '}
+          </a>
           where you can explore the implementation, contribute, or report
           issues.
         </p>

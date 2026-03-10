@@ -193,6 +193,10 @@ export class ProjectService {
         where: {
           id: projectId,
         },
+        include: {
+          members: true,
+          boards: true,
+        }
       });
 
       if (!project) {

@@ -170,10 +170,10 @@ export class BoardController {
         throw new Error('Invalid type for boardid');
       }
 
-      const fbd = await boardService.fetchBoard(boardId);
+      const board = await boardService.fetchBoard(boardId);
       res.status(200).json({
         status: 'success',
-        fbd,
+        board,
       });
 
       next();

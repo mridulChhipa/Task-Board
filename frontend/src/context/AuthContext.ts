@@ -51,5 +51,6 @@ export function authReducer(
   //   default:
   //     return state;
   // }
+  void state;
   return { ...action.payload };
 }

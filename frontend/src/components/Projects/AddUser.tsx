@@ -19,9 +19,5 @@ export default function AddUser({
   handleAdd,
   setAddUser,
 }: Props) {
-  return (
-    <>
-      {void userToAdd}
-    </>
-  );
+  return <>{void userToAdd}</>;
 }

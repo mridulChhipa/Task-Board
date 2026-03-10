@@ -6,6 +6,8 @@ import DashBoard from './pages/Dashboard/Dashboard.tsx';
 import NavBar from './components/NavBar/Navbar.tsx';
 import { AuthProvider } from './context/AuthProvider.tsx';
 import Loader from './components/ui/Loader.tsx';
+import ProjectPage from './pages/project.page.tsx';
+import { ProjectProvider } from './context/ProjectProvider.tsx';
 
 function App() {
   return (
@@ -19,6 +21,14 @@ function App() {
           <Route path="/signin" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/dashboard" element={<DashBoard />} />
+          <Route
+            path="/project/:pid"
+            element={
+              <ProjectProvider>
+                <ProjectPage />
+              </ProjectProvider>
+            }
+          />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

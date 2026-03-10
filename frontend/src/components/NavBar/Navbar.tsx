@@ -20,7 +20,7 @@ function NavBar() {
         <div className={styles.navLogo}>
           <Link className={styles.logo_link} to="/">
             <img src={logo} alt="Task Board Logo" />
-          </Link>{' '}
+          </Link>
           <button
             className={styles.navbarToggler}
             onClick={() => setOpen(!open)}

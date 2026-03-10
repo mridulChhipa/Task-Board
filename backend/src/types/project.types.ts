@@ -40,6 +40,11 @@ export interface UpdateRoleBody {
   role: ProjectLevelRole;
 }
 
+export interface Member {
+  id: number,
+  name: Member,
+}
+
 export interface ProjectDetails {
   id: string;
   name: string;

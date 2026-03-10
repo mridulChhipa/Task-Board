@@ -74,6 +74,7 @@ function DashBoard() {
             members: [],
             id: project.id,
             isArchived: false,
+            boards: [],
           };
 
           if (user) {
@@ -145,6 +146,7 @@ function DashBoard() {
         role: project.role ?? 'PROJECT_ADMIN',
         members: project.members ?? [],
         isArchived: project.isArchived,
+        boards: [],
       };
 
       if (user) {
@@ -172,7 +174,7 @@ function DashBoard() {
       console.error('Error updating project:', err);
       throw err instanceof Error
         ? err
-        : new Error('Error updating project', { cause: err as any });
+        : new Error('Error updating project', { cause: err });
     } finally {
       setShowUpdateModal(false);
       setName('');
@@ -217,6 +219,7 @@ function DashBoard() {
         role: project.role ?? 'PROJECT_ADMIN',
         members: project.members ?? [],
         isArchived: project.isArchived,
+        boards: [],
       };
 
       if (user) {
@@ -244,7 +247,7 @@ function DashBoard() {
       console.error('Error updating project:', err);
       throw err instanceof Error
         ? err
-        : new Error('Error updating project', { cause: err as any });
+        : new Error('Error updating project', { cause: err });
     } finally {
       setShowUpdateModal(false);
       setName('');
@@ -333,7 +336,13 @@ function DashBoard() {
                   {/* <td>{make_date(project.lastModified)}</td> */}
                   <td style={{ position: 'relative' }}>
                     <span style={{ position: 'absolute' }}>
-                      <Button onClick={() => { setAddUser(true) }}>+</Button>
+                      <Button
+                        onClick={() => {
+                          setAddUser(true);
+                        }}
+                      >
+                        +
+                      </Button>
                     </span>
                     <ul className={styles.userList}>
                       {project.members.map((member, memIdx) => (
