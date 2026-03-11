@@ -1,7 +1,8 @@
 import { type SubmitEventHandler } from 'react';
 import Button from '../Button/Button';
 import styles from './CreateProject.module.css';
-import type { Operation } from '../../pages/Dashboard/Dashboard';
+import tableStyles from '../../pages/Dashboard/Dashboard.module.css';
+import type { Operation, ProjectMember } from '../../pages/Dashboard/Dashboard';
 
 
 interface Props {
@@ -13,6 +14,8 @@ interface Props {
   setNewRole: React.Dispatch<React.SetStateAction<string>>;
   handleAdd: SubmitEventHandler;
   setAddUser: React.Dispatch<React.SetStateAction<boolean>>;
+  projectMembers: ProjectMember[];
+  setProjectMembers: React.Dispatch<React.SetStateAction<ProjectMember[]>>;
 }
 
 export default function AddUser({
@@ -24,10 +27,13 @@ export default function AddUser({
   setNewRole,
   handleAdd,
   setAddUser,
+  projectMembers,
+  setProjectMembers,
 }: Props) {
   return (
     <>
       <select value={operation} onChange={(e) => setOperation(e.target.value as Operation)}>
+        <option value='View'>View Users</option>
         <option value='Add'>Add User</option>
         <option value='Edit'>Edit User Role</option>
         <option value='Remove'>Remove User</option>
@@ -42,8 +48,9 @@ export default function AddUser({
         {operation === 'Add' && 'Add User'}
         {operation === 'Edit' && 'Edit User Role'}
         {operation === 'Remove' && 'Remove User'}
+        {operation === 'View' && 'View Users'}
       </h2>
-      <form className={styles.createForm} onSubmit={handleAdd}>
+      {(operation !== 'View') && <form className={styles.createForm} onSubmit={handleAdd}>
         <div className={styles.inputArea}>
           <label htmlFor="name" className={styles.label}>
             User e-mail:
@@ -83,7 +90,21 @@ export default function AddUser({
             {operation === 'Remove' && 'Remove User'}
           </Button>
         </div>
-      </form>
+      </form>}
+      {operation === 'View' && (
+        <table className={tableStyles.projectTable}>
+          <ul className={styles.userList}>
+            {project.members.map((member, memIdx) => (
+              <li className={styles.userListItem} key={memIdx}>
+                {member}
+              </li>
+            ))}
+            <li className={styles.userListItem} key="owner">
+              pednekarojas@gmail.com
+            </li>
+          </ul>
+        </div>
+      )}
     </>
   );
 }

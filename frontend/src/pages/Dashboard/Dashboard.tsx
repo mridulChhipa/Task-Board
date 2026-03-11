@@ -13,7 +13,11 @@ import CreateProject from '../../components/Projects/CreateProject';
 import UpdateProject from '../../components/Projects/UpdateProject';
 import AddUser from '../../components/Projects/AddUser';
 
-export type Operation = 'Add' | 'Edit' | 'Remove';
+export type Operation = 'View' | 'Add' | 'Edit' | 'Remove';
+export type ProjectMember = {
+  email: string;
+  role: string;
+};
 
 function DashBoard() {
   const { user } = useContext(AuthContext);
@@ -29,6 +33,7 @@ function DashBoard() {
   const [addUser, setAddUser] = useState(false);
   const [userToAdd, setUserToAdd] = useState('');
   const [newRole, setNewRole] = useState('');
+  const [projectMembers, setProjectMembers] = useState<ProjectMember[]>([]);
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -214,6 +219,7 @@ function DashBoard() {
         // added user's project list
         // project's user list
         // ask chuppa how to do...
+        
       }
       catch(err){
         throw new Error('Error adding user to project', { cause: err });
@@ -251,6 +257,8 @@ function DashBoard() {
         // edited user's project list: role update
         // project's user list's role element
         // ask chuppa how to do...
+        // use websockets? too much mehnat...
+        // let it be and let update on refresh?
       }
       catch(err){
         throw new Error('Error editing user role', { cause: err });
@@ -340,6 +348,8 @@ function DashBoard() {
             setNewRole={setNewRole}
             handleAdd={handleAdd}
             setAddUser={setAddUser}
+            projectMembers={projectMembers}
+            setProjectMembers={setProjectMembers}
           />
         </Modal>
       )}
@@ -382,22 +392,24 @@ function DashBoard() {
                   <td>{project.description}</td>
                   {/* <td>{make_date(project.lastModified)}</td> */}
                   <td style={{ position: 'relative' }}>
-                    <span style={{ position: 'absolute' }}>
-                      <Button
-                        onClick={() => {
-                          setAddUser(true);
-                        }}
-                      >
-                        Edit
-                      </Button>
-                    </span>
-                    <ul className={styles.userList}>
+                    <Button
+                      onClick={() => {
+                        setAddUser(true);
+                        setCurrProject(project.id);
+                      }}
+                    >
+                      Manage
+                    </Button>
+                    {/* <ul className={styles.userList}>
                       {project.members.map((member, memIdx) => (
                         <li className={styles.userListItem} key={memIdx}>
                           {member}
                         </li>
                       ))}
-                    </ul>
+                      <li className={styles.userListItem} key="owner">
+                        pednekarojas@gmail.com
+                      </li>
+                    </ul> */}
                   </td>
                   <td style={{ display: 'flex', justifyContent: 'center' }}>
                     <img
