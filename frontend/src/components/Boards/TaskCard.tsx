@@ -18,7 +18,6 @@ export function TaskCard({ task }: Props) {
         <span
           className={`${styles.taskTypeBadge} ${styles[`type${task.type}`]}`}
         >
-          {' '}
           {task.type}
         </span>
         <span className={styles.taskId}>{task.id}</span>
@@ -39,7 +38,6 @@ export function TaskCard({ task }: Props) {
         <span
           className={`${styles.taskpriority} ${styles[`priority${task.priority}`]}`}
         >
-          {' '}
           {task.priority}
         </span>
         <div className={styles.taskFooterRight}>

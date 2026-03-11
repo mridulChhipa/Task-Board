@@ -227,7 +227,7 @@ export class ProjectService {
               workflows: {
                 include: {
                   tasks: true,
-                }
+                },
               },
             },
           },

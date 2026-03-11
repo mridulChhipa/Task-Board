@@ -25,7 +25,6 @@ export function KanbanColumn({ workflow, onAddTask }: Props) {
       );
 
       setTasks(results);
-      // console.log(results);
     }
 
     if (workflow.tasks?.length) {
@@ -33,6 +32,7 @@ export function KanbanColumn({ workflow, onAddTask }: Props) {
     }
   }, [workflow.tasks]);
 
+  // console.log(workflow.id,tasks);
   return (
     <div className={styles.kanbanColumn}>
       <div className={styles.columnHeader}>
@@ -51,6 +51,7 @@ export function KanbanColumn({ workflow, onAddTask }: Props) {
         </button>
       </div>
       <div className={styles.columnBody}>
+        {/* {workflow.id} */}
         {tasks.map((task, idx) => (
           <TaskCard key={idx} task={task} />
         ))}

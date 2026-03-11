@@ -201,7 +201,7 @@ export class BoardService {
         id: board.id,
         projectId: board.projectId,
         name: board.name,
-        columns: allCols,
+        workflows: allCols,
       };
 
       console.log(bdto);

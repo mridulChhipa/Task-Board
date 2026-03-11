@@ -63,10 +63,9 @@ export default function ProjectPage() {
       const { bid } = resJson;
 
       const board = await fetchBoard(bid, project.id);
-      // console.log(board);
+      console.log(board);
       const updatedBoards: Board[] = project.boards;
       updatedBoards.push(board);
-
       const updatedProj: Project = {
         ...project,
         boards: updatedBoards,

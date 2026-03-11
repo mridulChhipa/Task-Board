@@ -23,7 +23,9 @@ export function make_date(date: string): string {
 }
 
 export function formatDate(iso: Date) {
-  if (!iso) return null;
+  if (!iso) {
+    return null;
+  }
   const d = new Date(iso);
   return d.toLocaleDateString('en-US', {
     month: 'short',
@@ -33,6 +35,8 @@ export function formatDate(iso: Date) {
 }
 
 export function isOverdue(iso: Date) {
-  if (!iso) return false;
+  if (!iso) {
+    return false;
+  }
   return new Date(iso) < new Date();
 }

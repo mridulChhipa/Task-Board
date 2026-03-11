@@ -10,15 +10,15 @@
 
 :root {
   --bg-app: #111214;
-  --bg-column: #1a1c20;
-  --bg-card: #22252b;
-  --bg-card-hover: #282c34;
-  --bg-badge: #1e2128;
-  --border: #2e3138;
-  --border-card: #303540;
-  --text-primary: #e8eaf0;
-  --text-muted: #7a7f8e;
-  --text-dim: #4e5260;
+  --bg-column: #f0f1f3;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f5f6f8;
+  --bg-badge: #e8eaed;
+  --border: #d4d6db;
+  --border-card: #dde0e5;
+  --text-primary: #1a1c20;
+  --text-muted: #5a5f6e;
+  --text-dim: #9ea3b0;
   --blue: #4a9eff;
   --green: #3ecf72;
   --orange: #f59e42;
@@ -63,7 +63,7 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: #3a3f4e;
 }
 
 .columnCount {
@@ -96,7 +96,7 @@
 .columnAddBtn:hover {
   background: var(--bg-card);
   color: var(--text-primary);
-  border-color: #4a4f5a;
+  border-color: #b0b4bf;
 }
 
 .columnBody {

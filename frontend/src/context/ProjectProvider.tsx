@@ -27,13 +27,13 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
               boards: [],
             };
             for (const boardData of projData.boards) {
-              let board: Board = {
+              const board: Board = {
                 ...boardData,
                 workflows: [],
               };
 
               for (const workflowData of boardData.workflows) {
-                let workflow: Workflow = {
+                const workflow: Workflow = {
                   ...workflowData,
                   tasks: [],
                 };

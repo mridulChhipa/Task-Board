@@ -12,6 +12,8 @@ export default function Boards({ boards }: Props) {
   const activeBoard = boards[activeIndex];
   // console.log(boards);
 
+  console.log(boards);
+
   return (
     <div className={styles.container}>
       <div className={styles.tabList} role="tablist">
@@ -43,9 +45,16 @@ export default function Boards({ boards }: Props) {
           aria-labelledby={`board-tab-${activeIndex}`}
           className={styles.panel}
         >
+          {/* {activeBoard.workflows[0].tasks} */}
           <div className={styles.kanbanBoard}>
-            {activeBoard.workflows.map((workflow, idx) => {
-              return <KanbanColumn key={idx} workflow={workflow} />;
+            {/* {activeBoard.workflows.length} */}
+            {activeBoard.workflows?.map((workflow) => {
+              return (
+                <KanbanColumn
+                  key={`${activeBoard.id}-${workflow.id}`}
+                  workflow={workflow}
+                />
+              );
             })}
           </div>
         </div>

@@ -1,10 +1,8 @@
-import { TaskDTO } from './task.types';
-
 export interface BoardDTO {
   id: string;
   name: string;
   projectId: string;
-  columns: ColumnDTO[];
+  workflows: ColumnDTO[];
 }
 
 export interface ColumnDTO {

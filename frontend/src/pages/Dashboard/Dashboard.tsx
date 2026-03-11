@@ -1,5 +1,9 @@
 import { useContext, useEffect, useState, type SubmitEvent } from 'react';
-import { AuthContext, DispatchContext } from '../../context/AuthContext';
+import {
+  AuthContext,
+  DispatchContext,
+  type User,
+} from '../../context/AuthContext';
 import { useFetchUser } from '../../utils/auth.utils';
 import { Link } from 'react-router-dom';
 import type { Project } from '../../types/project.types';
@@ -14,10 +18,10 @@ import UpdateProject from '../../components/Projects/UpdateProject';
 import AddUser from '../../components/Projects/AddUser';
 
 export type Operation = 'View' | 'Add' | 'Edit' | 'Remove';
-export type ProjectMember = {
+export interface ProjectMember {
   email: string;
   role: string;
-};
+}
 
 function DashBoard() {
   const { user } = useContext(AuthContext);
@@ -338,7 +342,7 @@ function DashBoard() {
       );
       const data = await res.json();
       const users = data.data.members;
-      const projectMembers: ProjectMember[] = users.map((user: any) => {
+      const projectMembers: ProjectMember[] = users.map((user: User) => {
         return {
           email: getEmail(user.userId),
           role: user.role,
