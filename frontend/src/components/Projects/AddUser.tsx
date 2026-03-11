@@ -15,7 +15,6 @@ interface Props {
   handleAdd: SubmitEventHandler;
   setAddUser: React.Dispatch<React.SetStateAction<boolean>>;
   projectMembers: ProjectMember[];
-  setProjectMembers: React.Dispatch<React.SetStateAction<ProjectMember[]>>;
 }
 
 export default function AddUser({
@@ -28,7 +27,6 @@ export default function AddUser({
   handleAdd,
   setAddUser,
   projectMembers,
-  setProjectMembers,
 }: Props) {
   return (
     <>
@@ -93,17 +91,21 @@ export default function AddUser({
       </form>}
       {operation === 'View' && (
         <table className={tableStyles.projectTable}>
-          <ul className={styles.userList}>
-            {project.members.map((member, memIdx) => (
-              <li className={styles.userListItem} key={memIdx}>
-                {member}
-              </li>
+          <thead>
+            <tr>
+              <th>Member e-mail</th>
+              <th>Member role</th>
+            </tr>
+          </thead>
+          <tbody>
+            {projectMembers.map((member, memIdx) => (
+              <tr key={memIdx}>
+                <td>{member.email}</td>
+                <td>{member.role}</td>
+              </tr>
             ))}
-            <li className={styles.userListItem} key="owner">
-              pednekarojas@gmail.com
-            </li>
-          </ul>
-        </div>
+          </tbody>
+        </table>
       )}
     </>
   );

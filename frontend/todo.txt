@@ -10,3 +10,6 @@ setarchive: project id in url and archive status in request body as json.
 insert sorting functionality in table headers if time permits.
 
 incorporate try catch blocks to catch all these random errors we've been throwing everywhere.
+
+improve project user management ui. If possible insert a delete and edit button in the view users menu.
+add users can also be simplified.

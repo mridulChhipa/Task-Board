@@ -32,7 +32,7 @@ function DashBoard() {
   const [operation, setOperation] = useState<Operation>('Add');
   const [addUser, setAddUser] = useState(false);
   const [userToAdd, setUserToAdd] = useState('');
-  const [newRole, setNewRole] = useState('');
+  const [newRole, setNewRole] = useState('PROJECT_VIEWER');
   const [projectMembers, setProjectMembers] = useState<ProjectMember[]>([]);
 
   const [name, setName] = useState('');
@@ -195,6 +195,7 @@ function DashBoard() {
     e.preventDefault();
     if(operation === 'Add') {
       try{
+        console.log("Adding user to project with email: ", userToAdd, " and role: ", newRole);
         const res = await fetch(
           `http://localhost:3000/api/project/assign-user/${currProject}`,
           {
@@ -227,7 +228,7 @@ function DashBoard() {
       finally {
         setAddUser(false);
         setUserToAdd('');
-        setNewRole('');
+        setNewRole('PROJECT_VIEWER');
         setOperation('Add');
       }
     }
@@ -266,7 +267,7 @@ function DashBoard() {
       finally {
         setAddUser(false);
         setUserToAdd('');
-        setNewRole('');
+        setNewRole('PROJECT_VIEWER');
         setOperation('Add');
       }
     }
@@ -302,11 +303,51 @@ function DashBoard() {
       finally {
         setAddUser(false);
         setUserToAdd('');
-        setNewRole('');
+        setNewRole('PROJECT_VIEWER');
         setOperation('Add');
       }
     }
   }
+
+  async function getMembers(): Promise<ProjectMember[]> {
+    async function getEmail(userId: number): Promise<string> {
+      try {
+        const res = await fetch(`http://localhost:3000/api/auth/${userId}`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const userData = await res.json();
+        console.log(userData);
+        return userData.data.personalData.email;
+      }
+      catch(err){
+        throw new Error('Error finding email of user', {cause:err})
+      }
+    }
+    try{
+      const res = await fetch(`http://localhost:3000/api/project/${currProject}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await res.json();
+      const users = data.data.members;
+        const projectMembers: ProjectMember[] = users.map((user: any) => {
+        return {
+          email: getEmail(user.userId),
+          role: user.role,
+        };
+      });
+      console.log(projectMembers);
+      return projectMembers;
+    }
+    catch(err){
+      throw new Error('Error fetching project members', { cause: err });
+    }
+  }
+
   return (
     <>
       {showCreateModal && (
@@ -349,7 +390,6 @@ function DashBoard() {
             handleAdd={handleAdd}
             setAddUser={setAddUser}
             projectMembers={projectMembers}
-            setProjectMembers={setProjectMembers}
           />
         </Modal>
       )}
@@ -396,6 +436,9 @@ function DashBoard() {
                       onClick={() => {
                         setAddUser(true);
                         setCurrProject(project.id);
+                        void getMembers()
+                          .then((members) => setProjectMembers(members))
+                          .catch(() => setProjectMembers([]));
                       }}
                     >
                       Manage
