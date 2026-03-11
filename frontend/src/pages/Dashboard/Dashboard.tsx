@@ -193,9 +193,14 @@ function DashBoard() {
   async function handleAdd(e: SubmitEvent) {
     // this function should handle both updating user role and adding users and removing users
     e.preventDefault();
-    if(operation === 'Add') {
-      try{
-        console.log("Adding user to project with email: ", userToAdd, " and role: ", newRole);
+    if (operation === 'Add') {
+      try {
+        console.log(
+          'Adding user to project with email: ',
+          userToAdd,
+          ' and role: ',
+          newRole,
+        );
         const res = await fetch(
           `http://localhost:3000/api/project/assign-user/${currProject}`,
           {
@@ -211,29 +216,27 @@ function DashBoard() {
           },
         );
 
-        if(!res.ok){
+        if (!res.ok) {
           const test = await res.text();
-          throw new Error(`Failed to assign user: ${res.status} ${res.statusText} - ${test}`);
+          throw new Error(
+            `Failed to assign user: ${res.status} ${res.statusText} - ${test}`,
+          );
         }
 
         // Update 2 things
         // added user's project list
         // project's user list
         // ask chuppa how to do...
-        
-      }
-      catch(err){
+      } catch (err) {
         throw new Error('Error adding user to project', { cause: err });
-      }
-      finally {
+      } finally {
         setAddUser(false);
         setUserToAdd('');
         setNewRole('PROJECT_VIEWER');
         setOperation('Add');
       }
-    }
-    else if(operation === 'Edit') {
-      try{
+    } else if (operation === 'Edit') {
+      try {
         const res = await fetch(
           `http://localhost:3000/api/project/update-role/${currProject}`,
           {
@@ -249,9 +252,11 @@ function DashBoard() {
           },
         );
 
-        if(!res.ok){
+        if (!res.ok) {
           const test = await res.text();
-          throw new Error(`Failed to edit user role: ${res.status} ${res.statusText} - ${test}`);
+          throw new Error(
+            `Failed to edit user role: ${res.status} ${res.statusText} - ${test}`,
+          );
         }
 
         // Update 2 things
@@ -260,19 +265,16 @@ function DashBoard() {
         // ask chuppa how to do...
         // use websockets? too much mehnat...
         // let it be and let update on refresh?
-      }
-      catch(err){
+      } catch (err) {
         throw new Error('Error editing user role', { cause: err });
-      }
-      finally {
+      } finally {
         setAddUser(false);
         setUserToAdd('');
         setNewRole('PROJECT_VIEWER');
         setOperation('Add');
       }
-    }
-    else{
-      try{
+    } else {
+      try {
         const res = await fetch(
           `http://localhost:3000/api/project/remove-user/${currProject}`,
           {
@@ -287,20 +289,20 @@ function DashBoard() {
           },
         );
 
-        if(!res.ok){
+        if (!res.ok) {
           const test = await res.text();
-          throw new Error(`Failed to remove user: ${res.status} ${res.statusText} - ${test}`);
+          throw new Error(
+            `Failed to remove user: ${res.status} ${res.statusText} - ${test}`,
+          );
         }
 
         // Update 2 things
         // added user's project list
         // project's user list
         // ask chuppa how to do...
-      }
-      catch(err){
+      } catch (err) {
         throw new Error('Error reomving user from project', { cause: err });
-      }
-      finally {
+      } finally {
         setAddUser(false);
         setUserToAdd('');
         setNewRole('PROJECT_VIEWER');
@@ -319,22 +321,24 @@ function DashBoard() {
         const userData = await res.json();
         console.log(userData);
         return userData.data.personalData.email;
-      }
-      catch(err){
-        throw new Error('Error finding email of user', {cause:err})
+      } catch (err) {
+        throw new Error('Error finding email of user', { cause: err });
       }
     }
-    try{
-      const res = await fetch(`http://localhost:3000/api/project/${currProject}`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
+    try {
+      const res = await fetch(
+        `http://localhost:3000/api/project/${currProject}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
       const data = await res.json();
       const users = data.data.members;
-        const projectMembers: ProjectMember[] = users.map((user: any) => {
+      const projectMembers: ProjectMember[] = users.map((user: any) => {
         return {
           email: getEmail(user.userId),
           role: user.role,
@@ -342,8 +346,7 @@ function DashBoard() {
       });
       console.log(projectMembers);
       return projectMembers;
-    }
-    catch(err){
+    } catch (err) {
       throw new Error('Error fetching project members', { cause: err });
     }
   }

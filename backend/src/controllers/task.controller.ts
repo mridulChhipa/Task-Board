@@ -73,7 +73,7 @@ export class TaskController {
         throw new Error('Invalid taskId format');
       }
       const fetchedTask = await taskService.getTask(taskId);
-      res.status(200).json({ data: fetchedTask });
+      res.status(200).json({ task: fetchedTask });
       next();
     } catch (error) {
       console.log('Fetch error: ', error);

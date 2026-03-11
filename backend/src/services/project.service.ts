@@ -137,7 +137,7 @@ export class ProjectService {
           email: userMail,
         },
       });
-      if(!user) {
+      if (!user) {
         throw new Error('User does not exist');
       }
       const userId = user.id;
@@ -178,7 +178,7 @@ export class ProjectService {
           email: userMail,
         },
       });
-      if(!user) {
+      if (!user) {
         throw new Error('User does not exist');
       }
       const userId = user.id;
@@ -222,7 +222,15 @@ export class ProjectService {
         },
         include: {
           members: true,
-          boards: true,
+          boards: {
+            include: {
+              workflows: {
+                include: {
+                  tasks: true,
+                }
+              },
+            },
+          },
         },
       });
 

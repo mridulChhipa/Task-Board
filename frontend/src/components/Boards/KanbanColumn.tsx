@@ -1,0 +1,60 @@
+import { useEffect, useState } from 'react';
+import type { Task, Workflow } from '../../types/boards.types';
+import { IconPlus } from './boards.images';
+import { TaskCard } from './TaskCard';
+import styles from './column.module.css';
+
+interface Props {
+  workflow: Workflow;
+  onAddTask?: () => void;
+}
+
+export function KanbanColumn({ workflow, onAddTask }: Props) {
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  useEffect(() => {
+    async function fetchTasks() {
+      const results = await Promise.all(
+        workflow.tasks.map((id) =>
+          fetch(`http://localhost:3000/api/task/${id}`, {
+            credentials: 'include',
+          })
+            .then((res) => res.json())
+            .then((resJson) => resJson.task),
+        ),
+      );
+
+      setTasks(results);
+      // console.log(results);
+    }
+
+    if (workflow.tasks?.length) {
+      fetchTasks();
+    }
+  }, [workflow.tasks]);
+
+  return (
+    <div className={styles.kanbanColumn}>
+      <div className={styles.columnHeader}>
+        <div className={styles.columnHeaderLeft}>
+          <span className={styles.columnTitle}>{workflow.name}</span>
+          {workflow.tasks.length > 0 && (
+            <span className={styles.columnCount}>{workflow.tasks.length}</span>
+          )}
+        </div>
+        <button
+          className={styles.columnAddBtn}
+          onClick={onAddTask}
+          title="Add task"
+        >
+          <IconPlus />
+        </button>
+      </div>
+      <div className={styles.columnBody}>
+        {tasks.map((task, idx) => (
+          <TaskCard key={idx} task={task} />
+        ))}
+      </div>
+    </div>
+  );
+}

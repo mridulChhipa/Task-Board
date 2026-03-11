@@ -1,8 +1,10 @@
+import { TaskDTO } from './task.types';
+
 export interface BoardDTO {
   id: string;
   name: string;
   projectId: string;
-  columns: string[];
+  columns: ColumnDTO[];
 }
 
 export interface ColumnDTO {
@@ -11,4 +13,5 @@ export interface ColumnDTO {
   boardId: string;
   limit: number;
   orderIdx: number;
+  tasks?: string[];
 }

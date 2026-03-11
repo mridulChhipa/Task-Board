@@ -171,7 +171,11 @@ export class BoardService {
           id: boardId,
         },
         include: {
-          workflows: true,
+          workflows: {
+            include: {
+              tasks: true,
+            },
+          },
         },
       });
 
@@ -179,9 +183,18 @@ export class BoardService {
         throw new Error('Error fetching board');
       }
 
-      const allCols: string[] = [];
+      const allCols: ColumnDTO[] = [];
       for (const col of board.workflows) {
-        allCols.push(col.id);
+        const currCol: ColumnDTO = {
+          id: col.id,
+          name: col.name,
+          boardId: col.boardId,
+          limit: col.limit,
+          orderIdx: col.orderIdx,
+          tasks: col.tasks.map((task) => task.id),
+        };
+
+        allCols.push(currCol);
       }
 
       const bdto: BoardDTO = {
@@ -190,6 +203,8 @@ export class BoardService {
         name: board.name,
         columns: allCols,
       };
+
+      console.log(bdto);
 
       return bdto;
     } catch (error) {

@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-app: #111214;
+  --bg-column: #1a1c20;
+  --bg-card: #22252b;
+  --bg-card-hover: #282c34;
+  --bg-badge: #1e2128;
+  --border: #2e3138;
+  --border-card: #303540;
+  --text-primary: #e8eaf0;
+  --text-muted: #7a7f8e;
+  --text-dim: #4e5260;
+  --blue: #4a9eff;
+  --green: #3ecf72;
+  --orange: #f59e42;
+  --red: #f04f4f;
+  --critical: #c026d3;
+  --radius-col: 14px;
+  --radius-card: 10px;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Syne', sans-serif;
+}
+
+.kanbanColumn {
+  width: 280px;
+  flex-shrink: 0;
+  background: var(--bg-column);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-col);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.kanbanColumn:hover {
+  border-color: #3a3f4a;
+}
+
+.columnHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.columnHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.columnTitle {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.columnCount {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  background: var(--bg-badge);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+.columnAddBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.columnAddBtn:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: #4a4f5a;
+}
+
+.columnBody {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 60px;
+}

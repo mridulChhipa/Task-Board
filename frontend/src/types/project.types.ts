@@ -1,3 +1,5 @@
+import type { Workflow } from './boards.types';
+
 export interface Project {
   id: string;
   name: string;
@@ -14,18 +16,5 @@ export interface Board {
   id: string;
   name: string;
   projectId: string;
-  // workflows Workflow[]
-}
-
-export interface Workflow {
-  id: string;
-  name: string;
-  orderIdx: number;
-  boardId: string;
-  limit: number;
-  tasks: Task[];
-}
-
-export interface Task {
-  id: string;
+  workflows: Workflow[];
 }

@@ -6,6 +6,8 @@ import {
   projectReducer,
 } from './ProjectContext';
 import { useParams } from 'react-router-dom';
+import type { Board, Project } from '../types/project.types';
+import type { Workflow } from '../types/boards.types';
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
   const [projectData, dispatch] = useReducer(projectReducer, defaultProject);
@@ -19,7 +21,34 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         })
           .then((res) => res.json())
           .then((resJson) => {
-            const project = resJson.data;
+            const projData = resJson.data;
+            const project: Project = {
+              ...projData,
+              boards: [],
+            };
+            for (const boardData of projData.boards) {
+              let board: Board = {
+                ...boardData,
+                workflows: [],
+              };
+
+              for (const workflowData of boardData.workflows) {
+                let workflow: Workflow = {
+                  ...workflowData,
+                  tasks: [],
+                };
+
+                for (const task of workflowData.tasks) {
+                  workflow.tasks.push(task.id);
+                }
+
+                board.workflows.push(workflow);
+              }
+
+              project.boards.push(board);
+            }
+
+            // console.log(project);
             dispatch({
               type: 'FETCH_PROJ',
               payload: {

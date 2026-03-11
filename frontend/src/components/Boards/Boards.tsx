@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import styles from './boards.module.css'; // or your CSS file
+import styles from './boards.module.css';
 import type { Board } from '../../types/project.types';
+import { KanbanColumn } from './KanbanColumn';
 
 interface Props {
   boards: Board[];
@@ -9,6 +10,7 @@ interface Props {
 export default function Boards({ boards }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const activeBoard = boards[activeIndex];
+  // console.log(boards);
 
   return (
     <div className={styles.container}>
@@ -41,9 +43,10 @@ export default function Boards({ boards }: Props) {
           aria-labelledby={`board-tab-${activeIndex}`}
           className={styles.panel}
         >
-          <div className={styles.placeholder}>
-            <h2>{activeBoard.name}</h2>
-            <p>Board content goes here...</p>
+          <div className={styles.kanbanBoard}>
+            {activeBoard.workflows.map((workflow, idx) => {
+              return <KanbanColumn key={idx} workflow={workflow} />;
+            })}
           </div>
         </div>
       )}
