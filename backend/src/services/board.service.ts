@@ -15,12 +15,12 @@ export class BoardService {
       Need to find a mechanism so that if creation of let
       say second def-workflow fails then it removes the already created two 
       */
-      const defaultWorkflows = ['To Do', 'In Progress', 'Review', 'Done'];
+      const defaultWorkflows = [{'name': 'To Do', 'order': 0}, {'name': 'In Progress', 'order': 1}, {'name': 'Review', 'order': 2}, {'name': 'Done', 'order': 3}];
       for (const defWorkflow of defaultWorkflows) {
         await db.workflow.create({
           data: {
-            name: defWorkflow,
-            orderIdx: 1000000,
+            name: defWorkflow.name,
+            orderIdx: defWorkflow.order,
             boardId: createdBoard.id,
           },
         });
@@ -118,6 +118,7 @@ export class BoardService {
           id: columnId,
         },
       });
+      console.log(columnName + " updated with position: " + position);
     } catch (error) {
       console.log('Adding column...Failed with: ', error);
       throw error;

@@ -11,6 +11,8 @@ interface Props {
 export default function Boards({ boards }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const activeBoard = boards[activeIndex];
+  const [workflowState, setWorkflowState] = useState(activeBoard.workflows);
+
   // console.log(boards);
 
   console.log(boards);
@@ -18,29 +20,30 @@ export default function Boards({ boards }: Props) {
   function dragstartHandler(event: React.DragEvent<HTMLDivElement>) {
     event.dataTransfer.setData('type', 'column');
     event.dataTransfer.setData('columnOrderId', event.currentTarget.id);
+    console.log("dragging column with orderIdx: " + event.currentTarget.id);
   }
   
   async function dropHandler(event: React.DragEvent<HTMLDivElement>, workflows: Workflow[]) {
     event.preventDefault();
-    async function changeOrder(columnId: string, newOrderIdx: number) {
+    async function changeOrder(workflow: Workflow, newOrderIdx: number) {
       try{
-        const dataRes = await fetch(`http://localhost:3000/api/board/${columnId}`, {
-          method: 'GET',
-          credentials: 'include',
-        });
-        const data = await dataRes.json();
-        await fetch(`http://localhost:3000/api/board/${activeBoard.id}/update-column/${columnId}`, {
+        const res = await fetch(`http://localhost:3000/api/project/${activeBoard.projectId}/board/${activeBoard.id}/update-column/${workflow.id}`, {
           method: 'PUT',
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            name: data.fcol.name,
-            limit: data.fcol.limit,
+            name: workflow.name,
+            limit: workflow.limit,
             orderIdx: newOrderIdx,
           }),
         });
+        const data = await res.json();
+        console.log(data);
+        workflow.orderIdx = newOrderIdx;
+        const newWorkflowState = [...workflowState];
+        setWorkflowState(newWorkflowState);
       }
       catch(err) {
         throw new Error('Column update failed with error: ', {cause:err});
@@ -51,25 +54,23 @@ export default function Boards({ boards }: Props) {
       const endIdx = Number(event.currentTarget.id);
       workflows.forEach((workflow) => {
         if(endIdx > startIdx && workflow.orderIdx > startIdx && workflow.orderIdx <= endIdx) {
-          changeOrder(workflow.id, workflow.orderIdx - 1);
-          console.log("workflow " + workflow.name + " moved to " + workflow.orderIdx);
+          changeOrder(workflow, workflow.orderIdx - 1);
+          console.log("workflow " + workflow.name + " moved to " + (workflow.orderIdx - 1));
         }
         else if(endIdx > startIdx && workflow.orderIdx === startIdx) {
-          changeOrder(workflow.id, endIdx);
+          changeOrder(workflow, endIdx);
           console.log("workflow " + workflow.name + " moved to " + endIdx);
         }
         else if(endIdx < startIdx && workflow.orderIdx >= endIdx && workflow.orderIdx < startIdx) {
-          changeOrder(workflow.id, workflow.orderIdx + 1);
-          console.log("workflow " + workflow.name + " moved to " + workflow.orderIdx);
+          changeOrder(workflow, workflow.orderIdx + 1);
+          console.log("workflow " + workflow.name + " moved to " + (workflow.orderIdx + 1));
         }
         else if(endIdx < startIdx && workflow.orderIdx === startIdx) {
-          changeOrder(workflow.id, endIdx);
+          changeOrder(workflow, endIdx);
           console.log("workflow " + workflow.name + " moved to " + endIdx);
         }
       });
-      // does not fucking work!!!!! 
-      // orderIdx is fucking useless, values are not sorted according to orderIdx at start....
-      // chuppa chutiya
+      // use setState for columns list, and update in dropHandler
     }
     else if(event.dataTransfer.getData('type') === 'task') {
       // enter task drop logic
@@ -103,7 +104,6 @@ export default function Boards({ boards }: Props) {
           );
         })}
       </div>
-
       {activeBoard && (
         <div
           role="tabpanel"
@@ -114,7 +114,9 @@ export default function Boards({ boards }: Props) {
           {/* {activeBoard.workflows[0].tasks} */}
           <div className={styles.kanbanBoard}>
             {/* {activeBoard.workflows.length} */}
-            {activeBoard.workflows?.map((workflow) => {
+            {workflowState
+            .sort((a, b) => a.orderIdx - b.orderIdx)
+            .map((workflow) => {
               return (
                 <KanbanColumn
                   key={`${activeBoard.id}-${workflow.id}`}
@@ -122,7 +124,7 @@ export default function Boards({ boards }: Props) {
                   workflow={workflow}
                   draggable={true}
                   dragstartHandler={dragstartHandler}
-                  dropHandler={(e) => dropHandler(e, activeBoard.workflows)}
+                  dropHandler={(e) => dropHandler(e, workflowState)}
                   dragoverHandler={dragoverHandler}
                 />
               );
