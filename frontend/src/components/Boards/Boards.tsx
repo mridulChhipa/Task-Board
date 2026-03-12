@@ -25,9 +25,11 @@ export default function Boards({ boards }: Props) {
   
   async function dropHandler(event: React.DragEvent<HTMLDivElement>, workflows: Workflow[]) {
     event.preventDefault();
+    event.stopPropagation();
+    console.log("Dropped on column with orderIdx: " + event.currentTarget.id);
     async function changeOrder(workflow: Workflow, newOrderIdx: number) {
       try{
-        const res = await fetch(`http://localhost:3000/api/project/${activeBoard.projectId}/board/${activeBoard.id}/update-column/${workflow.id}`, {
+        await fetch(`http://localhost:3000/api/project/${activeBoard.projectId}/board/${activeBoard.id}/update-column/${workflow.id}`, {
           method: 'PUT',
           credentials: 'include',
           headers: {
@@ -39,8 +41,6 @@ export default function Boards({ boards }: Props) {
             orderIdx: newOrderIdx,
           }),
         });
-        const data = await res.json();
-        console.log(data);
         workflow.orderIdx = newOrderIdx;
         const newWorkflowState = [...workflowState];
         setWorkflowState(newWorkflowState);
@@ -55,22 +55,17 @@ export default function Boards({ boards }: Props) {
       workflows.forEach((workflow) => {
         if(endIdx > startIdx && workflow.orderIdx > startIdx && workflow.orderIdx <= endIdx) {
           changeOrder(workflow, workflow.orderIdx - 1);
-          console.log("workflow " + workflow.name + " moved to " + (workflow.orderIdx - 1));
         }
         else if(endIdx > startIdx && workflow.orderIdx === startIdx) {
           changeOrder(workflow, endIdx);
-          console.log("workflow " + workflow.name + " moved to " + endIdx);
         }
         else if(endIdx < startIdx && workflow.orderIdx >= endIdx && workflow.orderIdx < startIdx) {
           changeOrder(workflow, workflow.orderIdx + 1);
-          console.log("workflow " + workflow.name + " moved to " + (workflow.orderIdx + 1));
         }
         else if(endIdx < startIdx && workflow.orderIdx === startIdx) {
           changeOrder(workflow, endIdx);
-          console.log("workflow " + workflow.name + " moved to " + endIdx);
         }
       });
-      // use setState for columns list, and update in dropHandler
     }
     else if(event.dataTransfer.getData('type') === 'task') {
       // enter task drop logic

@@ -40,7 +40,7 @@ export function KanbanColumn({ id, workflow, onAddTask, draggable, dragstartHand
   // console.log(workflow.id,tasks);
   return (
     <div className={styles.kanbanColumn} id={id} draggable={draggable} onDragStart={dragstartHandler} onDrop={dropHandler} onDragOver={dragoverHandler}>
-      <div className={styles.columnHeader} onDrop={dropHandler}>
+      <div className={styles.columnHeader}>
         <div className={styles.columnHeaderLeft}>
           <span className={styles.columnTitle}>{workflow.name}</span>
           {workflow.tasks.length > 0 && (
