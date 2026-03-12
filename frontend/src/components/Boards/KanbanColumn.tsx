@@ -14,8 +14,18 @@ interface Props {
   dragoverHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
 }
 
-export function KanbanColumn({ id, workflow, onAddTask, draggable, dragstartHandler, dropHandler, dragoverHandler }: Props) {
+export function KanbanColumn({
+  id,
+  workflow,
+  onAddTask,
+  draggable,
+  dragstartHandler,
+  dropHandler,
+  dragoverHandler,
+}: Props) {
   const [tasks, setTasks] = useState<Task[]>([]);
+
+  // console.log(workflow);
 
   useEffect(() => {
     async function fetchTasks() {
@@ -39,7 +49,14 @@ export function KanbanColumn({ id, workflow, onAddTask, draggable, dragstartHand
 
   // console.log(workflow.id,tasks);
   return (
-    <div className={styles.kanbanColumn} id={id} draggable={draggable} onDragStart={dragstartHandler} onDrop={dropHandler} onDragOver={dragoverHandler}>
+    <div
+      className={styles.kanbanColumn}
+      id={id}
+      draggable={draggable}
+      onDragStart={dragstartHandler}
+      onDrop={dropHandler}
+      onDragOver={dragoverHandler}
+    >
       <div className={styles.columnHeader} onDrop={dropHandler}>
         <div className={styles.columnHeaderLeft}>
           <span className={styles.columnTitle}>{workflow.name}</span>
