@@ -16,7 +16,6 @@ export class TaskService {
     dueDate,
     statusId,
     parentId,
-    stackPosition,
   }: CreateTaskBody): Promise<string> {
     try {
       const createdTask = await db.task.create({
@@ -30,7 +29,6 @@ export class TaskService {
           dueDate: dueDate,
           statusId,
           parentId,
-          stackPosition: stackPosition,
         },
       });
 
@@ -56,7 +54,6 @@ export class TaskService {
       dueDate,
       statusId,
       parentId,
-      stackPosition,
     }: CreateTaskBody,
   ): Promise<void> {
     try {
@@ -74,10 +71,6 @@ export class TaskService {
         parentId = null;
       }
 
-      if (existingTask.stackPosition > stackPosition) {
-        throw new Error('Invalid status transition');
-      }
-
       await db.task.update({
         data: {
           title,
@@ -88,7 +81,6 @@ export class TaskService {
           dueDate: dueDate,
           statusId,
           parentId,
-          stackPosition,
         },
         where: {
           id: taskId,

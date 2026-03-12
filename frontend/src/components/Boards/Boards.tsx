@@ -29,12 +29,11 @@ export default function Boards({ boards }: Props) {
   const [workflowState, setWorkflowState] = useState(activeBoard.workflows);
   const [isAdding, setIsAdding] = useState(false);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
+  const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
 
   useEffect(() => {
     setWorkflowState(activeBoard.workflows);
   }, [activeIndex]);
-
-  console.log(boards);
 
   const { pid: projectId } = useParams();
   const [boardName, setBoardName] = useState<string>('');
@@ -51,9 +50,17 @@ export default function Boards({ boards }: Props) {
   const[dueDate, setDueDate] = useState('');
 
   function dragstartHandler(event: React.DragEvent<HTMLDivElement>) {
+    event.stopPropagation();
     event.dataTransfer.setData('type', 'column');
     event.dataTransfer.setData('columnOrderId', event.currentTarget.id);
     console.log('dragging column with orderIdx: ' + event.currentTarget.id);
+  }
+
+  function taskDragstartHandler(event: React.DragEvent<HTMLDivElement>){
+    event.stopPropagation();
+    event.dataTransfer.setData('type', 'task');
+    event.dataTransfer.setData('taskId', event.currentTarget.id);
+    event.dataTransfer.setData('currCol', '');
   }
 
   async function dropHandler(
@@ -118,9 +125,39 @@ export default function Boards({ boards }: Props) {
   const handleAdd: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
 
+    async function getUserIdFromEmail(email: string): Promise<number> {
+      try{
+        const res = await fetch(`http://localhost:3000/api/auth/get-user-by-mail/${email}`, {
+          credentials: 'include',
+        });
+        const resJson = await res.json();
+        return resJson.data.personalData.userId;
+      } catch (err) {
+        throw new Error('Error fetching user id from email: ', { cause: err });
+      }
+    }
+
+    // use for sorting, commented out later.
+    // async function getDate(taskId: string){
+    //   try{
+    //     const res = await fetch(`http://localhost:3000/api/task/${taskId}`, {
+    //       credentials: 'include',
+    //     });
+    //     const resJson = await res.json();
+    //     return resJson.task.dueDate ? new Date(resJson.task.dueDate) : null;
+    //   } catch (err) {
+    //     throw new Error('Error fetching task details: ', { cause: err });
+    //   }
+    // }
+
     if(!projectId || !activeBoard) {
       return;
     }
+
+    console.log('dueDate: ', dueDate);
+    const assigneeId: number = await getUserIdFromEmail(assignee);
+    const reporterId: number = await getUserIdFromEmail(reporter);
+    const dateObject = dueDate !== '' ? new Date(dueDate) : null;
 
     try{
       const res = await fetch(`http://localhost:3000/api/task/create`, {
@@ -134,17 +171,53 @@ export default function Boards({ boards }: Props) {
           description: taskDescription,
           type: taskType,
           priority: priority,
-          assignee: assignee,
-          reporter: reporter,
-          dueDate: dueDate,
-          statusId: activeBoard.workflows[0].id, // confirm what this is supposed to be
-          parentId: null, // confirm what this is supposed to be
-          stackPosition: 0, // set to last position in column, store that as well.
+          assignee: assigneeId,
+          reporter: reporterId,
+          dueDate: dateObject,
+          statusId: activeColumnId,
+          parentId: null, // change to parent task id if story type.
         }),
       });
       const data = await res.json();
-      console.log(data);
-      // update task state in frontend
+      const newTaskId = data.taskId;
+      
+      setWorkflowState(prev => 
+        prev.map((workflow) => 
+          workflow.id === activeColumnId ? 
+            { ...workflow, tasks: [...workflow.tasks, newTaskId]//.sort(
+              // async (a, b) => {
+              //   const dateA = await getDate(a);
+              //   const dateB = await getDate(b);
+              //   if(dateA && dateB){
+              //     const diff = dateA.getTime() - dateB.getTime();
+              //     const day_diff = Math.round(diff / (1000 * 3600 * 24));
+              //     if(day_diff === 0) {
+              //       if(a.priority === "CRITICAL" && b.priority !== "CRITICAL") return -1;
+              //       else if(a.priority !== "CRITICAL" && b.priority === "CRITICAL") return 1;
+              //       else if(a.priority === "HIGH" && b.priority !== "HIGH") return -1;
+              //       else if(a.priority !== "HIGH" && b.priority === "HIGH") return 1;
+              //       else if(a.priority === "MEDIUM" && b.priority !== "MEDIUM") return -1;
+              //       else if(a.priority !== "MEDIUM" && b.priority === "MEDIUM") return 1;
+              //       else return 0;
+              //     }
+              //     else return day_diff;
+              //   }
+              //   if(dateA && !dateB) return -1;
+              //   else if(!dateA && dateB) return 1;
+              //   else {
+              //     if(a.priority === "CRITICAL" && b.priority !== "CRITICAL") return -1;
+              //     else if(a.priority !== "CRITICAL" && b.priority === "CRITICAL") return 1;
+              //     else if(a.priority === "HIGH" && b.priority !== "HIGH") return -1;
+              //     else if(a.priority !== "HIGH" && b.priority === "HIGH") return 1;
+              //     else if(a.priority === "MEDIUM" && b.priority !== "MEDIUM") return -1;
+              //     else if(a.priority !== "MEDIUM" && b.priority === "MEDIUM") return 1;
+              //     else return 0;
+              //   }
+              // })
+            } as Workflow
+            : workflow
+        )
+      );
     } catch (err) {
       console.error('Error creating task:', {cause: err});
     }
@@ -279,7 +352,6 @@ export default function Boards({ boards }: Props) {
                       name="dueDate"
                       id="dueDate"
                       onChange={(e) => setDueDate(e.target.value)}
-                      required
                       className={formStyles.formControl}
                       value={dueDate}
                     />
@@ -345,7 +417,10 @@ export default function Boards({ boards }: Props) {
                       key={`${activeBoard.id}-${workflow.id}`}
                       id={workflow.orderIdx.toString()}
                       workflow={workflow}
-                      onAddTask={() => setShowAddTaskModal(true)}
+                      onAddTask={() => {
+                        setShowAddTaskModal(true);
+                        setActiveColumnId(workflow.id);  
+                      }}
                       draggable={true}
                       dragstartHandler={dragstartHandler}
                       dropHandler={(e) => dropHandler(e, workflowState)}

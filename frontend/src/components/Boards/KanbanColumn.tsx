@@ -30,13 +30,13 @@ export function KanbanColumn({
   useEffect(() => {
     async function fetchTasks() {
       const results = await Promise.all(
-        workflow.tasks.map((id) =>
-          fetch(`http://localhost:3000/api/task/${id}`, {
+        workflow.tasks.map(async (id) => {
+          const res = await fetch(`http://localhost:3000/api/task/${id}`, {
             credentials: 'include',
-          })
-            .then((res) => res.json())
-            .then((resJson) => resJson.task),
-        ),
+          });
+          const data = await res.json();
+          return data.task;
+        }),
       );
 
       setTasks(results);
@@ -54,8 +54,8 @@ export function KanbanColumn({
       id={id}
       draggable={draggable}
       onDragStart={dragstartHandler}
-      onDrop={dropHandler}
       onDragOver={dragoverHandler}
+      onDrop={dropHandler}
     >
       <div className={styles.columnHeader}>
         <div className={styles.columnHeaderLeft}>

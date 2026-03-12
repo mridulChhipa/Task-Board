@@ -206,7 +206,7 @@ export class AuthService {
         });
 
         if (!currProj) {
-          throw new Error('');
+          throw new Error('Project not found');
         }
 
         const allMembers: number[] = [];
@@ -220,13 +220,84 @@ export class AuthService {
           description: currProj.description ?? '',
           role: membership.role as ProjectRole,
           members: allMembers,
+          isArchived: currProj.isArchived,
         });
       }
 
       const userData: UserWithProjs = {
         personalData: {
+          userId: rawUserData.id,
           name: rawUserData.name,
           email: rawUserData.email,
+          avatar: rawUserData.avatar,
+          globalRole: rawUserData.globalRole,
+        },
+        projectData: allProjs,
+      };
+
+      return userData;
+    } catch (error) {
+      console.log('User Details Catch: ', error);
+      throw error;
+    }
+  }
+
+  async userDetailsByMail(userMail: string): Promise<UserWithProjs> {
+    try {
+      console.log(
+        '================ \n UserMail: ',
+        userMail,
+        ' \n ==================',
+      );
+      const rawUserData = await db.user.findUnique({
+        where: {
+          email: userMail,
+        },
+        include: {
+          projects: true,
+        },
+      });
+
+      if (!rawUserData) {
+        throw new Error('User not found');
+      }
+
+      const allProjs: ProjectDetails[] = [];
+
+      for (const membership of rawUserData.projects) {
+        const currProj = await db.project.findUnique({
+          where: {
+            id: membership.projectId,
+          },
+          include: {
+            members: true,
+          },
+        });
+
+        if (!currProj) {
+          throw new Error('Project not found');
+        }
+
+        const allMembers: number[] = [];
+        for (const member of currProj.members) {
+          allMembers.push(member.userId);
+        }
+
+        allProjs.push({
+          id: currProj.id,
+          name: currProj.name,
+          description: currProj.description ?? '',
+          role: membership.role as ProjectRole,
+          members: allMembers,
+          isArchived: currProj.isArchived,
+        });
+      }
+
+      const userData: UserWithProjs = {
+        personalData: {
+          userId: rawUserData.id,
+          email: rawUserData.email,
+          name: rawUserData.name,
           avatar: rawUserData.avatar,
           globalRole: rawUserData.globalRole,
         },

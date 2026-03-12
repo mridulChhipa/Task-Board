@@ -55,6 +55,14 @@ authRouter.get(
   },
 );
 
+authRouter.get(
+  '/get-user-by-mail/:userMail',
+  authenticateToken,
+  (req: Request, res: Response, next: NextFunction) => {
+    authController.fetchUserByMail(req, res, next);
+  },
+);
+
 authRouter.patch(
   '/update-user',
   authenticateToken,

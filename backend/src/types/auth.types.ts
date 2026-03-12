@@ -41,6 +41,7 @@ export interface AuthToken {
 }
 
 export interface UserDetails {
+  userId: number;
   name: string;
   email: string;
   avatar: string | null;

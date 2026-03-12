@@ -131,6 +131,33 @@ export class AuthController {
     }
   }
 
+  async fetchUserByMail(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const userMail = req.params.userMail;
+
+      if(typeof userMail !== 'string') {
+        throw new Error('Invalid type for userMail');
+      }
+
+      console.log('Params console: ', req.params.userMail);
+
+      const fetchedUser = await authService.userDetailsByMail(userMail);
+      res.status(200).json({
+        status: 'success',
+        data: fetchedUser,
+      });
+
+      next();
+    }
+    catch (error) {
+      next(error);
+    }
+  }
+
   async updateUser(
     req: Request,
     res: Response,

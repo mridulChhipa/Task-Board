@@ -19,7 +19,6 @@ export interface CreateTaskBody {
   assignee: number;
   reporter: number;
   dueDate: Date;
-  stackPosition: number;
   statusId: string;
   parentId: string | null;
 }
@@ -33,7 +32,6 @@ export interface TaskDTO {
   assignee: number;
   reporter: number;
   dueDate: Date | null;
-  stackPosition: number;
   statusId: string;
   parentId: string | null;
   createdAt: Date;
@@ -52,7 +50,6 @@ export interface TaskResponseBody {
   assignee: number;
   reporter: number;
   dueDate: Date;
-  stackPosition: number;
   statusId: string;
   parentId: string | null;
   children: TaskResponseBody[];

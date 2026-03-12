@@ -5,15 +5,21 @@ import { IconCalendar, IconUser, IconWarning } from './boards.images';
 
 interface Props {
   task: Task;
+  draggable?: boolean;
+  dragstartHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
 }
 
-export function TaskCard({ task }: Props) {
+export function TaskCard({ task, draggable, dragstartHandler}: Props) {
   const overdue =
     typeof task.dueDate !== 'string' ? false : isOverdue(task.dueDate);
   // console.log(task);
 
   return (
-    <div className={styles.taskCard}>
+    <div 
+      className={styles.taskCard}
+      draggable={draggable}
+      onDragStart={dragstartHandler}
+    >
       <div className={styles.taskTop}>
         <span
           className={`${styles.taskTypeBadge} ${styles[`type${task.type}`]}`}
