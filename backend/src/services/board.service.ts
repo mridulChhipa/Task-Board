@@ -15,7 +15,12 @@ export class BoardService {
       Need to find a mechanism so that if creation of let
       say second def-workflow fails then it removes the already created two 
       */
-      const defaultWorkflows = [{'name': 'To Do', 'order': 0}, {'name': 'In Progress', 'order': 1}, {'name': 'Review', 'order': 2}, {'name': 'Done', 'order': 3}];
+      const defaultWorkflows = [
+        { name: 'To Do', order: 0 },
+        { name: 'In Progress', order: 1 },
+        { name: 'Review', order: 2 },
+        { name: 'Done', order: 3 },
+      ];
       for (const defWorkflow of defaultWorkflows) {
         await db.workflow.create({
           data: {
@@ -67,20 +72,21 @@ export class BoardService {
 
   async addColumn(
     boardId: string,
-    columnName: string,
+    name: string,
     limit: number,
-  ): Promise<string> {
+    orderIdx: number,
+  ): Promise<ColumnDTO> {
     try {
       const createdColumn = await db.workflow.create({
         data: {
           boardId,
-          name: columnName,
-          orderIdx: 1000000,
+          name,
+          orderIdx,
           limit,
         },
       });
 
-      return createdColumn.id;
+      return createdColumn;
     } catch (error) {
       throw new Error('Error adding workflow/column: ', { cause: error });
     }
@@ -91,7 +97,7 @@ export class BoardService {
     boardId: string,
     columnName: string,
     limit: number,
-    position: number,
+    orderIdx: number,
   ): Promise<void> {
     try {
       const existingColumn = await db.workflow.findFirst({
@@ -111,14 +117,13 @@ export class BoardService {
       await db.workflow.update({
         data: {
           name: columnName,
-          orderIdx: position,
+          orderIdx,
           limit,
         },
         where: {
           id: columnId,
         },
       });
-      console.log(columnName + " updated with position: " + position);
     } catch (error) {
       console.log('Adding column...Failed with: ', error);
       throw error;

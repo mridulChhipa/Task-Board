@@ -48,3 +48,59 @@
   overflow-x: auto;
   padding-bottom: 16px;
 }
+
+.columnAddBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.formControl {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #ffffff;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  outline: none;
+}
+
+.formControl:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.formControl::placeholder {
+  color: #9ca3af;
+}
+
+.addColumnMenu {
+  position: absolute;
+  padding: 10px;
+  border: 1px solid lightblue;
+  border-radius: 16px;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  background-color: rgb(255, 255, 255);
+  box-shadow: 0px 4px 10px lightgray;
+}
+
+.addColumnMenu * {
+  margin: 5px auto;
+}
