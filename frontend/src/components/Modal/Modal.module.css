@@ -19,4 +19,6 @@
   color: black;
   max-width: 600px;
   width: 50%;
+  max-height: 80%;
+  overflow-y: auto;
 }
