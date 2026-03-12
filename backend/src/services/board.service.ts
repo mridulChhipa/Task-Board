@@ -75,7 +75,7 @@ export class BoardService {
     name: string,
     limit: number,
     orderIdx: number,
-  ): Promise<string> {
+  ): Promise<ColumnDTO> {
     try {
       const createdColumn = await db.workflow.create({
         data: {
@@ -86,7 +86,7 @@ export class BoardService {
         },
       });
 
-      return createdColumn.id;
+      return createdColumn;
     } catch (error) {
       throw new Error('Error adding workflow/column: ', { cause: error });
     }

@@ -1,13 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap');
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 :root {
   --bg-app: #111214;
   --bg-column: #f0f1f3;
@@ -80,13 +72,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
+  width: 26px !important;
+  flex-shrink: 0;
+  /* This prevents the button from getting squashed */
+  min-width: 26px;
   height: 26px;
   border-radius: 6px;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text-dim);
   cursor: pointer;
+
   transition:
     background 0.15s,
     color 0.15s,

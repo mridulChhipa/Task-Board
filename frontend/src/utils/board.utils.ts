@@ -1,3 +1,5 @@
+import { DispatchContext } from '../context/AuthContext';
+import type { Workflow } from '../types/boards.types';
 import type { Board } from '../types/project.types';
 
 export async function fetchBoard(
@@ -34,7 +36,7 @@ export async function addWorkflow(
   orderIdx: number,
   projectId: string,
   limit: number,
-): Promise<Board> {
+): Promise<Workflow> {
   try {
     const response = await fetch(
       `http://localhost:3000/api/project/${projectId}/board/add-column/${boardId}`,
@@ -43,6 +45,7 @@ export async function addWorkflow(
         headers: {
           'Content-Type': 'application/json',
         },
+        method: 'POST',
         body: JSON.stringify({
           boardId,
           name,
@@ -57,10 +60,10 @@ export async function addWorkflow(
     }
 
     const data = await response.json();
-    const board: Board = data.board;
+    const column: Workflow = data.column;
 
-    return board;
+    return column;
   } catch (err) {
-    throw new Error("Can't fetch project at the moment", { cause: err });
+    throw new Error("Can't create column at the moment", { cause: err });
   }
 }

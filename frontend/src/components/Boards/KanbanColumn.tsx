@@ -60,7 +60,7 @@ export function KanbanColumn({
       <div className={styles.columnHeader} onDrop={dropHandler}>
         <div className={styles.columnHeaderLeft}>
           <span className={styles.columnTitle}>{workflow.name}</span>
-          {workflow.tasks.length > 0 && (
+          {workflow.tasks?.length > 0 && (
             <span className={styles.columnCount}>{workflow.tasks.length}</span>
           )}
         </div>

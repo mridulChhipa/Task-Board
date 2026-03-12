@@ -6,15 +6,25 @@ import type { Workflow } from '../../types/boards.types';
 import { addWorkflow } from '../../utils/board.utils';
 import { useParams } from 'react-router-dom';
 import { IconPlus } from './boards.images';
+import Button from '../Button/Button';
 
 interface Props {
   boards: Board[];
 }
 
 export default function Boards({ boards }: Props) {
+  if (boards.length === 0) {
+    return (
+      <>
+        <br />
+        <h1>Start Working</h1>
+      </>
+    );
+  }
   const [activeIndex, setActiveIndex] = useState(0);
   const activeBoard = boards[activeIndex];
   const [workflowState, setWorkflowState] = useState(activeBoard.workflows);
+  const [isAdding, setIsAdding] = useState(false);
 
   useEffect(() => {
     setWorkflowState(activeBoard.workflows);
@@ -75,9 +85,9 @@ export default function Boards({ boards }: Props) {
           changeOrder(workflow, workflow.orderIdx - 1);
           console.log(
             'workflow ' +
-              workflow.name +
-              ' moved to ' +
-              (workflow.orderIdx - 1),
+            workflow.name +
+            ' moved to ' +
+            (workflow.orderIdx - 1),
           );
         } else if (endIdx > startIdx && workflow.orderIdx === startIdx) {
           changeOrder(workflow, endIdx);
@@ -90,9 +100,9 @@ export default function Boards({ boards }: Props) {
           changeOrder(workflow, workflow.orderIdx + 1);
           console.log(
             'workflow ' +
-              workflow.name +
-              ' moved to ' +
-              (workflow.orderIdx + 1),
+            workflow.name +
+            ' moved to ' +
+            (workflow.orderIdx + 1),
           );
         } else if (endIdx < startIdx && workflow.orderIdx === startIdx) {
           changeOrder(workflow, endIdx);
@@ -162,20 +172,52 @@ export default function Boards({ boards }: Props) {
               })}
 
             {activeBoard && (
-              <button
-                className={styles.columnAddBtn}
-                onClick={() => {
-                  addWorkflow(
-                    activeBoard.id,
-                    boardName,
-                    boards.length + 1,
-                    projectId ? projectId : '',
-                    boardLimit,
-                  );
-                }}
-              >
-                <IconPlus />
-              </button>
+              <div style={{ position: 'relative' }}>
+                <button
+                  className={styles.columnAddBtn}
+                  onClick={() => {
+                    setIsAdding(!isAdding);
+                  }}
+                >
+                  <IconPlus />
+                </button>
+                {isAdding &&
+                  <div className={styles.addColumnMenu}>
+                    <input
+                      type="text"
+                      value={boardName}
+                      onChange={(e) => setBoardName(e.target.value)}
+                      placeholder="Column Name"
+                      className={styles.formControl}
+                    />
+                    <input
+                      placeholder="Limit"
+                      type="number"
+                      value={boardLimit}
+                      onChange={(e) => setBoardLimit(e.target.valueAsNumber)}
+                      className={styles.formControl}
+                    />
+                    <Button
+                      onClick={() => {
+                        addWorkflow(
+                          activeBoard.id,
+                          boardName,
+                          boards.length + 1,
+                          projectId ?? '',
+                          boardLimit,
+                        ).then((column) => {
+                          setWorkflowState([...workflowState, column]);
+                        }).finally(() => {
+                          setBoardName('');
+                          setBoardLimit(0);
+                        });
+                      }}
+                    >
+                      Add
+                    </Button>
+                  </div>
+                }
+              </div>
             )}
           </div>
         </div>
