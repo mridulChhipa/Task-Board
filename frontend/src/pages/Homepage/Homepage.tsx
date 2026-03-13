@@ -42,7 +42,7 @@ function Features({ children, imgSrc, imgLoc = 'left' }: FeatureProps) {
     <img src={imgSrc} alt="Feature" className={styles.featureImage} />
   );
 
-  const text = <p className={styles.featureText}>{children}</p>;
+  const text = <div className={styles.featureText}>{children}</div>;
 
   return (
     <div className={styles.featureContainer}>

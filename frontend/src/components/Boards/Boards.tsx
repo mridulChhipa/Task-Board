@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styles from './boards.module.css';
 import formStyles from '../Projects/CreateProject.module.css';
 import type { Board } from '../../types/project.types';
@@ -10,6 +10,7 @@ import { IconPlus } from './boards.images';
 import Button from '../Button/Button';
 import type { SubmitEventHandler } from 'react';
 import Modal from '../Modal/Modal';
+import { AuthContext } from '../../context/AuthContext';
 
 interface Props {
   boards: Board[];
@@ -90,6 +91,8 @@ export default function Boards({ boards }: Props) {
       </>
     );
   }
+
+  const {user} = useContext(AuthContext);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeBoard = boards[activeIndex];
   const [workflowState, setWorkflowState] = useState(activeBoard.workflows);
@@ -112,7 +115,6 @@ export default function Boards({ boards }: Props) {
   type Priority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   const[priority, setPriority] = useState<Priority>("LOW");
   const[assignee, setAssignee] = useState('');
-  const[reporter, setReporter] = useState('');
   const[dueDate, setDueDate] = useState('');
 
   function dragstartHandler(event: React.DragEvent<HTMLDivElement>) {
@@ -273,7 +275,7 @@ export default function Boards({ boards }: Props) {
     }
 
     const assigneeId: number = await getUserIdFromEmail(assignee);
-    const reporterId: number = await getUserIdFromEmail(reporter);
+    const reporterId: number = user?.userId ?? -1;
     const dateObject = dueDate !== '' ? new Date(dueDate) : null;
 
     try{
@@ -315,7 +317,6 @@ export default function Boards({ boards }: Props) {
       setTaskType('STORY');
       setPriority('LOW');
       setAssignee('');
-      setReporter('');
       setDueDate('');
     }
   };
@@ -414,21 +415,6 @@ export default function Boards({ boards }: Props) {
                       required
                       className={formStyles.formControl}
                       value={assignee}
-                    />
-                  </div>
-                  <div className={formStyles.inputArea}>
-                    <label htmlFor="reporter" className={formStyles.label}>
-                      Reporter
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="e.g. janedoe@taskboard.com"
-                      name="reporter"
-                      id="reporter"
-                      onChange={(e) => setReporter(e.target.value)}
-                      required
-                      className={formStyles.formControl}
-                      value={reporter}
                     />
                   </div>
                   <div className={formStyles.inputArea}>

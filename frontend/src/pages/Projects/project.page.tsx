@@ -1,18 +1,18 @@
 // import { useParams } from 'react-router-dom';
 import { useContext, useState } from 'react';
 import styles from './project.page.module.css';
-import Button from '../components/Button/Button';
-import Modal from '../components/Modal/Modal';
-import AddBoard from '../components/Projects/AddBoard';
-import { fetchBoard } from '../utils/board.utils';
+import Button from '../../components/Button/Button';
+import Modal from '../../components/Modal/Modal';
+import AddBoard from '../../components/Projects/AddBoard';
+import { fetchBoard } from '../../utils/board.utils';
 import type { SubmitEvent } from 'react';
 import {
   ProjectContext,
   ProjectDispatchContext,
-} from '../context/ProjectContext';
-import type { Board, Project } from '../types/project.types';
-import Boards from '../components/Boards/Boards';
-import { CommentTest } from '../tests/CommentTest';
+} from '../../context/ProjectContext';
+import type { Board, Project } from '../../types/project.types';
+import Boards from '../../components/Boards/Boards';
+import { CommentTest } from '../../tests/CommentTest';
 
 export default function ProjectPage() {
   const [showAddModal, setShowAddModal] = useState(false);

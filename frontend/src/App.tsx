@@ -6,7 +6,7 @@ import DashBoard from './pages/Dashboard/Dashboard.tsx';
 import NavBar from './components/NavBar/Navbar.tsx';
 import { AuthProvider } from './context/AuthProvider.tsx';
 import Loader from './components/ui/Loader.tsx';
-import ProjectPage from './pages/project.page.tsx';
+import ProjectPage from './pages/Projects/project.page.tsx';
 import { ProjectProvider } from './context/ProjectProvider.tsx';
 
 function App() {
