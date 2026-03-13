@@ -15,6 +15,72 @@ interface Props {
   boards: Board[];
 }
 
+async function sortWorkflows(workflows: Workflow[]): Promise<Workflow[]> {
+  // use for sorting, commented out later.
+    async function getDate(taskId: string){
+      try{
+        const res = await fetch(`http://localhost:3000/api/task/${taskId}`, {
+          credentials: 'include',
+        });
+        const resJson = await res.json();
+        return { 
+          date: resJson.task.dueDate ? new Date(resJson.task.dueDate) : null,
+          priority: resJson.task.priority,
+         };
+      } catch (err) {
+        throw new Error('Error fetching task details: ', { cause: err });
+      }
+    }
+    const newWF = await Promise.all(
+      workflows.map(async (workflow) =>
+        Promise.all(
+          workflow.tasks.map(async (task) => {
+            const data = await getDate(task);
+            return {
+              taskId: task,
+              date: data.date,
+              priority: data.priority,
+            }
+          })
+        )
+      )
+    );
+    const sorted = newWF.map((workflow) => {
+      return workflow.sort((a, b) => {
+        const dateA = a.date;
+        const dateB = b.date;
+        if(dateA && dateB){
+          const diff = dateA.getTime() - dateB.getTime();
+          const day_diff = Math.round(diff / (1000 * 3600 * 24));
+          if(day_diff === 0) {
+            if(a.priority === "CRITICAL" && b.priority !== "CRITICAL") return -1;
+            else if(a.priority !== "CRITICAL" && b.priority === "CRITICAL") return 1;
+            else if(a.priority === "HIGH" && b.priority !== "HIGH") return -1;
+            else if(a.priority !== "HIGH" && b.priority === "HIGH") return 1;
+            else if(a.priority === "MEDIUM" && b.priority !== "MEDIUM") return -1;
+            else if(a.priority !== "MEDIUM" && b.priority === "MEDIUM") return 1;
+            else return 0;
+          }
+          else return day_diff;
+        }
+        if(dateA && !dateB) return -1;
+        else if(!dateA && dateB) return 1;
+        else {
+          if(a.priority === "CRITICAL" && b.priority !== "CRITICAL") return -1;
+          else if(a.priority !== "CRITICAL" && b.priority === "CRITICAL") return 1;
+          else if(a.priority === "HIGH" && b.priority !== "HIGH") return -1;
+          else if(a.priority !== "HIGH" && b.priority === "HIGH") return 1;
+          else if(a.priority === "MEDIUM" && b.priority !== "MEDIUM") return -1;
+          else if(a.priority !== "MEDIUM" && b.priority === "MEDIUM") return 1;
+          else return 0;
+        }
+      });
+    });
+    return workflows.map((workflow, idx) => {
+      return {...workflow, tasks: sorted[idx].map((task) => task.taskId)};
+    });
+}
+
 export default function Boards({ boards }: Props) {
   if (boards.length === 0) {
     return (
@@ -80,6 +146,7 @@ export default function Boards({ boards }: Props) {
         if(ogColIdx + 1 !== currColIdx) return;
         const limit = workflows[currColIdx].limit;
         const taskCount = workflows[currColIdx].tasks.length;
+        console.log(currColIdx);
         if(limit != -1 && taskCount >= limit) return;
       }
       event.preventDefault();
@@ -162,23 +229,23 @@ export default function Boards({ boards }: Props) {
         console.log('Error transferring task: ', {cause: err});
         return;
       }
-      setWorkflowState(prev => 
-        prev.map((workflow) => {
-          if(workflow.id === colId) {
-            return {
-              ...workflow,
-              tasks: [...workflow.tasks, taskId],
-            }
+      const newWF = workflows.map((workflow) => {
+        if(workflow.id === colId) {
+          return {
+            ...workflow,
+            tasks: [...workflow.tasks, taskId],
           }
-          else if(workflow.id === ogCol) {
-            return {
-              ...workflow,
-              tasks: workflow.tasks.filter((id) => id !== taskId),
-            }
+        }
+        else if(workflow.id === ogCol) {
+          return {
+            ...workflow,
+            tasks: workflow.tasks.filter((id) => id !== taskId),
           }
-          return workflow;
-        })
-      );
+        }
+        return workflow;
+      });
+      const sortedWF = await sortWorkflows(newWF);
+      setWorkflowState(sortedWF);
     }
   }
 
@@ -200,19 +267,6 @@ export default function Boards({ boards }: Props) {
         throw new Error('Error fetching user id from email: ', { cause: err });
       }
     }
-
-    // use for sorting, commented out later.
-    // async function getDate(taskId: string){
-    //   try{
-    //     const res = await fetch(`http://localhost:3000/api/task/${taskId}`, {
-    //       credentials: 'include',
-    //     });
-    //     const resJson = await res.json();
-    //     return resJson.task.dueDate ? new Date(resJson.task.dueDate) : null;
-    //   } catch (err) {
-    //     throw new Error('Error fetching task details: ', { cause: err });
-    //   }
-    // }
 
     if(!projectId || !activeBoard) {
       return;
@@ -243,44 +297,14 @@ export default function Boards({ boards }: Props) {
       });
       const data = await res.json();
       const newTaskId = data.taskId;
-      
-      setWorkflowState(prev => 
-        prev.map((workflow) => 
-          workflow.id === activeColumnId ? 
-            { ...workflow, tasks: [...workflow.tasks, newTaskId]//.sort(
-              // async (a, b) => {
-              //   const dateA = await getDate(a);
-              //   const dateB = await getDate(b);
-              //   if(dateA && dateB){
-              //     const diff = dateA.getTime() - dateB.getTime();
-              //     const day_diff = Math.round(diff / (1000 * 3600 * 24));
-              //     if(day_diff === 0) {
-              //       if(a.priority === "CRITICAL" && b.priority !== "CRITICAL") return -1;
-              //       else if(a.priority !== "CRITICAL" && b.priority === "CRITICAL") return 1;
-              //       else if(a.priority === "HIGH" && b.priority !== "HIGH") return -1;
-              //       else if(a.priority !== "HIGH" && b.priority === "HIGH") return 1;
-              //       else if(a.priority === "MEDIUM" && b.priority !== "MEDIUM") return -1;
-              //       else if(a.priority !== "MEDIUM" && b.priority === "MEDIUM") return 1;
-              //       else return 0;
-              //     }
-              //     else return day_diff;
-              //   }
-              //   if(dateA && !dateB) return -1;
-              //   else if(!dateA && dateB) return 1;
-              //   else {
-              //     if(a.priority === "CRITICAL" && b.priority !== "CRITICAL") return -1;
-              //     else if(a.priority !== "CRITICAL" && b.priority === "CRITICAL") return 1;
-              //     else if(a.priority === "HIGH" && b.priority !== "HIGH") return -1;
-              //     else if(a.priority !== "HIGH" && b.priority === "HIGH") return 1;
-              //     else if(a.priority === "MEDIUM" && b.priority !== "MEDIUM") return -1;
-              //     else if(a.priority !== "MEDIUM" && b.priority === "MEDIUM") return 1;
-              //     else return 0;
-              //   }
-              // })
-            } as Workflow
-            : workflow
-        )
+      const newWF = workflowState.map((workflow) => 
+        workflow.id === activeColumnId ?  
+          { ...workflow, tasks: [...workflow.tasks, newTaskId]
+          } as Workflow
+          : workflow
       );
+      const sortedWF = await sortWorkflows(newWF);
+      setWorkflowState(sortedWF);
     } catch (err) {
       console.error('Error creating task:', {cause: err});
     }
@@ -299,6 +323,7 @@ export default function Boards({ boards }: Props) {
   return (
     <>
       <>
+      <button onClick={() => {console.log(workflowState)}}>print</button>
         {
           showAddTaskModal && (
             <Modal onclick={() => setShowAddTaskModal(false)}>

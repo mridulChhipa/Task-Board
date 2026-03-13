@@ -49,6 +49,11 @@ export function KanbanColumn({
 
   useEffect(() => {
     async function fetchTasks() {
+      if(workflow.tasks.length === 0) {
+        setTasks([]);
+        return;
+      }
+
       const results = await Promise.all(
         workflow.tasks.map(async (id) => {
           const res = await fetch(`http://localhost:3000/api/task/${id}`, {
@@ -62,9 +67,7 @@ export function KanbanColumn({
       setTasks(results);
     }
 
-    if (workflow.tasks?.length) {
-      fetchTasks();
-    }
+    fetchTasks();
   }, [workflow.tasks]);
 
   return (
@@ -81,7 +84,7 @@ export function KanbanColumn({
         <div className={styles.columnHeaderLeft}>
           <span className={styles.columnTitle}>{workflow.name}</span>
           {workflow.tasks?.length > 0 && (
-            <span className={styles.columnCount}>{workflow.tasks.length}</span>
+            <span className={styles.columnCount}>{tasks.length}</span>
           )}
         </div>
         <button
@@ -94,10 +97,10 @@ export function KanbanColumn({
       </div>
       <div className={styles.columnBody}>
         {/* {workflow.id} */}
-        {tasks.map((task, idx) => (
+        {tasks.map((task) => (
           <TaskCard
             deleteTask={deleteTask}
-            key={idx}
+            key={task.id}
             task={task}
             dragstartHandler={taskDragstartHandler}
             draggable={true}
