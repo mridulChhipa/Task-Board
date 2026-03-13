@@ -27,6 +27,7 @@ export class BoardService {
             name: defWorkflow.name,
             orderIdx: defWorkflow.order,
             boardId: createdBoard.id,
+            limit: defWorkflow.name === 'In Progress' ? 5 : -1,
           },
         });
       }

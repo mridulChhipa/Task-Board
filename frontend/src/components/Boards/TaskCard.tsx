@@ -9,16 +9,17 @@ interface Props {
   dragstartHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
 }
 
-export function TaskCard({ task, draggable, dragstartHandler}: Props) {
+export function TaskCard({ task, dragstartHandler}: Props) {
   const overdue =
     typeof task.dueDate !== 'string' ? false : isOverdue(task.dueDate);
   // console.log(task);
-
   return (
     <div 
       className={styles.taskCard}
-      draggable={draggable}
+      draggable={true}
       onDragStart={dragstartHandler}
+      data-parent={task.statusId}
+      data-id={task.id}
     >
       <div className={styles.taskTop}>
         <span

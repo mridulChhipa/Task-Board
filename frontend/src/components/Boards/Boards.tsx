@@ -53,23 +53,38 @@ export default function Boards({ boards }: Props) {
     event.stopPropagation();
     event.dataTransfer.setData('type', 'column');
     event.dataTransfer.setData('columnOrderId', event.currentTarget.id);
-    console.log('dragging column with orderIdx: ' + event.currentTarget.id);
   }
 
   function taskDragstartHandler(event: React.DragEvent<HTMLDivElement>){
     event.stopPropagation();
     event.dataTransfer.setData('type', 'task');
-    event.dataTransfer.setData('taskId', event.currentTarget.id);
-    event.dataTransfer.setData('currCol', '');
+    event.dataTransfer.setData('taskId', event.currentTarget.dataset.id ?? '');
+    event.dataTransfer.setData('ogCol', event.currentTarget.dataset.parent ?? '');
+    console.log(event.currentTarget.dataset.parent);
   }
 
   async function dropHandler(
     event: React.DragEvent<HTMLDivElement>,
     workflows: Workflow[],
   ) {
-    event.preventDefault();
+    if(event.currentTarget.dataset.column === 'true') {
+      const type = event.dataTransfer.getData('type');
+      if(type === 'task'){
+        // check for wip limit, adjacent column, same columns
+        const ogCol = event.dataTransfer.getData('ogCol');
+        const currCol = workflows[Number(event.currentTarget.id)].id;
+        if(ogCol === currCol) return;
+        const ogColIdx = workflows.find((workflow) => workflow.id === ogCol)?.orderIdx;
+        const currColIdx = Number(event.currentTarget.id);
+        if(ogColIdx === undefined) return;
+        if(ogColIdx + 1 !== currColIdx) return;
+        const limit = workflows[currColIdx].limit;
+        const taskCount = workflows[currColIdx].tasks.length;
+        if(limit != -1 && taskCount >= limit) return;
+      }
+      event.preventDefault();
+    }
     event.stopPropagation();
-    console.log("Dropped on column with orderIdx: " + event.currentTarget.id);
     async function changeOrder(workflow: Workflow, newOrderIdx: number) {
       try{
         await fetch(`http://localhost:3000/api/project/${activeBoard.projectId}/board/${activeBoard.id}/update-column/${workflow.id}`, {
@@ -114,7 +129,56 @@ export default function Boards({ boards }: Props) {
       });
     }
     else if(event.dataTransfer.getData('type') === 'task') {
-      // enter task drop logic
+      const currCol = Number(event.currentTarget.id);
+      const colId = workflows[currCol].id;
+      const ogCol = event.dataTransfer.getData('ogCol');
+      const taskId = event.dataTransfer.getData('taskId');
+      try{
+        const res1 = await fetch(`http://localhost:3000/api/task/${taskId}`, {
+          credentials: 'include',
+        });
+        const data = await res1.json();
+        const res = await fetch(`http://localhost:3000/api/task/update/${taskId}`, {
+          method: 'PUT',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title: data.task.title,
+            description: data.task.description,
+            type: data.task.type,
+            priority: data.task.priority,
+            assignee: data.task.assignee,
+            reporter: data.task.reporter,
+            dueDate: data.task.dueDate,
+            statusId: colId,
+          }),
+        });
+        const text = await res.text();
+        console.log('Task update response: ', text);
+      }
+      catch(err) {
+        console.log('Error transferring task: ', {cause: err});
+        return;
+      }
+      setWorkflowState(prev => 
+        prev.map((workflow) => {
+          if(workflow.id === colId) {
+            return {
+              ...workflow,
+              tasks: [...workflow.tasks, taskId],
+            }
+          }
+          else if(workflow.id === ogCol) {
+            return {
+              ...workflow,
+              tasks: workflow.tasks.filter((id) => id !== taskId),
+            }
+          }
+          return workflow;
+        })
+      );
     }
   }
 
@@ -154,7 +218,6 @@ export default function Boards({ boards }: Props) {
       return;
     }
 
-    console.log('dueDate: ', dueDate);
     const assigneeId: number = await getUserIdFromEmail(assignee);
     const reporterId: number = await getUserIdFromEmail(reporter);
     const dateObject = dueDate !== '' ? new Date(dueDate) : null;
@@ -418,6 +481,7 @@ export default function Boards({ boards }: Props) {
                       id={workflow.orderIdx.toString()}
                       workflow={workflow}
                       onAddTask={() => {
+                        if(workflow.tasks.length >= workflow.limit && workflow.limit !== -1) return;
                         setShowAddTaskModal(true);
                         setActiveColumnId(workflow.id);  
                       }}
@@ -425,6 +489,7 @@ export default function Boards({ boards }: Props) {
                       dragstartHandler={dragstartHandler}
                       dropHandler={(e) => dropHandler(e, workflowState)}
                       dragoverHandler={dragoverHandler}
+                      taskDragstartHandler={taskDragstartHandler}
                     />
                   );
                 })}

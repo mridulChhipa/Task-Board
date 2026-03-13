@@ -7,11 +7,12 @@ import styles from './column.module.css';
 interface Props {
   id: string;
   workflow: Workflow;
-  onAddTask?: () => void;
+  onAddTask: () => void;
   draggable?: boolean;
   dragstartHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
   dropHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
   dragoverHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
+  taskDragstartHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
 }
 
 export function KanbanColumn({
@@ -22,6 +23,7 @@ export function KanbanColumn({
   dragstartHandler,
   dropHandler,
   dragoverHandler,
+  taskDragstartHandler,
 }: Props) {
   const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -56,6 +58,7 @@ export function KanbanColumn({
       onDragStart={dragstartHandler}
       onDragOver={dragoverHandler}
       onDrop={dropHandler}
+      data-column={'true'}
     >
       <div className={styles.columnHeader}>
         <div className={styles.columnHeaderLeft}>
@@ -75,7 +78,7 @@ export function KanbanColumn({
       <div className={styles.columnBody}>
         {/* {workflow.id} */}
         {tasks.map((task, idx) => (
-          <TaskCard key={idx} task={task} />
+          <TaskCard key={idx} task={task} dragstartHandler={taskDragstartHandler} draggable={true}/>
         ))}
       </div>
     </div>
