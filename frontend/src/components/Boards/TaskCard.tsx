@@ -1,20 +1,27 @@
 import type { Task } from '../../types/boards.types';
 import styles from './task.module.css';
 import { formatDate, isOverdue } from '../../utils/helpers';
-import { IconCalendar, IconUser, IconWarning } from './boards.images';
+import {
+  IconCalendar,
+  IconDelete,
+  IconUser,
+  IconWarning,
+} from './boards.images';
 
 interface Props {
   task: Task;
+  deleteTask: (id: string) => Promise<void>;
   draggable?: boolean;
   dragstartHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
 }
 
-export function TaskCard({ task, dragstartHandler}: Props) {
+export function TaskCard({ task, dragstartHandler, deleteTask }: Props) {
   const overdue =
     typeof task.dueDate !== 'string' ? false : isOverdue(task.dueDate);
   // console.log(task);
+
   return (
-    <div 
+    <div
       className={styles.taskCard}
       draggable={true}
       onDragStart={dragstartHandler}
@@ -28,6 +35,9 @@ export function TaskCard({ task, dragstartHandler}: Props) {
           {task.type}
         </span>
         <span className={styles.taskId}>{task.id}</span>
+        <span className={styles.deleteIcon} onClick={() => deleteTask(task.id)}>
+          <IconDelete />
+        </span>
       </div>
 
       <div className={styles.taskTitle}>{task.title}</div>

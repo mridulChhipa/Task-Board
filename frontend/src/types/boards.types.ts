@@ -15,7 +15,7 @@ export interface Task {
   priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   assignee: number;
   reporter: number;
-  stackPosition: number;
+  // stackPosition: number;
   dueDate?: Date;
   statusId: string;
   createdAt: Date;

@@ -55,3 +55,28 @@ export const IconUser = ({ size = 13 }) => (
     />
   </svg>
 );
+
+export const IconDelete = ({ size = 13 }) => (
+  <svg width={size} height={size} viewBox="0 0 13 13" fill="none">
+    <path
+      d="M5 3.5V2H8V3.5"
+      stroke="currentColor"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M2 3.5H11"
+      stroke="currentColor"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+    />
+    <path
+      d="M3.5 3.5V10.5C3.5 11.33 4.17 12 5 12H8C8.83 12 9.5 11.33 9.5 10.5V3.5"
+      stroke="currentColor"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);

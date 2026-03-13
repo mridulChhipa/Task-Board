@@ -139,7 +139,7 @@ export class AuthController {
     try {
       const userMail = req.params.userMail;
 
-      if(typeof userMail !== 'string') {
+      if (typeof userMail !== 'string') {
         throw new Error('Invalid type for userMail');
       }
 
@@ -152,8 +152,7 @@ export class AuthController {
       });
 
       next();
-    }
-    catch (error) {
+    } catch (error) {
       next(error);
     }
   }

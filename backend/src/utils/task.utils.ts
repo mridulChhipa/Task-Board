@@ -18,7 +18,7 @@ export function toTaskDTO(task: TaskWithChildren): TaskDTO {
     assignee: task.assignee,
     reporter: task.reporter,
     dueDate: task.dueDate,
-    stackPosition: task.stackPosition,
+    // stackPosition: task.stackPosition,
     statusId: task.statusId,
     parentId: task.parentId,
     createdAt: task.createdAt,

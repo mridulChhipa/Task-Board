@@ -27,7 +27,25 @@ export function KanbanColumn({
 }: Props) {
   const [tasks, setTasks] = useState<Task[]>([]);
 
-  // console.log(workflow);
+  async function deleteTask(taskId: string) {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/task/delete/${taskId}`,
+        {
+          credentials: 'include',
+          method: 'DELETE',
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Can't delete task", { cause: response.text });
+      }
+
+      setTasks(tasks.filter((task) => task.id !== taskId));
+    } catch (err) {
+      throw new Error('Error deleting task', { cause: err });
+    }
+  }
 
   useEffect(() => {
     async function fetchTasks() {
@@ -49,7 +67,6 @@ export function KanbanColumn({
     }
   }, [workflow.tasks]);
 
-  // console.log(workflow.id,tasks);
   return (
     <div
       className={styles.kanbanColumn}
@@ -78,7 +95,13 @@ export function KanbanColumn({
       <div className={styles.columnBody}>
         {/* {workflow.id} */}
         {tasks.map((task, idx) => (
-          <TaskCard key={idx} task={task} dragstartHandler={taskDragstartHandler} draggable={true}/>
+          <TaskCard
+            deleteTask={deleteTask}
+            key={idx}
+            task={task}
+            dragstartHandler={taskDragstartHandler}
+            draggable={true}
+          />
         ))}
       </div>
     </div>
