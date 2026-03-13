@@ -1,0 +1,29 @@
+.threadContainer {
+  border: 1px solid #e1e4e8;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  margin: 1rem;
+}
+
+.threadContainer h2 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.meta {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.content {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #333;
+}
+
+.commentSection {
+  margin-top: 1rem;
+  border-top: 1px solid #eee;
+}

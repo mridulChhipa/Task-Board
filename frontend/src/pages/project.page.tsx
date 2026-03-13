@@ -12,25 +12,11 @@ import {
 } from '../context/ProjectContext';
 import type { Board, Project } from '../types/project.types';
 import Boards from '../components/Boards/Boards';
+import { CommentTest } from '../tests/CommentTest';
 
 export default function ProjectPage() {
-  // const { pid } = useParams();
-  // const [project, setProject] = useState<Project | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [boardName, setBoardName] = useState('');
-
-  // async function loadProject() {
-  //   const data = await fetchProject(pid as string);
-  //   setProject(data);
-  // }
-
-  // useEffect(() => {
-  //   loadProject();
-  // }, [pid]);
-
-  // if (!project) {
-  //   return <div>Loading...</div>;
-  // }
 
   const dispatch = useContext(ProjectDispatchContext);
   const { project } = useContext(ProjectContext);
@@ -110,7 +96,11 @@ export default function ProjectPage() {
         </div>
         <hr />
         <Boards boards={project.boards ?? []} />
+
+        <CommentTest />
+
       </div>
+
     </>
   );
 }

@@ -1,0 +1,14 @@
+.commentWrapper {
+  margin-top: 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid #f0f0f0;
+  transition: border-color 0.2s;
+}
+
+.commentWrapper:hover {
+  border-left-color: #007bff;
+}
+
+.repliesList {
+  background-color: #007bff;
+}
