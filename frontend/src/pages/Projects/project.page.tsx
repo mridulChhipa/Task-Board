@@ -90,8 +90,10 @@ export default function ProjectPage() {
       )}
       <div className={styles.container}>
         <div className={styles.projectHeader}>
-          <h1>{project.name}</h1>
-          <span className={styles.desc}>{project.description}</span>
+          <div className={styles.leftHeader}>
+            <h1 className={styles.desc}>{project.name}</h1>
+            <p className={styles.desc}>{project.description}</p>
+          </div>
           <Button onClick={() => setShowAddModal(true)}>Add Board</Button>
         </div>
         <hr />

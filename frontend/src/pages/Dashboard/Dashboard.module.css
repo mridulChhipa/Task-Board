@@ -59,6 +59,9 @@
   font-size: 0.9rem;
   border-bottom: 1px solid #f1f5f9;
   vertical-align: middle;
+  max-width: 20vw;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
 }
 
 .projectTable td a {

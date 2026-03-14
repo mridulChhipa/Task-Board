@@ -2,14 +2,27 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .projectHeader h1 {
   font-size: 1.5rem;
 }
 
+.leftHeader {
+  display: flex;
+  flex-direction: row;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .desc {
   margin-left: 20px;
+  max-width: 35vw;
+  overflow: hidden;
 }
 
 .container {

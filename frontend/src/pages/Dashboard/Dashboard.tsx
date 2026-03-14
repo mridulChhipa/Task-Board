@@ -450,16 +450,6 @@ function DashBoard() {
                     >
                       Manage
                     </Button>
-                    {/* <ul className={styles.userList}>
-                      {project.members.map((member, memIdx) => (
-                        <li className={styles.userListItem} key={memIdx}>
-                          {member}
-                        </li>
-                      ))}
-                      <li className={styles.userListItem} key="owner">
-                        pednekarojas@gmail.com
-                      </li>
-                    </ul> */}
                   </td>
                   <td style={{ display: 'flex', justifyContent: 'center' }}>
                     <img
