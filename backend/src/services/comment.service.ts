@@ -122,7 +122,7 @@ export class CommentService {
     content,
     taskId,
     parentId,
-  }: CommentBody): Promise<string> {
+  }: CommentBody): Promise<CommentDTO> {
     try {
       const createdComment = await db.comment.create({
         data: {
@@ -152,7 +152,7 @@ export class CommentService {
         // });
       }
 
-      return createdComment.id;
+      return createdComment as CommentDTO;
     } catch (error) {
       throw new Error('Error creating thread: ', { cause: error });
     }

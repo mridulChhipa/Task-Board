@@ -22,7 +22,7 @@ commentRouter.patch('/delete-thread/:tid', (req, res, next) => {
   commentController.deleteThread(req, res, next);
 });
 
-commentRouter.post('/delete-comment/:cid', (req, res, next) => {
+commentRouter.patch('/delete-comment/:cid', (req, res, next) => {
   commentController.deleteComment(req, res, next);
 });
 

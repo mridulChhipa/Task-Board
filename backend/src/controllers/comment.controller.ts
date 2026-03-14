@@ -2,6 +2,7 @@ import { commentService } from '../services/comment.service';
 import type { Request, Response, NextFunction } from 'express';
 import type {
   CommentBody,
+  CommentDTO,
   ThreadBody,
   UpdateCommentBody,
   UpdateThreadBody,
@@ -17,11 +18,11 @@ export class CommentController {
       // console.log("===========\n ReqBody from thread : ", );
       const threadyBody: ThreadBody = req.body;
       console.log(threadyBody);
-      const task = await commentService.createThread(threadyBody);
+      const thread = await commentService.createThread(threadyBody);
 
       res.status(201).json({
         status: 'success',
-        task,
+        thread,
       });
     } catch (error) {
       // throw new Error('Error creating thread from controller: ', {
@@ -90,11 +91,11 @@ export class CommentController {
   ): Promise<void> {
     try {
       const commentBody: CommentBody = req.body;
-      const cid = await commentService.createComment(commentBody);
+      const comment: CommentDTO = await commentService.createComment(commentBody);
 
       res.status(201).json({
         status: 'success',
-        cid,
+        comment,
       });
     } catch (error) {
       // throw new Error('Error creating comment from controller: ', {

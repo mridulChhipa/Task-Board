@@ -453,17 +453,35 @@ function DashBoard() {
                       Manage
                     </Button>
                   </td>
-                  <td style={{ display: 'flex', justifyContent: 'center' }}>
-                    <span
+                  <td
+                    style={{
+                      verticalAlign: 'middle',
+                      textAlign: 'center',
+                      height: '100%',
+                    }}
+                  >
+                    <button
+                      type="button"
                       onClick={() => {
                         setCurrProject(project.id);
                         setUpdatedDesc(project.description);
                         setUpdatedName(project.name);
+                        setUpdatedIsArchived(project.isArchived);
                         setShowUpdateModal(true);
                       }}
+                      aria-label={`Settings for ${project.name}`}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        padding: 0,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
                     >
-                      <IconSettings />
-                    </span>
+                      <IconSettings size={25} />
+                    </button>
                   </td>
                 </tr>
               ))}

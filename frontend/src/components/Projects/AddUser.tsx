@@ -54,11 +54,9 @@ export default function AddUser({
       {operation !== 'View' && (
         <Form onSubmit={handleAdd}>
           <InputArea>
-            <Label htmlFor="name">
-              User e-mail:
-            </Label>
+            <Label htmlFor="name">User e-mail:</Label>
             <FormControl
-              name='email'
+              name="email"
               type="email"
               placeholder="e.g. john_doe@taskboard.com"
               value={userToAdd}
@@ -69,9 +67,7 @@ export default function AddUser({
 
           {operation !== 'Remove' && (
             <InputArea>
-              <Label htmlFor="newRole">
-                Project Role:
-              </Label>
+              <Label htmlFor="newRole">Project Role:</Label>
               <select
                 value={newRole}
                 onChange={(e) => setNewRole(e.target.value)}

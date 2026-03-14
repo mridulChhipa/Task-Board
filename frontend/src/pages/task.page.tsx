@@ -7,7 +7,11 @@ import Button from '../components/Button/Button';
 import { AuthContext } from '../context/AuthContext';
 import type { ThreadDTO } from '../types/comment.types';
 import Thread from '../components/Thread/Thread';
-import Form, { FormControl, InputArea, TextAreaControl } from '../components/Forms/Form';
+import Form, {
+  FormControl,
+  InputArea,
+  TextAreaControl,
+} from '../components/Forms/Form';
 
 export default function TaskPage() {
   const { tid } = useParams<{ tid: string }>();
@@ -90,7 +94,7 @@ export default function TaskPage() {
       }
 
       const threadData = await res.json();
-      setThreads([...threads, threadData.task as ThreadDTO]);
+      setThreads([...threads, threadData.thread as ThreadDTO]);
       setThreadContent('');
       setThreadTitle('');
     } catch (err) {
@@ -129,7 +133,6 @@ export default function TaskPage() {
               deleteThread={deleteThread}
               key={idx}
               thread={thread}
-              allComments={{}}
             />
           );
         })}
@@ -156,7 +159,7 @@ export default function TaskPage() {
           />
         </InputArea>
 
-        <Button type="submit">Create Thread</Button>
+        <Button type="submit">Start New Thread</Button>
       </Form>
     </div>
   );

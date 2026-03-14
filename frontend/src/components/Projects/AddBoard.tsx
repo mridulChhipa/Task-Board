@@ -30,9 +30,7 @@ export default function AddBoard({
 
       <Form onSubmit={handleAdd}>
         <InputArea>
-          <Label htmlFor="name">
-            Board Name
-          </Label>
+          <Label htmlFor="name">Board Name</Label>
           <FormControl
             type="text"
             placeholder="e.g. SVG Editor"

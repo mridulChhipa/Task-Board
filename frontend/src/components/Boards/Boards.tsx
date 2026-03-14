@@ -331,9 +331,9 @@ export default function Boards({ boards }: Props) {
       const newWF = workflowState.map((workflow) =>
         workflow.id === activeColumnId
           ? ({
-            ...workflow,
-            tasks: [...workflow.tasks, newTaskId],
-          } as Workflow)
+              ...workflow,
+              tasks: [...workflow.tasks, newTaskId],
+            } as Workflow)
           : workflow,
       );
       const sortedWF = await sortWorkflows(newWF);
@@ -685,7 +685,7 @@ export default function Boards({ boards }: Props) {
                   {isAdding && (
                     <div className={styles.addColumnMenu}>
                       <FormControl
-                        name='col-name'
+                        name="col-name"
                         type="text"
                         value={boardName}
                         onChange={(e) => setBoardName(e.target.value)}
@@ -695,7 +695,7 @@ export default function Boards({ boards }: Props) {
                         placeholder="Limit"
                         type="number"
                         value={boardLimit}
-                        name='limit'
+                        name="limit"
                         onChange={(e) => setBoardLimit(e.target.valueAsNumber)}
                       />
                       <Button
