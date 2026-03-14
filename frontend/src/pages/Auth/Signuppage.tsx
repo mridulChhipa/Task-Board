@@ -2,8 +2,13 @@ import styles from './auth.module.css';
 import Button from '../../components/Button/Button';
 import type { SubmitEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import Form, {
+  FormControl,
+  InputArea,
+  Label,
+} from '../../components/Forms/Form';
 
-function SignupPage() {
+function SignUpPage() {
   const navigate = useNavigate();
 
   async function submitRegister(e: SubmitEvent) {
@@ -32,55 +37,47 @@ function SignupPage() {
     <div className={styles.loginform}>
       <div className={styles.formcontainer}>
         <h1>Sign up to Task Board</h1>
-        <p style={{ fontSize: '1.1em' }}>
-          Enter your name, email and password in the given fields.
-        </p>
-        <div style={{ height: '30px' }}></div>
-        <form className={styles.form} onSubmit={submitRegister}>
-          <div className={styles.input}>
-            <label>Name: </label>
-            <br />
-            <input
+        <Form onSubmit={submitRegister}>
+          <InputArea>
+            <Label htmlFor="name">Name: </Label>
+            <FormControl
               type="text"
               name="name"
+              id="name"
               required
-              className={styles.inputfield}
+              onChange={() => {}}
+              placeholder="Name"
             />
-          </div>
-          <div style={{ height: '20px' }}></div>
-          <div className={styles.input}>
-            <label>Email: </label>
-            <br />
-            <input
+          </InputArea>
+          <InputArea>
+            <Label htmlFor="email">Email: </Label>
+            <FormControl
               type="email"
               name="email"
+              id="email"
               required
-              className={styles.inputfield}
+              placeholder="Email"
+              onChange={() => {}}
             />
-          </div>
-          <div style={{ height: '20px' }}></div>
-          <div className={styles.input}>
-            <label>Password: </label>
-            <br />
-            <input
+          </InputArea>
+          <InputArea>
+            <Label htmlFor="password">Password: </Label>
+            <FormControl
               type="password"
               name="password"
+              id="password"
               required
-              className={styles.inputfield}
+              placeholder="Password"
             />
-          </div>
-          <div style={{ height: '40px' }}></div>
+          </InputArea>
           <Button priority="first" type="submit">
             Sign Up
           </Button>
-        </form>
-        <div style={{ height: '20px' }}></div>
-        <p style={{ fontSize: '1.1em' }}>
-          Already have an account? <Link to="/signin">Log in here</Link>.
-        </p>
+        </Form>
+        Already have an account? <Link to="/signin">Log in here</Link>.
       </div>
     </div>
   );
 }
 
-export default SignupPage;
+export default SignUpPage;

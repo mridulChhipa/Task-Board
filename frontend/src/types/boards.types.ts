@@ -1,4 +1,4 @@
-import type { ThreadDTO } from "./comment.types";
+import type { ThreadDTO } from './comment.types';
 
 export interface Workflow {
   id: string;

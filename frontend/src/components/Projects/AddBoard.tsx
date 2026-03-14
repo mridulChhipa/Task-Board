@@ -1,6 +1,7 @@
 import type { SubmitEventHandler } from 'react';
 import Button from '../Button/Button';
 import styles from './CreateProject.module.css';
+import Form, { FormControl, InputArea, Label } from '../Forms/Form';
 
 interface Props {
   name: string;
@@ -27,12 +28,12 @@ export default function AddBoard({
         Add a New Board
       </h2>
 
-      <form className={styles.createForm} onSubmit={handleAdd}>
-        <div className={styles.inputArea}>
-          <label htmlFor="name" className={styles.label}>
+      <Form onSubmit={handleAdd}>
+        <InputArea>
+          <Label htmlFor="name">
             Board Name
-          </label>
-          <input
+          </Label>
+          <FormControl
             type="text"
             placeholder="e.g. SVG Editor"
             onChange={(e) => setName(e.target.value)}
@@ -40,9 +41,8 @@ export default function AddBoard({
             id="name"
             value={name}
             required
-            className={styles.formControl}
           />
-        </div>
+        </InputArea>
 
         <div className={styles.buttonGroup}>
           <Button
@@ -56,7 +56,7 @@ export default function AddBoard({
             Create
           </Button>
         </div>
-      </form>
+      </Form>
     </div>
   );
 }

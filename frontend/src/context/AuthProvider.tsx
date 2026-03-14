@@ -39,7 +39,7 @@ async function tryRefreshToken(): Promise<Record<string, unknown> | null> {
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [authData, dispatch] = useReducer(authReducer, defaultAuth);
+  const [authContext, dispatch] = useReducer(authReducer, defaultAuth);
 
   useEffect(() => {
     const restoreUser = async () => {
@@ -100,7 +100,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <DispatchContext.Provider value={dispatch}>
-      <AuthContext.Provider value={authData}>{children}</AuthContext.Provider>
+      <AuthContext.Provider value={authContext}>
+        {children}
+      </AuthContext.Provider>
     </DispatchContext.Provider>
   );
 };

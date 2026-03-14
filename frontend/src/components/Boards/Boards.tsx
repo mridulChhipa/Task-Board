@@ -11,78 +11,81 @@ import Button from '../Button/Button';
 import type { SubmitEventHandler } from 'react';
 import Modal from '../Modal/Modal';
 import { AuthContext } from '../../context/AuthContext';
+import Form, { FormControl, InputArea, Label } from '../Forms/Form';
 
 interface Props {
   boards: Board[];
 }
 
-export type TaskType = "STORY" | "TASK" | "BUG";
-export type Priority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+export type TaskType = 'STORY' | 'TASK' | 'BUG';
+export type Priority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
 async function sortWorkflows(workflows: Workflow[]): Promise<Workflow[]> {
   // use for sorting, commented out later.
-    async function getDate(taskId: string){
-      try{
-        const res = await fetch(`http://localhost:3000/api/task/${taskId}`, {
-          credentials: 'include',
-        });
-        const resJson = await res.json();
-        return { 
-          date: resJson.task.dueDate ? new Date(resJson.task.dueDate) : null,
-          priority: resJson.task.priority,
-         };
-      } catch (err) {
-        throw new Error('Error fetching task details: ', { cause: err });
-      }
-    }
-    const newWF = await Promise.all(
-      workflows.map(async (workflow) =>
-        Promise.all(
-          workflow.tasks.map(async (task) => {
-            const data = await getDate(task);
-            return {
-              taskId: task,
-              date: data.date,
-              priority: data.priority,
-            }
-          })
-        )
-      )
-    );
-    const sorted = newWF.map((workflow) => {
-      return workflow.sort((a, b) => {
-        const dateA = a.date;
-        const dateB = b.date;
-        if(dateA && dateB){
-          const diff = dateA.getTime() - dateB.getTime();
-          const day_diff = Math.round(diff / (1000 * 3600 * 24));
-          if(day_diff === 0) {
-            if(a.priority === "CRITICAL" && b.priority !== "CRITICAL") return -1;
-            else if(a.priority !== "CRITICAL" && b.priority === "CRITICAL") return 1;
-            else if(a.priority === "HIGH" && b.priority !== "HIGH") return -1;
-            else if(a.priority !== "HIGH" && b.priority === "HIGH") return 1;
-            else if(a.priority === "MEDIUM" && b.priority !== "MEDIUM") return -1;
-            else if(a.priority !== "MEDIUM" && b.priority === "MEDIUM") return 1;
-            else return 0;
-          }
-          else return day_diff;
-        }
-        if(dateA && !dateB) return -1;
-        else if(!dateA && dateB) return 1;
-        else {
-          if(a.priority === "CRITICAL" && b.priority !== "CRITICAL") return -1;
-          else if(a.priority !== "CRITICAL" && b.priority === "CRITICAL") return 1;
-          else if(a.priority === "HIGH" && b.priority !== "HIGH") return -1;
-          else if(a.priority !== "HIGH" && b.priority === "HIGH") return 1;
-          else if(a.priority === "MEDIUM" && b.priority !== "MEDIUM") return -1;
-          else if(a.priority !== "MEDIUM" && b.priority === "MEDIUM") return 1;
-          else return 0;
-        }
+  async function getDate(taskId: string) {
+    try {
+      const res = await fetch(`http://localhost:3000/api/task/${taskId}`, {
+        credentials: 'include',
       });
+      const resJson = await res.json();
+      return {
+        date: resJson.task.dueDate ? new Date(resJson.task.dueDate) : null,
+        priority: resJson.task.priority,
+      };
+    } catch (err) {
+      throw new Error('Error fetching task details: ', { cause: err });
+    }
+  }
+  const newWF = await Promise.all(
+    workflows.map(async (workflow) =>
+      Promise.all(
+        workflow.tasks.map(async (task) => {
+          const data = await getDate(task);
+          return {
+            taskId: task,
+            date: data.date,
+            priority: data.priority,
+          };
+        }),
+      ),
+    ),
+  );
+  const sorted = newWF.map((workflow) => {
+    return workflow.sort((a, b) => {
+      const dateA = a.date;
+      const dateB = b.date;
+      if (dateA && dateB) {
+        const diff = dateA.getTime() - dateB.getTime();
+        const day_diff = Math.round(diff / (1000 * 3600 * 24));
+        if (day_diff === 0) {
+          if (a.priority === 'CRITICAL' && b.priority !== 'CRITICAL') return -1;
+          else if (a.priority !== 'CRITICAL' && b.priority === 'CRITICAL')
+            return 1;
+          else if (a.priority === 'HIGH' && b.priority !== 'HIGH') return -1;
+          else if (a.priority !== 'HIGH' && b.priority === 'HIGH') return 1;
+          else if (a.priority === 'MEDIUM' && b.priority !== 'MEDIUM')
+            return -1;
+          else if (a.priority !== 'MEDIUM' && b.priority === 'MEDIUM') return 1;
+          else return 0;
+        } else return day_diff;
+      }
+      if (dateA && !dateB) return -1;
+      else if (!dateA && dateB) return 1;
+      else {
+        if (a.priority === 'CRITICAL' && b.priority !== 'CRITICAL') return -1;
+        else if (a.priority !== 'CRITICAL' && b.priority === 'CRITICAL')
+          return 1;
+        else if (a.priority === 'HIGH' && b.priority !== 'HIGH') return -1;
+        else if (a.priority !== 'HIGH' && b.priority === 'HIGH') return 1;
+        else if (a.priority === 'MEDIUM' && b.priority !== 'MEDIUM') return -1;
+        else if (a.priority !== 'MEDIUM' && b.priority === 'MEDIUM') return 1;
+        else return 0;
+      }
     });
-    return workflows.map((workflow, idx) => {
-      return {...workflow, tasks: sorted[idx].map((task) => task.taskId)};
-    });
+  });
+  return workflows.map((workflow, idx) => {
+    return { ...workflow, tasks: sorted[idx].map((task) => task.taskId) };
+  });
 }
 
 export default function Boards({ boards }: Props) {
@@ -95,7 +98,7 @@ export default function Boards({ boards }: Props) {
     );
   }
 
-  const {user} = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeBoard = boards[activeIndex];
   const [workflowState, setWorkflowState] = useState(activeBoard.workflows);
@@ -111,15 +114,15 @@ export default function Boards({ boards }: Props) {
   const [boardName, setBoardName] = useState<string>('');
   const [boardLimit, setBoardLimit] = useState<number>(0);
 
-  const[taskName, setTaskName] = useState('');
-  const[taskDescription, setTaskDescription] = useState('');
-  const[taskType, setTaskType] = useState<TaskType>("STORY");
-  const[priority, setPriority] = useState<Priority>("LOW");
-  const[assignee, setAssignee] = useState('');
-  const[dueDate, setDueDate] = useState('');
+  const [taskName, setTaskName] = useState('');
+  const [taskDescription, setTaskDescription] = useState('');
+  const [taskType, setTaskType] = useState<TaskType>('STORY');
+  const [priority, setPriority] = useState<Priority>('LOW');
+  const [assignee, setAssignee] = useState('');
+  const [dueDate, setDueDate] = useState('');
 
-  const[editModal, setEditModal] = useState(false);
-  const[currentTaskId, setCurrentTaskId] = useState<string | null>(null);
+  const [editModal, setEditModal] = useState(false);
+  const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const setState = {
     setTaskName: setTaskName,
     setTaskDescription: setTaskDescription,
@@ -137,11 +140,14 @@ export default function Boards({ boards }: Props) {
     event.dataTransfer.setData('columnOrderId', event.currentTarget.id);
   }
 
-  function taskDragstartHandler(event: React.DragEvent<HTMLDivElement>){
+  function taskDragstartHandler(event: React.DragEvent<HTMLDivElement>) {
     event.stopPropagation();
     event.dataTransfer.setData('type', 'task');
     event.dataTransfer.setData('taskId', event.currentTarget.dataset.id ?? '');
-    event.dataTransfer.setData('ogCol', event.currentTarget.dataset.parent ?? '');
+    event.dataTransfer.setData(
+      'ogCol',
+      event.currentTarget.dataset.parent ?? '',
+    );
     console.log(event.currentTarget.dataset.parent);
   }
 
@@ -149,39 +155,44 @@ export default function Boards({ boards }: Props) {
     event: React.DragEvent<HTMLDivElement>,
     workflows: Workflow[],
   ) {
-    if(event.currentTarget.dataset.column === 'true') {
+    if (event.currentTarget.dataset.column === 'true') {
       const type = event.dataTransfer.getData('type');
-      if(type === 'task'){
+      if (type === 'task') {
         // check for wip limit, adjacent column, same columns
         const ogCol = event.dataTransfer.getData('ogCol');
         const currCol = workflows[Number(event.currentTarget.id)].id;
-        if(ogCol === currCol) return;
-        const ogColIdx = workflows.find((workflow) => workflow.id === ogCol)?.orderIdx;
+        if (ogCol === currCol) return;
+        const ogColIdx = workflows.find(
+          (workflow) => workflow.id === ogCol,
+        )?.orderIdx;
         const currColIdx = Number(event.currentTarget.id);
-        if(ogColIdx === undefined) return;
-        if(ogColIdx + 1 !== currColIdx) return;
+        if (ogColIdx === undefined) return;
+        if (ogColIdx + 1 !== currColIdx) return;
         const limit = workflows[currColIdx].limit;
         const taskCount = workflows[currColIdx].tasks.length;
         console.log(currColIdx);
-        if(limit != -1 && taskCount >= limit) return;
+        if (limit != -1 && taskCount >= limit) return;
       }
       event.preventDefault();
     }
     event.stopPropagation();
     async function changeOrder(workflow: Workflow, newOrderIdx: number) {
-      try{
-        await fetch(`http://localhost:3000/api/project/${activeBoard.projectId}/board/${activeBoard.id}/update-column/${workflow.id}`, {
-          method: 'PUT',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
+      try {
+        await fetch(
+          `http://localhost:3000/api/project/${activeBoard.projectId}/board/${activeBoard.id}/update-column/${workflow.id}`,
+          {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              name: workflow.name,
+              limit: workflow.limit,
+              orderIdx: newOrderIdx,
+            }),
           },
-          body: JSON.stringify({
-            name: workflow.name,
-            limit: workflow.limit,
-            orderIdx: newOrderIdx,
-          }),
-        });
+        );
         workflow.orderIdx = newOrderIdx;
         const newWorkflowState = [...workflowState];
         setWorkflowState(newWorkflowState);
@@ -199,64 +210,65 @@ export default function Boards({ boards }: Props) {
           workflow.orderIdx <= endIdx
         ) {
           changeOrder(workflow, workflow.orderIdx - 1);
-        }
-        else if(endIdx > startIdx && workflow.orderIdx === startIdx) {
+        } else if (endIdx > startIdx && workflow.orderIdx === startIdx) {
           changeOrder(workflow, endIdx);
-        }
-        else if(endIdx < startIdx && workflow.orderIdx >= endIdx && workflow.orderIdx < startIdx) {
+        } else if (
+          endIdx < startIdx &&
+          workflow.orderIdx >= endIdx &&
+          workflow.orderIdx < startIdx
+        ) {
           changeOrder(workflow, workflow.orderIdx + 1);
-        }
-        else if(endIdx < startIdx && workflow.orderIdx === startIdx) {
+        } else if (endIdx < startIdx && workflow.orderIdx === startIdx) {
           changeOrder(workflow, endIdx);
         }
       });
-    }
-    else if(event.dataTransfer.getData('type') === 'task') {
+    } else if (event.dataTransfer.getData('type') === 'task') {
       const currCol = Number(event.currentTarget.id);
       const colId = workflows[currCol].id;
       const ogCol = event.dataTransfer.getData('ogCol');
       const taskId = event.dataTransfer.getData('taskId');
-      try{
+      try {
         const res1 = await fetch(`http://localhost:3000/api/task/${taskId}`, {
           credentials: 'include',
         });
         const data = await res1.json();
-        const res = await fetch(`http://localhost:3000/api/task/update/${taskId}`, {
-          method: 'PUT',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
+        const res = await fetch(
+          `http://localhost:3000/api/task/update/${taskId}`,
+          {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              title: data.task.title,
+              description: data.task.description,
+              type: data.task.type,
+              priority: data.task.priority,
+              assignee: data.task.assignee,
+              reporter: data.task.reporter,
+              dueDate: data.task.dueDate,
+              statusId: colId,
+            }),
           },
-          body: JSON.stringify({
-            title: data.task.title,
-            description: data.task.description,
-            type: data.task.type,
-            priority: data.task.priority,
-            assignee: data.task.assignee,
-            reporter: data.task.reporter,
-            dueDate: data.task.dueDate,
-            statusId: colId,
-          }),
-        });
+        );
         const text = await res.text();
         console.log('Task update response: ', text);
-      }
-      catch(err) {
-        console.log('Error transferring task: ', {cause: err});
+      } catch (err) {
+        console.log('Error transferring task: ', { cause: err });
         return;
       }
       const newWF = workflows.map((workflow) => {
-        if(workflow.id === colId) {
+        if (workflow.id === colId) {
           return {
             ...workflow,
             tasks: [...workflow.tasks, taskId],
-          }
-        }
-        else if(workflow.id === ogCol) {
+          };
+        } else if (workflow.id === ogCol) {
           return {
             ...workflow,
             tasks: workflow.tasks.filter((id) => id !== taskId),
-          }
+          };
         }
         return workflow;
       });
@@ -270,10 +282,13 @@ export default function Boards({ boards }: Props) {
   }
 
   async function getUserIdFromEmail(email: string): Promise<number> {
-    try{
-      const res = await fetch(`http://localhost:3000/api/auth/get-user-by-mail/${email}`, {
-        credentials: 'include',
-      });
+    try {
+      const res = await fetch(
+        `http://localhost:3000/api/auth/get-user-by-mail/${email}`,
+        {
+          credentials: 'include',
+        },
+      );
       const resJson = await res.json();
       return resJson.data.personalData.userId;
     } catch (err) {
@@ -284,7 +299,7 @@ export default function Boards({ boards }: Props) {
   const handleAdd: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
 
-    if(!projectId || !activeBoard) {
+    if (!projectId || !activeBoard) {
       return;
     }
 
@@ -292,7 +307,7 @@ export default function Boards({ boards }: Props) {
     const reporterId: number = user?.userId ?? -1;
     const dateObject = dueDate !== '' ? new Date(dueDate) : null;
 
-    try{
+    try {
       const res = await fetch(`http://localhost:3000/api/task/create`, {
         method: 'POST',
         credentials: 'include',
@@ -313,18 +328,19 @@ export default function Boards({ boards }: Props) {
       });
       const data = await res.json();
       const newTaskId = data.taskId;
-      const newWF = workflowState.map((workflow) => 
-        workflow.id === activeColumnId ?  
-          { ...workflow, tasks: [...workflow.tasks, newTaskId]
-          } as Workflow
-          : workflow
+      const newWF = workflowState.map((workflow) =>
+        workflow.id === activeColumnId
+          ? ({
+            ...workflow,
+            tasks: [...workflow.tasks, newTaskId],
+          } as Workflow)
+          : workflow,
       );
       const sortedWF = await sortWorkflows(newWF);
       setWorkflowState(sortedWF);
     } catch (err) {
-      console.error('Error creating task:', {cause: err});
-    }
-    finally {
+      console.error('Error creating task:', { cause: err });
+    } finally {
       setShowAddTaskModal(false);
       setTaskName('');
       setTaskDescription('');
@@ -337,10 +353,13 @@ export default function Boards({ boards }: Props) {
 
   const handleEdit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try{
-      const ogres = await fetch(`http://localhost:3000/api/task/${currentTaskId}`, {
-        credentials: 'include',
-      });
+    try {
+      const ogres = await fetch(
+        `http://localhost:3000/api/task/${currentTaskId}`,
+        {
+          credentials: 'include',
+        },
+      );
       const ogdata = await ogres.json();
       const assigneeId: number = ogdata.task.assignee;
       const parentId = ogdata.task.parentId;
@@ -366,11 +385,9 @@ export default function Boards({ boards }: Props) {
       const newWF = workflowState.map((workflow) => workflow);
       const sortedWF = await sortWorkflows(newWF);
       setWorkflowState(sortedWF);
-    }
-    catch(err){
-      console.error('Error editing task: ', {cause: err});
-    }
-    finally{
+    } catch (err) {
+      console.error('Error editing task: ', { cause: err });
+    } finally {
       setEditModal(false);
       setTaskName('');
       setTaskDescription('');
@@ -385,247 +402,215 @@ export default function Boards({ boards }: Props) {
   return (
     <>
       <>
-        {
-          showAddTaskModal && (
-            <Modal onclick={() => setShowAddTaskModal(false)}>
-              <div>
-                <h2
-                  style={{
-                    textAlign: 'center',
-                    marginBottom: '1.5rem',
-                    fontWeight: '700',
-                  }}
-                >
-                  Create new Task
-                </h2>
-                <form className={formStyles.createForm} onSubmit={handleAdd}>
-                  <div className={formStyles.inputArea}>
-                    <label htmlFor="name" className={formStyles.label}>
-                      Task Name
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Create QGraphicsScene"
-                      name="taskName"
-                      id="taskName"
-                      onChange={(e) => setTaskName(e.target.value)}
-                      required
-                      className={formStyles.formControl}
-                      value={taskName}
-                    />
-                  </div>
-                  <div className={formStyles.inputArea}>
-                    <label htmlFor="description" className={formStyles.label}>
-                      Description
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Create QGraphicsScene for rendering SVG elements"
-                      name="taskDescription"
-                      id="taskDescription"
-                      onChange={(e) => setTaskDescription(e.target.value)}
-                      required
-                      className={formStyles.formControl}
-                      value={taskDescription}
-                    />
-                  </div>
-                  <div className={formStyles.inputArea}>
-                    <label htmlFor="taskType" className={formStyles.label}>
-                      Task Type
-                    </label>
-                    <select
-                      name="taskType"
-                      id="taskType"
-                      onChange={(e) => setTaskType(e.target.value as TaskType)}
-                      value={taskType}
-                      className={formStyles.formControl}
-                    >
-                      <option value="STORY">Story</option>
-                      <option value="TASK">Task</option>
-                      <option value="BUG">Bug</option>
-                    </select>
-                  </div>
-                  <div className={formStyles.inputArea}>
-                    <label htmlFor="taskPriority" className={formStyles.label}>
-                      Priority
-                    </label>
-                    <select
-                      name="taskPriority"
-                      id="taskPriority"
-                      onChange={(e) => setPriority(e.target.value as Priority)}
-                      value={priority}
-                      className={formStyles.formControl}
-                    >
-                      <option value="LOW">Low</option>
-                      <option value="MEDIUM">Medium</option>
-                      <option value="HIGH">High</option>
-                      <option value="CRITICAL">Critical</option>
-                    </select>
-                  </div>
-                  <div className={formStyles.inputArea}>
-                    <label htmlFor="assignee" className={formStyles.label}>
-                      Assignee
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="e.g. johndoe@taskboard.com"
-                      name="assignee"
-                      id="assignee"
-                      onChange={(e) => setAssignee(e.target.value)}
-                      required
-                      className={formStyles.formControl}
-                      value={assignee}
-                    />
-                  </div>
-                  <div className={formStyles.inputArea}>
-                    <label htmlFor="dueDate" className={formStyles.label}>
-                      Due Date
-                    </label>
-                    <input
-                      type="date"
-                      name="dueDate"
-                      id="dueDate"
-                      onChange={(e) => setDueDate(e.target.value)}
-                      className={formStyles.formControl}
-                      value={dueDate}
-                    />
-                  </div>
-                    <div className={formStyles.buttonGroup}>
-                    <Button
-                      priority="second"
-                      type="button"
-                      onClick={() => setShowAddTaskModal(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button priority="first" type="submit">
-                      Create Task
-                    </Button>
-                  </div>
-                </form>
-              </div>
-            </Modal>
-          )
-        }
-        {editModal && <Modal onclick={() => {setEditModal(false); setCurrentTaskId(null);}}>
-              <div>
-                <h2
-                  style={{
-                    textAlign: 'center',
-                    marginBottom: '1.5rem',
-                    fontWeight: '700',
-                  }}
-                >
-                  Edit Task
-                </h2>
-                <form className={formStyles.createForm} onSubmit={handleEdit}>
-                  <div className={formStyles.inputArea}>
-                    <label htmlFor="name" className={formStyles.label}>
-                      Task Name
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Create QGraphicsScene"
-                      name="taskName"
-                      id="taskName"
-                      onChange={(e) => setTaskName(e.target.value)}
-                      required
-                      className={formStyles.formControl}
-                      value={taskName}
-                    />
-                  </div>
-                  <div className={formStyles.inputArea}>
-                    <label htmlFor="description" className={formStyles.label}>
-                      Description
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Create QGraphicsScene for rendering SVG elements"
-                      name="taskDescription"
-                      id="taskDescription"
-                      onChange={(e) => setTaskDescription(e.target.value)}
-                      required
-                      className={formStyles.formControl}
-                      value={taskDescription}
-                    />
-                  </div>
-                  <div className={formStyles.inputArea}>
-                    <label htmlFor="taskType" className={formStyles.label}>
-                      Task Type
-                    </label>
-                    <select
-                      name="taskType"
-                      id="taskType"
-                      onChange={(e) => setTaskType(e.target.value as TaskType)}
-                      value={taskType}
-                      className={formStyles.formControl}
-                    >
-                      <option value="STORY">Story</option>
-                      <option value="TASK">Task</option>
-                      <option value="BUG">Bug</option>
-                    </select>
-                  </div>
-                  <div className={formStyles.inputArea}>
-                    <label htmlFor="taskPriority" className={formStyles.label}>
-                      Priority
-                    </label>
-                    <select
-                      name="taskPriority"
-                      id="taskPriority"
-                      onChange={(e) => setPriority(e.target.value as Priority)}
-                      value={priority}
-                      className={formStyles.formControl}
-                    >
-                      <option value="LOW">Low</option>
-                      <option value="MEDIUM">Medium</option>
-                      <option value="HIGH">High</option>
-                      <option value="CRITICAL">Critical</option>
-                    </select>
-                  </div>
-                  <div className={formStyles.inputArea}>
-                    <label htmlFor="assignee" className={formStyles.label}>
-                      Assignee
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="e.g. johndoe@taskboard.com"
-                      name="assignee"
-                      id="assignee"
-                      onChange={(e) => setAssignee(e.target.value)}
-                      required
-                      className={formStyles.formControl}
-                      value={assignee}
-                    />
-                  </div>
-                  <div className={formStyles.inputArea}>
-                    <label htmlFor="dueDate" className={formStyles.label}>
-                      Due Date
-                    </label>
-                    <input
-                      type="date"
-                      name="dueDate"
-                      id="dueDate"
-                      onChange={(e) => setDueDate(e.target.value)}
-                      className={formStyles.formControl}
-                      value={dueDate}
-                    />
-                  </div>
-                    <div className={formStyles.buttonGroup}>
-                    <Button
-                      priority="second"
-                      type="button"
-                      onClick={() => setEditModal(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button priority="first" type="submit">
-                      Edit Task
-                    </Button>
-                  </div>
-                </form>
-              </div>
-            </Modal>
-        }
+        {showAddTaskModal && (
+          <Modal onclick={() => setShowAddTaskModal(false)}>
+            <div>
+              <h2
+                style={{
+                  textAlign: 'center',
+                  marginBottom: '1.5rem',
+                  fontWeight: '700',
+                }}
+              >
+                Create new Task
+              </h2>
+              <Form onSubmit={handleAdd}>
+                <InputArea>
+                  <Label htmlFor="name">Task Name</Label>
+                  <FormControl
+                    type="text"
+                    placeholder="e.g. Create QGraphicsScene"
+                    name="taskName"
+                    id="taskName"
+                    onChange={(e) => setTaskName(e.target.value)}
+                    required
+                    value={taskName}
+                  />
+                </InputArea>
+                <InputArea>
+                  <Label htmlFor="description">Description</Label>
+                  <FormControl
+                    type="text"
+                    placeholder="e.g. Create QGraphicsScene for rendering SVG elements"
+                    name="taskDescription"
+                    id="taskDescription"
+                    onChange={(e) => setTaskDescription(e.target.value)}
+                    required
+                    value={taskDescription}
+                  />
+                </InputArea>
+                <InputArea>
+                  <Label htmlFor="taskType">Task Type</Label>
+                  <select
+                    name="taskType"
+                    id="taskType"
+                    onChange={(e) => setTaskType(e.target.value as TaskType)}
+                    value={taskType}
+                  >
+                    <option value="STORY">Story</option>
+                    <option value="TASK">Task</option>
+                    <option value="BUG">Bug</option>
+                  </select>
+                </InputArea>
+                <InputArea>
+                  <Label htmlFor="taskPriority">Priority</Label>
+                  <select
+                    name="taskPriority"
+                    id="taskPriority"
+                    onChange={(e) => setPriority(e.target.value as Priority)}
+                    value={priority}
+                  >
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HIGH">High</option>
+                    <option value="CRITICAL">Critical</option>
+                  </select>
+                </InputArea>
+                <InputArea>
+                  <Label htmlFor="assignee">Assignee</Label>
+                  <FormControl
+                    type="email"
+                    placeholder="e.g. johndoe@taskboard.com"
+                    name="assignee"
+                    id="assignee"
+                    onChange={(e) => setAssignee(e.target.value)}
+                    required
+                    value={assignee}
+                  />
+                </InputArea>
+                <InputArea>
+                  <Label htmlFor="dueDate">Due Date</Label>
+                  <FormControl
+                    type="date"
+                    name="dueDate"
+                    id="dueDate"
+                    onChange={(e) => setDueDate(e.target.value)}
+                    value={dueDate}
+                  />
+                </InputArea>
+                <div className={formStyles.buttonGroup}>
+                  <Button
+                    priority="second"
+                    type="button"
+                    onClick={() => setShowAddTaskModal(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button priority="first" type="submit">
+                    Create Task
+                  </Button>
+                </div>
+              </Form>
+            </div>
+          </Modal>
+        )}
+        {editModal && (
+          <Modal
+            onclick={() => {
+              setEditModal(false);
+              setCurrentTaskId(null);
+            }}
+          >
+            <div>
+              <h2
+                style={{
+                  textAlign: 'center',
+                  marginBottom: '1.5rem',
+                  fontWeight: '700',
+                }}
+              >
+                Edit Task
+              </h2>
+              <Form onSubmit={handleEdit}>
+                <InputArea>
+                  <Label htmlFor="name">Task Name</Label>
+                  <FormControl
+                    type="text"
+                    placeholder="e.g. Create QGraphicsScene"
+                    name="taskName"
+                    id="taskName"
+                    onChange={(e) => setTaskName(e.target.value)}
+                    required
+                    value={taskName}
+                  />
+                </InputArea>
+                <InputArea>
+                  <Label htmlFor="description">Description</Label>
+                  <FormControl
+                    type="text"
+                    placeholder="e.g. Create QGraphicsScene for rendering SVG elements"
+                    name="taskDescription"
+                    id="taskDescription"
+                    onChange={(e) => setTaskDescription(e.target.value)}
+                    required
+                    value={taskDescription}
+                  />
+                </InputArea>
+                <InputArea>
+                  <label htmlFor="taskType">Task Type</label>
+                  <select
+                    name="taskType"
+                    id="taskType"
+                    onChange={(e) => setTaskType(e.target.value as TaskType)}
+                    value={taskType}
+                  >
+                    <option value="STORY">Story</option>
+                    <option value="TASK">Task</option>
+                    <option value="BUG">Bug</option>
+                  </select>
+                </InputArea>
+                <InputArea>
+                  <label htmlFor="taskPriority">Priority</label>
+                  <select
+                    name="taskPriority"
+                    id="taskPriority"
+                    onChange={(e) => setPriority(e.target.value as Priority)}
+                    value={priority}
+                  >
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HIGH">High</option>
+                    <option value="CRITICAL">Critical</option>
+                  </select>
+                </InputArea>
+                <InputArea>
+                  <Label htmlFor="assignee">Assignee</Label>
+                  <FormControl
+                    type="email"
+                    placeholder="e.g. johndoe@taskboard.com"
+                    name="assignee"
+                    id="assignee"
+                    onChange={(e) => setAssignee(e.target.value)}
+                    required
+                    value={assignee}
+                  />
+                </InputArea>
+                <InputArea>
+                  <Label htmlFor="dueDate">Due Date</Label>
+                  <FormControl
+                    type="date"
+                    name="dueDate"
+                    id="dueDate"
+                    onChange={(e) => setDueDate(e.target.value)}
+                    value={dueDate}
+                  />
+                </InputArea>
+                <div className={formStyles.buttonGroup}>
+                  <Button
+                    priority="second"
+                    type="button"
+                    onClick={() => setEditModal(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button priority="first" type="submit">
+                    Edit Task
+                  </Button>
+                </div>
+              </Form>
+            </div>
+          </Modal>
+        )}
       </>
       <div className={styles.container}>
         <div className={styles.tabList} role="tablist">
@@ -659,9 +644,7 @@ export default function Boards({ boards }: Props) {
             aria-labelledby={`board-tab-${activeIndex}`}
             className={styles.panel}
           >
-            {/* {activeBoard.workflows[0].tasks} */}
             <div className={styles.kanbanBoard}>
-              {/* {activeBoard.workflows.length} */}
               {workflowState
                 .sort((a, b) => a.orderIdx - b.orderIdx)
                 .map((workflow) => {
@@ -671,9 +654,13 @@ export default function Boards({ boards }: Props) {
                       id={workflow.orderIdx.toString()}
                       workflow={workflow}
                       onAddTask={() => {
-                        if(workflow.tasks.length >= workflow.limit && workflow.limit !== -1) return;
+                        if (
+                          workflow.tasks.length >= workflow.limit &&
+                          workflow.limit !== -1
+                        )
+                          return;
                         setShowAddTaskModal(true);
-                        setActiveColumnId(workflow.id);  
+                        setActiveColumnId(workflow.id);
                       }}
                       draggable={true}
                       dragstartHandler={dragstartHandler}
@@ -695,21 +682,21 @@ export default function Boards({ boards }: Props) {
                   >
                     <IconPlus />
                   </button>
-                  {isAdding &&
+                  {isAdding && (
                     <div className={styles.addColumnMenu}>
-                      <input
+                      <FormControl
+                        name='col-name'
                         type="text"
                         value={boardName}
                         onChange={(e) => setBoardName(e.target.value)}
                         placeholder="Column Name"
-                        className={styles.formControl}
                       />
-                      <input
+                      <FormControl
                         placeholder="Limit"
                         type="number"
                         value={boardLimit}
+                        name='limit'
                         onChange={(e) => setBoardLimit(e.target.valueAsNumber)}
-                        className={styles.formControl}
                       />
                       <Button
                         onClick={() => {
@@ -719,18 +706,20 @@ export default function Boards({ boards }: Props) {
                             workflowState.length,
                             projectId ?? '',
                             boardLimit,
-                          ).then((column) => {
-                            setWorkflowState([...workflowState, column]);
-                          }).finally(() => {
-                            setBoardName('');
-                            setBoardLimit(0);
-                          });
+                          )
+                            .then((column) => {
+                              setWorkflowState([...workflowState, column]);
+                            })
+                            .finally(() => {
+                              setBoardName('');
+                              setBoardLimit(0);
+                            });
                         }}
                       >
                         Add
                       </Button>
                     </div>
-                  }
+                  )}
                 </div>
               )}
             </div>

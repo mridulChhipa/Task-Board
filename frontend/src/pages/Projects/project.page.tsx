@@ -99,7 +99,6 @@ export default function ProjectPage() {
         <hr />
         <Boards boards={project.boards ?? []} />
       </div>
-
     </>
   );
 }

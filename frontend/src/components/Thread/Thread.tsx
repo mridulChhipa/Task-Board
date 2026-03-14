@@ -6,7 +6,7 @@ import styles from './thread.module.css';
 interface Props {
   thread: ThreadDTO;
   allComments: Record<string, CommentDTO>;
-  deleteThread: (id: string) => Promise<void>,
+  deleteThread: (id: string) => Promise<void>;
 }
 
 export default function Thread({ thread, allComments, deleteThread }: Props) {
@@ -17,16 +17,18 @@ export default function Thread({ thread, allComments, deleteThread }: Props) {
     <div className={styles.threadContainer}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <h2>{thread.title}</h2>
-        <span className={styles.deleteIcon} onClick={() => deleteThread(thread.id)}>
+        <span
+          className={styles.deleteIcon}
+          onClick={() => deleteThread(thread.id)}
+        >
           <IconDelete />
         </span>
       </div>
       <div className={styles.meta}>
-        Posted by User {thread.authorId} on {new Date(thread.createdAt).toDateString()}
+        Posted by User {thread.authorId} on
+        {new Date(thread.createdAt).toDateString()}
       </div>
-      <div className={styles.content}>
-        {thread.content}
-      </div>
+      <div className={styles.content}>{thread.content}</div>
 
       <section className={styles.commentSection}>
         <h3>Comments ({thread.comments ?? [].length})</h3>
@@ -40,4 +42,4 @@ export default function Thread({ thread, allComments, deleteThread }: Props) {
       </section>
     </div>
   );
-};
+}

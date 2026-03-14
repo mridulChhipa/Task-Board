@@ -3,6 +3,7 @@ import Button from '../Button/Button';
 import styles from './CreateProject.module.css';
 import tableStyles from '../../pages/Dashboard/Dashboard.module.css';
 import type { Operation, ProjectMember } from '../../pages/Dashboard/Dashboard';
+import Form, { FormControl, InputArea, Label } from '../Forms/Form';
 
 interface Props {
   operation: Operation;
@@ -51,26 +52,26 @@ export default function AddUser({
         {operation === 'View' && 'View Users'}
       </h2>
       {operation !== 'View' && (
-        <form className={styles.createForm} onSubmit={handleAdd}>
-          <div className={styles.inputArea}>
-            <label htmlFor="name" className={styles.label}>
+        <Form onSubmit={handleAdd}>
+          <InputArea>
+            <Label htmlFor="name">
               User e-mail:
-            </label>
-            <input
+            </Label>
+            <FormControl
+              name='email'
               type="email"
               placeholder="e.g. john_doe@taskboard.com"
               value={userToAdd}
               onChange={(e) => setUserToAdd(e.target.value)}
               required
-              className={styles.formControl}
             />
-          </div>
+          </InputArea>
 
           {operation !== 'Remove' && (
-            <div className={styles.inputArea}>
-              <label htmlFor="newRole" className={styles.label}>
+            <InputArea>
+              <Label htmlFor="newRole">
                 Project Role:
-              </label>
+              </Label>
               <select
                 value={newRole}
                 onChange={(e) => setNewRole(e.target.value)}
@@ -79,7 +80,7 @@ export default function AddUser({
                 <option value="PROJECT_MEMBER">Member</option>
                 <option value="PROJECT_VIEWER">Viewer</option>
               </select>
-            </div>
+            </InputArea>
           )}
 
           <div className={styles.buttonGroup}>
@@ -96,7 +97,7 @@ export default function AddUser({
               {operation === 'Remove' && 'Remove User'}
             </Button>
           </div>
-        </form>
+        </Form>
       )}
       {operation === 'View' && (
         <table className={tableStyles.projectTable}>

@@ -14,11 +14,10 @@ export function Comment({ commentId, allComments }: Props) {
   return (
     <div className={styles.commentWrapper}>
       <div className={styles.meta}>
-        <strong>User {comment.authorId}</strong> {new Date(comment.createdAt).toLocaleDateString()}
+        <strong>User {comment.authorId}</strong>
+        {new Date(comment.createdAt).toLocaleDateString()}
       </div>
-      <div className={styles.content}>
-        {comment.content}
-      </div>
+      <div className={styles.content}>{comment.content}</div>
 
       {comment.replies && comment.replies.length > 0 && (
         <div className={styles.repliesList}>
@@ -33,4 +32,4 @@ export function Comment({ commentId, allComments }: Props) {
       )}
     </div>
   );
-};
+}

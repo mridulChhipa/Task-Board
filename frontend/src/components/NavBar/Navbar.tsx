@@ -3,8 +3,8 @@ import logo from '../../assets/logo.png';
 import { Link, NavLink } from 'react-router';
 import { useContext, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import settingsIcon from '../../assets/settingsIcon.svg';
 import { useLogout } from '../../utils/auth.utils';
+import { IconSettings } from '../Boards/boards.images';
 
 function NavBar() {
   const [open, setOpen] = useState(false);
@@ -122,7 +122,7 @@ function NavBar() {
                       setDropOpen(!dropOpen);
                     }}
                   >
-                    <img src={settingsIcon} />
+                    <IconSettings />
                   </button>
 
                   {dropOpen && (
