@@ -14,12 +14,14 @@ export class CommentController {
     next: NextFunction,
   ): Promise<void> {
     try {
+      // console.log("===========\n ReqBody from thread : ", );
       const threadyBody: ThreadBody = req.body;
-      const tid = await commentService.createThread(threadyBody);
+      console.log(threadyBody);
+      const task = await commentService.createThread(threadyBody);
 
       res.status(201).json({
         status: 'success',
-        tid,
+        task,
       });
     } catch (error) {
       // throw new Error('Error creating thread from controller: ', {

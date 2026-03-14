@@ -1,0 +1,9 @@
+.taskContainer {
+  margin: 2rem;
+}
+
+.inputArea {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

@@ -7,6 +7,7 @@ import {
   IconUser,
   IconWarning,
 } from './boards.images';
+import { Link } from 'react-router-dom';
 
 interface Props {
   task: Task;
@@ -40,7 +41,9 @@ export function TaskCard({ task, dragstartHandler, deleteTask }: Props) {
         </span>
       </div>
 
-      <div className={styles.taskTitle}>{task.title}</div>
+      <Link to={`./task/${task.id}`} className={styles.taskTitle}>
+        {task.title}
+      </Link>
 
       {task.dueDate && (
         <div

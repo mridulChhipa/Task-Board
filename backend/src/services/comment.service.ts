@@ -17,7 +17,7 @@ export class CommentService {
     authorId,
     content,
     taskId,
-  }: ThreadBody): Promise<string> {
+  }: ThreadBody): Promise<ThreadDTO> {
     try {
       const createdThread = await db.thread.create({
         data: {
@@ -47,7 +47,7 @@ export class CommentService {
         // });
       }
 
-      return createdThread.id;
+      return createdThread as ThreadDTO;
     } catch (error) {
       throw new Error('Error creating thread: ', { cause: error });
     }
