@@ -98,9 +98,6 @@ export default function ProjectPage() {
         </div>
         <hr />
         <Boards boards={project.boards ?? []} />
-
-        <CommentTest />
-
       </div>
 
     </>

@@ -174,12 +174,14 @@ export class TaskService {
         },
         include: {
           children: true,
+          threads: true,
         },
       });
 
       if (!existingTask) {
         throw new Error('Task with the given taskId does not exist');
       }
+      console.log(existingTask);
 
       // VSCode automatically tells if await is needed or not
       return toTaskDTO(existingTask);

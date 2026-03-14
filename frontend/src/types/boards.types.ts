@@ -1,3 +1,5 @@
+import type { ThreadDTO } from "./comment.types";
+
 export interface Workflow {
   id: string;
   name: string;
@@ -23,4 +25,5 @@ export interface Task {
   resolvedAt?: Date;
   closedAt?: string;
   parentId?: string;
+  threads?: ThreadDTO[];
 }

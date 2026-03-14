@@ -8,6 +8,8 @@ import { AuthProvider } from './context/AuthProvider.tsx';
 import Loader from './components/ui/Loader.tsx';
 import ProjectPage from './pages/Projects/project.page.tsx';
 import { ProjectProvider } from './context/ProjectProvider.tsx';
+import TaskPage from './pages/task.page.tsx';
+import { taskLoader } from './utils/task.utils.ts';
 
 function App() {
   return (
@@ -25,7 +27,17 @@ function App() {
             path="/project/:pid"
             element={
               <ProjectProvider>
-                <ProjectPage />
+                <ProjectPage>
+                </ProjectPage>
+              </ProjectProvider>
+            }
+          />
+
+          <Route
+            path="/project/:pid/task/:tid"
+            element={
+              <ProjectProvider>
+                <TaskPage />
               </ProjectProvider>
             }
           />

@@ -1,3 +1,5 @@
+import { ThreadDTO } from "./comment.types";
+
 export enum TaskType {
   STORY = 'STORY',
   TASK = 'TASK',
@@ -38,7 +40,8 @@ export interface TaskDTO {
   updatedAt: Date;
   resolvedAt: Date | null;
   closedAt: Date | null;
-  children: TaskDTO[];
+  children: string[];
+  threads: ThreadDTO[];
 }
 
 export interface TaskResponseBody {

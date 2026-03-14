@@ -18,7 +18,7 @@ commentRouter.post('/update-comment/:cid', (req, res, next) => {
   commentController.updateComment(req, res, next);
 });
 
-commentRouter.post('/delete-thread/:tid', (req, res, next) => {
+commentRouter.patch('/delete-thread/:tid', (req, res, next) => {
   commentController.deleteThread(req, res, next);
 });
 
