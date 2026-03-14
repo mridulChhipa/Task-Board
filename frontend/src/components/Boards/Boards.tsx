@@ -16,6 +16,9 @@ interface Props {
   boards: Board[];
 }
 
+export type TaskType = "STORY" | "TASK" | "BUG";
+export type Priority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+
 async function sortWorkflows(workflows: Workflow[]): Promise<Workflow[]> {
   // use for sorting, commented out later.
     async function getDate(taskId: string){
@@ -110,12 +113,23 @@ export default function Boards({ boards }: Props) {
 
   const[taskName, setTaskName] = useState('');
   const[taskDescription, setTaskDescription] = useState('');
-  type TaskType = "STORY" | "TASK" | "BUG";
   const[taskType, setTaskType] = useState<TaskType>("STORY");
-  type Priority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   const[priority, setPriority] = useState<Priority>("LOW");
   const[assignee, setAssignee] = useState('');
   const[dueDate, setDueDate] = useState('');
+
+  const[editModal, setEditModal] = useState(false);
+  const[currentTaskId, setCurrentTaskId] = useState<string | null>(null);
+  const setState = {
+    setTaskName: setTaskName,
+    setTaskDescription: setTaskDescription,
+    setTaskType: setTaskType,
+    setPriority: setPriority,
+    setAssignee: setAssignee,
+    setDueDate: setDueDate,
+    setEditModal: setEditModal,
+    setCurrentTaskId: setCurrentTaskId,
+  };
 
   function dragstartHandler(event: React.DragEvent<HTMLDivElement>) {
     event.stopPropagation();
@@ -255,20 +269,20 @@ export default function Boards({ boards }: Props) {
     event.preventDefault();
   }
 
+  async function getUserIdFromEmail(email: string): Promise<number> {
+    try{
+      const res = await fetch(`http://localhost:3000/api/auth/get-user-by-mail/${email}`, {
+        credentials: 'include',
+      });
+      const resJson = await res.json();
+      return resJson.data.personalData.userId;
+    } catch (err) {
+      throw new Error('Error fetching user id from email: ', { cause: err });
+    }
+  }
+
   const handleAdd: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-
-    async function getUserIdFromEmail(email: string): Promise<number> {
-      try{
-        const res = await fetch(`http://localhost:3000/api/auth/get-user-by-mail/${email}`, {
-          credentials: 'include',
-        });
-        const resJson = await res.json();
-        return resJson.data.personalData.userId;
-      } catch (err) {
-        throw new Error('Error fetching user id from email: ', { cause: err });
-      }
-    }
 
     if(!projectId || !activeBoard) {
       return;
@@ -321,10 +335,56 @@ export default function Boards({ boards }: Props) {
     }
   };
 
+  const handleEdit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try{
+      const ogres = await fetch(`http://localhost:3000/api/task/${currentTaskId}`, {
+        credentials: 'include',
+      });
+      const ogdata = await ogres.json();
+      const assigneeId: number = ogdata.task.assignee;
+      const parentId = ogdata.task.parentId;
+      const statusId = ogdata.task.statusId;
+      await fetch(`http://localhost:3000/api/task/update/${currentTaskId}`, {
+        credentials: 'include',
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: taskName,
+          description: taskDescription,
+          type: taskType,
+          priority: priority,
+          reporter: ogdata.task.reporter,
+          assignee: assigneeId,
+          parentId: parentId,
+          statusId: statusId,
+          dueDate: dueDate !== '' ? new Date(dueDate) : null,
+        }),
+      });
+      const newWF = workflowState.map((workflow) => workflow);
+      const sortedWF = await sortWorkflows(newWF);
+      setWorkflowState(sortedWF);
+    }
+    catch(err){
+      console.error('Error editing task: ', {cause: err});
+    }
+    finally{
+      setEditModal(false);
+      setTaskName('');
+      setTaskDescription('');
+      setTaskType('STORY');
+      setPriority('LOW');
+      setAssignee('');
+      setDueDate('');
+      setCurrentTaskId(null);
+    }
+  };
+
   return (
     <>
       <>
-      <button onClick={() => {console.log(workflowState)}}>print</button>
         {
           showAddTaskModal && (
             <Modal onclick={() => setShowAddTaskModal(false)}>
@@ -447,6 +507,125 @@ export default function Boards({ boards }: Props) {
             </Modal>
           )
         }
+        {editModal && <Modal onclick={() => {setEditModal(false); setCurrentTaskId(null);}}>
+              <div>
+                <h2
+                  style={{
+                    textAlign: 'center',
+                    marginBottom: '1.5rem',
+                    fontWeight: '700',
+                  }}
+                >
+                  Edit Task
+                </h2>
+                <form className={formStyles.createForm} onSubmit={handleEdit}>
+                  <div className={formStyles.inputArea}>
+                    <label htmlFor="name" className={formStyles.label}>
+                      Task Name
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Create QGraphicsScene"
+                      name="taskName"
+                      id="taskName"
+                      onChange={(e) => setTaskName(e.target.value)}
+                      required
+                      className={formStyles.formControl}
+                      value={taskName}
+                    />
+                  </div>
+                  <div className={formStyles.inputArea}>
+                    <label htmlFor="description" className={formStyles.label}>
+                      Description
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Create QGraphicsScene for rendering SVG elements"
+                      name="taskDescription"
+                      id="taskDescription"
+                      onChange={(e) => setTaskDescription(e.target.value)}
+                      required
+                      className={formStyles.formControl}
+                      value={taskDescription}
+                    />
+                  </div>
+                  <div className={formStyles.inputArea}>
+                    <label htmlFor="taskType" className={formStyles.label}>
+                      Task Type
+                    </label>
+                    <select
+                      name="taskType"
+                      id="taskType"
+                      onChange={(e) => setTaskType(e.target.value as TaskType)}
+                      value={taskType}
+                      className={formStyles.formControl}
+                    >
+                      <option value="STORY">Story</option>
+                      <option value="TASK">Task</option>
+                      <option value="BUG">Bug</option>
+                    </select>
+                  </div>
+                  <div className={formStyles.inputArea}>
+                    <label htmlFor="taskPriority" className={formStyles.label}>
+                      Priority
+                    </label>
+                    <select
+                      name="taskPriority"
+                      id="taskPriority"
+                      onChange={(e) => setPriority(e.target.value as Priority)}
+                      value={priority}
+                      className={formStyles.formControl}
+                    >
+                      <option value="LOW">Low</option>
+                      <option value="MEDIUM">Medium</option>
+                      <option value="HIGH">High</option>
+                      <option value="CRITICAL">Critical</option>
+                    </select>
+                  </div>
+                  <div className={formStyles.inputArea}>
+                    <label htmlFor="assignee" className={formStyles.label}>
+                      Assignee
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="e.g. johndoe@taskboard.com"
+                      name="assignee"
+                      id="assignee"
+                      onChange={(e) => setAssignee(e.target.value)}
+                      required
+                      className={formStyles.formControl}
+                      value={assignee}
+                    />
+                  </div>
+                  <div className={formStyles.inputArea}>
+                    <label htmlFor="dueDate" className={formStyles.label}>
+                      Due Date
+                    </label>
+                    <input
+                      type="date"
+                      name="dueDate"
+                      id="dueDate"
+                      onChange={(e) => setDueDate(e.target.value)}
+                      className={formStyles.formControl}
+                      value={dueDate}
+                    />
+                  </div>
+                    <div className={formStyles.buttonGroup}>
+                    <Button
+                      priority="second"
+                      type="button"
+                      onClick={() => setEditModal(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button priority="first" type="submit">
+                      Edit Task
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            </Modal>
+        }
       </>
       <div className={styles.container}>
         <div className={styles.tabList} role="tablist">
@@ -501,6 +680,7 @@ export default function Boards({ boards }: Props) {
                       dropHandler={(e) => dropHandler(e, workflowState)}
                       dragoverHandler={dragoverHandler}
                       taskDragstartHandler={taskDragstartHandler}
+                      setState={setState}
                     />
                   );
                 })}

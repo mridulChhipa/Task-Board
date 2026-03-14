@@ -9,15 +9,42 @@ import {
 } from './boards.images';
 import { useNavigate } from 'react-router-dom';
 import IconSettings from '../../assets/settingsIcon.svg';
+import type { Priority, TaskType } from './Boards';
 
 interface Props {
   task: Task;
   deleteTask: (id: string) => Promise<void>;
   draggable?: boolean;
   dragstartHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
+  setState: {
+    setTaskName: React.Dispatch<React.SetStateAction<string>>;
+    setTaskDescription: React.Dispatch<React.SetStateAction<string>>;
+    setTaskType: React.Dispatch<React.SetStateAction<TaskType>>;
+    setPriority: React.Dispatch<React.SetStateAction<Priority>>;
+    setAssignee: React.Dispatch<React.SetStateAction<string>>;
+    setDueDate: React.Dispatch<React.SetStateAction<string>>;
+    setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
+    setCurrentTaskId: React.Dispatch<React.SetStateAction<string | null>>;
+  }
 }
 
-export function TaskCard({ task, dragstartHandler, deleteTask }: Props) {
+async function getMailfromId(id: number): Promise<string> {
+  try{
+    const res = await fetch(`http://localhost:3000/api/auth/${id}`, {
+      credentials: 'include',
+    });
+    const data = await res.json();
+    console.log(data);
+    const email =  data.data.personalData.email;
+    return email;
+  }
+  catch(err){
+    console.error("Error fetching user data", err);
+    return '';
+  }
+}
+
+export function TaskCard({ task, dragstartHandler, deleteTask, setState }: Props) {
   const overdue =
     typeof task.dueDate !== 'string' ? false : isOverdue(task.dueDate);
   // console.log(task);
@@ -49,8 +76,21 @@ export function TaskCard({ task, dragstartHandler, deleteTask }: Props) {
             <IconDelete />
           </span>
           <span className={styles.settingsIcon}>
-            <img src={IconSettings} alt="Settings" onClick={(e) => {
+            <img src={IconSettings} alt="Settings" onClick={async (e) => {
               e.stopPropagation();
+              setState.setTaskName(task.title);
+              setState.setTaskDescription(task.description ?? '');
+              setState.setTaskType(task.type);
+              setState.setPriority(task.priority);
+              setState.setAssignee(await getMailfromId(task.assignee));
+              setState.setDueDate(
+                task.dueDate
+                  ? new Date(task.dueDate).toISOString().slice(0, 10)
+                  : ''
+              );
+              setState.setCurrentTaskId(task.id);
+              setState.setEditModal(true);
+              console.log("HI");
             }} style={{height:'13px'}}/>
           </span>
         </div>

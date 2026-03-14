@@ -3,6 +3,7 @@ import type { Task, Workflow } from '../../types/boards.types';
 import { IconPlus } from './boards.images';
 import { TaskCard } from './TaskCard';
 import styles from './column.module.css';
+import type { TaskType, Priority } from './Boards';
 
 interface Props {
   id: string;
@@ -13,6 +14,16 @@ interface Props {
   dropHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
   dragoverHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
   taskDragstartHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
+  setState: {
+    setTaskName: React.Dispatch<React.SetStateAction<string>>;
+    setTaskDescription: React.Dispatch<React.SetStateAction<string>>;
+    setTaskType: React.Dispatch<React.SetStateAction<TaskType>>;
+    setPriority: React.Dispatch<React.SetStateAction<Priority>>;
+    setAssignee: React.Dispatch<React.SetStateAction<string>>;
+    setDueDate: React.Dispatch<React.SetStateAction<string>>;
+    setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
+    setCurrentTaskId: React.Dispatch<React.SetStateAction<string | null>>;
+  }
 }
 
 export function KanbanColumn({
@@ -24,6 +35,7 @@ export function KanbanColumn({
   dropHandler,
   dragoverHandler,
   taskDragstartHandler,
+  setState,
 }: Props) {
   const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -104,6 +116,7 @@ export function KanbanColumn({
             task={task}
             dragstartHandler={taskDragstartHandler}
             draggable={true}
+            setState={setState}
           />
         ))}
       </div>
