@@ -39,7 +39,6 @@ export default function TaskPage() {
         const task: Task = data.task;
 
         setTask(task);
-        setThreads(task.threads ?? []);
       } catch (err) {
         setError((err as Error).message);
       } finally {
