@@ -66,8 +66,7 @@ export class BoardService {
         },
       });
     } catch (error) {
-      console.log('Board Updation failed: ', error);
-      throw error;
+      throw new Error('Board Updation failed: ', { cause: error });
     }
   }
 
@@ -126,8 +125,7 @@ export class BoardService {
         },
       });
     } catch (error) {
-      console.log('Adding column...Failed with: ', error);
-      throw error;
+      throw new Error('Adding column...Failed with: ', { cause: error });
     }
   }
 
@@ -153,8 +151,7 @@ export class BoardService {
         },
       });
     } catch (error) {
-      console.log('Column Deletion...Failed with: ', error);
-      throw error;
+      throw new Error('Column Deletion...Failed with: ', { cause: error });
     }
   }
 
@@ -166,8 +163,7 @@ export class BoardService {
         },
       });
     } catch (error) {
-      console.log('Board Deletions...Failed with: ', error);
-      throw error;
+      throw new Error('Board Deletions...Failed with: ', { cause: error });
     }
   }
 
@@ -215,8 +211,7 @@ export class BoardService {
 
       return bdto;
     } catch (error) {
-      console.log('Board Deletions...Failed with: ', error);
-      throw error;
+      throw new Error('Board Deletions...Failed with: ', { cause: error });
     }
   }
 
@@ -242,8 +237,7 @@ export class BoardService {
 
       return coldto;
     } catch (error) {
-      console.log('Board Deletions...Failed with: ', error);
-      throw error;
+      throw new Error('Board Deletions...Failed with: ', { cause: error });
     }
   }
 }

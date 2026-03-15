@@ -23,7 +23,7 @@ interface Props {
     setDueDate: React.Dispatch<React.SetStateAction<string>>;
     setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
     setCurrentTaskId: React.Dispatch<React.SetStateAction<string | null>>;
-  }
+  };
 }
 
 export function KanbanColumn({
@@ -61,7 +61,7 @@ export function KanbanColumn({
 
   useEffect(() => {
     async function fetchTasks() {
-      if(workflow.tasks.length === 0) {
+      if (workflow.tasks.length === 0) {
         setTasks([]);
         return;
       }

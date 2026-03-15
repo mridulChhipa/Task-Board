@@ -1,13 +1,19 @@
 import { useState, useContext } from 'react';
 import styles from './auth.module.css';
 import Button from '../../components/Button/Button';
-import { DispatchContext } from '../../context/AuthContext';
+import { AuthContext, DispatchContext } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import type { SubmitEvent } from 'react';
+import Form, {
+  FormControl,
+  InputArea,
+  Label,
+} from '../../components/Forms/Form';
 
-export default function LoginPage() {
+export default function LogInPage() {
   const navigate = useNavigate();
   const dispatch = useContext(DispatchContext);
+  const authContext = useContext(AuthContext);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,8 +37,6 @@ export default function LoginPage() {
       if (!loginRes.ok) {
         throw new Error(`Login failed (${loginRes.status})`);
       }
-
-      // console.log("Hello World!");
 
       const loginData = await loginRes.json();
 
@@ -65,8 +69,6 @@ export default function LoginPage() {
             avatar: userData.data.personalData.avatar,
           },
           isLoading: false,
-          // refreshToken: loginData.refreshToken,
-          // authenticated: true,
         },
       });
 
@@ -79,63 +81,49 @@ export default function LoginPage() {
     }
   }
 
+  if (authContext.user) {
+    navigate('/dashboard');
+  }
+
   return (
     <div className={styles.loginform}>
       <div className={styles.formcontainer}>
         <h1>Log in to Task Board</h1>
-        <p style={{ fontSize: '1.1em' }}>
-          Enter your email and password in the given fields.
-        </p>
-        <div style={{ height: '30px' }} />
-
-        <form className={styles.form} onSubmit={handleSubmit}>
+        <Form className={styles.form} onSubmit={handleSubmit}>
           {error && (
             <p style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>
           )}
 
-          <div className={styles.input}>
-            <label htmlFor="email">Email:</label>
-            <input
+          <InputArea>
+            <Label htmlFor="email">Email:</Label>
+            <FormControl
               id="email"
               type="email"
               name="email"
               value={email}
+              placeholder="Email e.g. email@provider.com"
               onChange={(e) => setEmail(e.target.value)}
               required
-              className={styles.inputfield}
-              autoComplete="email"
-              disabled={isLoading}
             />
-          </div>
-
-          <div style={{ height: '20px' }} />
-
-          <div className={styles.input}>
-            <label htmlFor="password">Password:</label>
-            <input
+          </InputArea>
+          <InputArea>
+            <Label htmlFor="password">Password:</Label>
+            <FormControl
               id="password"
               type="password"
               name="password"
               value={password}
+              placeholder="Password"
               onChange={(e) => setPassword(e.target.value)}
               required
-              className={styles.inputfield}
-              autoComplete="current-password"
-              disabled={isLoading}
             />
-          </div>
-
-          <div style={{ height: '40px' }} />
+          </InputArea>
 
           <Button priority="first" type="submit" disabled={isLoading}>
             {isLoading ? 'Logging in...' : 'Log In'}
           </Button>
-        </form>
-
-        <div style={{ height: '20px' }} />
-        <p style={{ fontSize: '1.1em' }}>
-          Don't have an account? <Link to="/signup">Register here</Link>.
-        </p>
+        </Form>
+        Don't have an account? <Link to="/signup">Register here</Link>.
       </div>
     </div>
   );

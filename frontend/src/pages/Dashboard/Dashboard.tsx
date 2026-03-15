@@ -10,12 +10,14 @@ import type { Project } from '../../types/project.types';
 
 import Button from '../../components/Button/Button';
 import styles from './Dashboard.module.css';
-import dummyAvater from '../../assets/dummyAvatar.svg';
-import settingsIcon from '../../assets/settingsIcon.svg';
 import Modal from '../../components/Modal/Modal';
 import CreateProject from '../../components/Projects/CreateProject';
 import UpdateProject from '../../components/Projects/UpdateProject';
 import AddUser from '../../components/Projects/AddUser';
+import {
+  DummyAvatar,
+  IconSettings,
+} from '../../components/Boards/boards.images';
 
 export type Operation = 'View' | 'Add' | 'Edit' | 'Remove';
 export interface ProjectMember {
@@ -451,18 +453,35 @@ function DashBoard() {
                       Manage
                     </Button>
                   </td>
-                  <td style={{ display: 'flex', justifyContent: 'center' }}>
-                    <img
-                      src={settingsIcon}
-                      alt="settings"
-                      style={{ height: '25px' }}
+                  <td
+                    style={{
+                      verticalAlign: 'middle',
+                      textAlign: 'center',
+                      height: '100%',
+                    }}
+                  >
+                    <button
+                      type="button"
                       onClick={() => {
                         setCurrProject(project.id);
                         setUpdatedDesc(project.description);
                         setUpdatedName(project.name);
+                        setUpdatedIsArchived(project.isArchived);
                         setShowUpdateModal(true);
                       }}
-                    />
+                      aria-label={`Settings for ${project.name}`}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        padding: 0,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <IconSettings size={25} />
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -474,7 +493,9 @@ function DashBoard() {
             {user?.avatar ? (
               <img src={user.avatar} className={styles.avatar} />
             ) : (
-              <img src={dummyAvater} className={styles.avatar} />
+              <div className={styles.avatar}>
+                <DummyAvatar />
+              </div>
             )}
           </div>
           <div className={styles.notifications}>

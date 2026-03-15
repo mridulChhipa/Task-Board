@@ -17,7 +17,7 @@ export class CommentService {
     authorId,
     content,
     taskId,
-  }: ThreadBody): Promise<string> {
+  }: ThreadBody): Promise<ThreadDTO> {
     try {
       const createdThread = await db.thread.create({
         data: {
@@ -47,7 +47,7 @@ export class CommentService {
         // });
       }
 
-      return createdThread.id;
+      return createdThread as ThreadDTO;
     } catch (error) {
       throw new Error('Error creating thread: ', { cause: error });
     }
@@ -122,8 +122,13 @@ export class CommentService {
     content,
     taskId,
     parentId,
-  }: CommentBody): Promise<string> {
+  }: CommentBody): Promise<CommentDTO> {
     try {
+      console.log(
+        '=============Creating Comment with content: \n',
+        content,
+        '\n=======================',
+      );
       const createdComment = await db.comment.create({
         data: {
           threadId,
@@ -134,10 +139,11 @@ export class CommentService {
       });
 
       if (createdComment) {
+        console.log(createdComment);
         await db.activity.create({
           data: {
-            type: 'THREAD_ADDED',
-            threadId: createdComment.id,
+            type: 'COMMENT_ADDED',
+            commentId: createdComment.id,
             taskId: taskId,
           },
         });
@@ -152,9 +158,10 @@ export class CommentService {
         // });
       }
 
-      return createdComment.id;
+      return createdComment as CommentDTO;
     } catch (error) {
-      throw new Error('Error creating thread: ', { cause: error });
+      console.log(error);
+      throw new Error('Error creating comment: ', { cause: error });
     }
   }
 
@@ -190,11 +197,11 @@ export class CommentService {
   }
 
   async deleteComment(id: string, threadId: string): Promise<void> {
+    void threadId;
     try {
       const existingComment = await db.comment.findUnique({
         where: {
           id,
-          threadId,
         },
       });
 
@@ -208,16 +215,17 @@ export class CommentService {
         },
         where: {
           id,
-          threadId,
         },
       });
     } catch (error) {
+      console.log(error);
       throw new Error('Error deleting comment: ', { cause: error });
     }
   }
 
   async fetchComment(id: string): Promise<CommentDTO> {
     try {
+      // console.log("Fetching: ", id);
       const existingComment = await db.comment.findUnique({
         where: {
           id,
@@ -226,6 +234,8 @@ export class CommentService {
           replies: true,
         },
       });
+
+      // console.log("Existing: ", existingComment);
 
       if (!existingComment) {
         throw new Error();

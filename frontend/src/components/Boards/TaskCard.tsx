@@ -4,12 +4,12 @@ import { formatDate, isOverdue } from '../../utils/helpers';
 import {
   IconCalendar,
   IconDelete,
+  IconSettings,
   IconUser,
   IconWarning,
 } from './boards.images';
-import { useNavigate } from 'react-router-dom';
-import IconSettings from '../../assets/settingsIcon.svg';
 import type { Priority, TaskType } from './Boards';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   task: Task;
@@ -25,26 +25,30 @@ interface Props {
     setDueDate: React.Dispatch<React.SetStateAction<string>>;
     setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
     setCurrentTaskId: React.Dispatch<React.SetStateAction<string | null>>;
-  }
+  };
 }
 
 async function getMailfromId(id: number): Promise<string> {
-  try{
+  try {
     const res = await fetch(`http://localhost:3000/api/auth/${id}`, {
       credentials: 'include',
     });
     const data = await res.json();
     console.log(data);
-    const email =  data.data.personalData.email;
+    const email = data.data.personalData.email;
     return email;
-  }
-  catch(err){
-    console.error("Error fetching user data", err);
+  } catch (err) {
+    console.error('Error fetching user data', err);
     return '';
   }
 }
 
-export function TaskCard({ task, dragstartHandler, deleteTask, setState }: Props) {
+export function TaskCard({
+  task,
+  dragstartHandler,
+  deleteTask,
+  setState,
+}: Props) {
   const overdue =
     typeof task.dueDate !== 'string' ? false : isOverdue(task.dueDate);
   // console.log(task);
@@ -69,14 +73,18 @@ export function TaskCard({ task, dragstartHandler, deleteTask, setState }: Props
             {task.type}
           </span>
           <span className={styles.taskId}>{task.id}</span>
-          <span className={styles.deleteIcon} onClick={(e) => {
-            e.stopPropagation();
-            deleteTask(task.id);
-          }}>
+          <span
+            className={styles.deleteIcon}
+            onClick={(e) => {
+              e.stopPropagation();
+              deleteTask(task.id);
+            }}
+          >
             <IconDelete />
           </span>
-          <span className={styles.settingsIcon}>
-            <img src={IconSettings} alt="Settings" onClick={async (e) => {
+          <span
+            className={styles.settingsIcon}
+            onClick={async (e) => {
               e.stopPropagation();
               setState.setTaskName(task.title);
               setState.setTaskDescription(task.description ?? '');
@@ -86,12 +94,14 @@ export function TaskCard({ task, dragstartHandler, deleteTask, setState }: Props
               setState.setDueDate(
                 task.dueDate
                   ? new Date(task.dueDate).toISOString().slice(0, 10)
-                  : ''
+                  : '',
               );
               setState.setCurrentTaskId(task.id);
               setState.setEditModal(true);
-              console.log("HI");
-            }} style={{height:'13px'}}/>
+              console.log('HI');
+            }}
+          >
+            <IconSettings />
           </span>
         </div>
 

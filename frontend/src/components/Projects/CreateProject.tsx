@@ -1,6 +1,12 @@
 import type { SubmitEventHandler } from 'react';
 import Button from '../Button/Button';
 import styles from './CreateProject.module.css';
+import Form, {
+  FormControl,
+  InputArea,
+  Label,
+  TextAreaControl,
+} from '../Forms/Form';
 
 interface Props {
   name: string;
@@ -31,12 +37,10 @@ export default function CreateProject({
         Create a New Project
       </h2>
 
-      <form className={styles.createForm} onSubmit={handleCreate}>
-        <div className={styles.inputArea}>
-          <label htmlFor="name" className={styles.label}>
-            Project Name
-          </label>
-          <input
+      <Form onSubmit={handleCreate}>
+        <InputArea>
+          <Label htmlFor="name">Project Name</Label>
+          <FormControl
             type="text"
             placeholder="e.g. SVG Editor"
             onChange={(e) => setName(e.target.value)}
@@ -44,24 +48,20 @@ export default function CreateProject({
             id="name"
             value={name}
             required
-            className={styles.formControl}
           />
-        </div>
+        </InputArea>
 
-        <div className={styles.inputArea}>
-          <label htmlFor="description" className={styles.label}>
-            Description
-          </label>
-          <textarea
+        <InputArea>
+          <Label htmlFor="description">Description</Label>
+          <TextAreaControl
             name="description"
             id="description"
             placeholder="What is this project about?"
             required
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className={styles.formControl}
           />
-        </div>
+        </InputArea>
 
         <div className={styles.buttonGroup}>
           <Button
@@ -75,7 +75,7 @@ export default function CreateProject({
             Create
           </Button>
         </div>
-      </form>
+      </Form>
     </div>
   );
 }

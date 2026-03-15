@@ -18,15 +18,16 @@ commentRouter.post('/update-comment/:cid', (req, res, next) => {
   commentController.updateComment(req, res, next);
 });
 
-commentRouter.post('/delete-thread/:tid', (req, res, next) => {
+commentRouter.patch('/delete-thread/:tid', (req, res, next) => {
   commentController.deleteThread(req, res, next);
 });
 
-commentRouter.post('/delete-comment/:cid', (req, res, next) => {
+commentRouter.patch('/delete-comment/:cid', (req, res, next) => {
+  console.log(req.body);
   commentController.deleteComment(req, res, next);
 });
 
-commentRouter.get('t/:cid', (req, res, next) => {
+commentRouter.get('/t/:cid', (req, res, next) => {
   commentController.fetchComment(req, res, next);
 });
 

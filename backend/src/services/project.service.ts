@@ -22,8 +22,7 @@ export class ProjectService {
       });
       return project;
     } catch (error) {
-      console.log(error);
-      throw error;
+      throw new Error('Error creating project: ', { cause: error });
     }
   }
 
@@ -62,8 +61,7 @@ export class ProjectService {
 
       return retProj;
     } catch (error) {
-      console.log(error);
-      throw error;
+      throw new Error('Error updating project details: ', { cause: error });
     }
   }
 
@@ -81,8 +79,7 @@ export class ProjectService {
         },
       });
     } catch (error) {
-      console.log(error);
-      throw error;
+      throw new Error('Error archiving project', { cause: error });
     }
   }
 
@@ -122,8 +119,7 @@ export class ProjectService {
         },
       });
     } catch (error) {
-      console.log(error);
-      throw error;
+      throw new Error('Error assigning user: ', { cause: error });
     }
   }
 
@@ -163,8 +159,7 @@ export class ProjectService {
         },
       });
     } catch (error) {
-      console.log(error);
-      throw error;
+      throw new Error('Error removing user from project: ', { cause: error });
     }
   }
 
@@ -209,8 +204,7 @@ export class ProjectService {
         },
       });
     } catch (error) {
-      console.log(error);
-      throw error;
+      throw new Error('Error updating user role: ', { cause: error });
     }
   }
 
@@ -239,8 +233,7 @@ export class ProjectService {
       }
       return project;
     } catch (error) {
-      console.log(error);
-      throw error;
+      throw new Error('Error fetching project', { cause: error });
     }
   }
 
@@ -260,8 +253,7 @@ export class ProjectService {
         },
       });
     } catch (error) {
-      console.log(error);
-      throw error;
+      throw new Error('Error deleting project: ', { cause: error });
     }
   }
 

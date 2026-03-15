@@ -2,9 +2,9 @@ import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 
 export default function Loader() {
-  const authData = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
 
-  if (authData.isLoading) {
+  if (authContext.isLoading) {
     return (
       <div
         style={{

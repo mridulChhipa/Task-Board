@@ -1,29 +1,17 @@
 .loginform {
   color: black;
-  background-color: beige;
+  background-color: rgb(220, 229, 245);
   text-align: center;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  height: 91vh;
 }
 
 .input {
   text-align: left;
   font-size: 1.1em;
   width: 400px;
-}
-
-.inputfield {
-  width: 300px;
-  height: 30px;
-  font-size: 1em;
-  padding: 15px;
-  width: 400px;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  border-radius: 20px;
 }
 
 .formcontainer {

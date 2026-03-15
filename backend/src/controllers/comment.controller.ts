@@ -2,6 +2,7 @@ import { commentService } from '../services/comment.service';
 import type { Request, Response, NextFunction } from 'express';
 import type {
   CommentBody,
+  CommentDTO,
   ThreadBody,
   UpdateCommentBody,
   UpdateThreadBody,
@@ -14,12 +15,14 @@ export class CommentController {
     next: NextFunction,
   ): Promise<void> {
     try {
+      // console.log("===========\n ReqBody from thread : ", );
       const threadyBody: ThreadBody = req.body;
-      const tid = await commentService.createThread(threadyBody);
+      console.log(threadyBody);
+      const thread = await commentService.createThread(threadyBody);
 
       res.status(201).json({
         status: 'success',
-        tid,
+        thread,
       });
     } catch (error) {
       // throw new Error('Error creating thread from controller: ', {
@@ -88,11 +91,12 @@ export class CommentController {
   ): Promise<void> {
     try {
       const commentBody: CommentBody = req.body;
-      const cid = await commentService.createComment(commentBody);
+      const comment: CommentDTO =
+        await commentService.createComment(commentBody);
 
       res.status(201).json({
         status: 'success',
-        cid,
+        comment,
       });
     } catch (error) {
       // throw new Error('Error creating comment from controller: ', {
@@ -138,8 +142,9 @@ export class CommentController {
       if (typeof cid !== 'string') {
         throw new Error('Invalid tid');
       }
-
-      await commentService.deleteComment(cid, req.body.threadId);
+      console.log('Body', req.body);
+      const { threadId } = req.body;
+      await commentService.deleteComment(cid, threadId);
 
       res.status(204).json({
         status: 'success',
@@ -163,10 +168,11 @@ export class CommentController {
         throw new Error('cid type error');
       }
 
-      const data = commentService.fetchComment(cid);
+      const comment = await commentService.fetchComment(cid);
+      // console.log("From fetchComment controller", comment);
       res.status(200).json({
         status: 'success',
-        data,
+        comment,
       });
     } catch (err) {
       next(err);
@@ -184,10 +190,10 @@ export class CommentController {
         throw new Error('tid type error');
       }
 
-      const data = commentService.fetchComment(tid);
+      const thread = await commentService.fetchComment(tid);
       res.status(200).json({
         status: 'success',
-        data,
+        thread,
       });
     } catch (err) {
       next(err);

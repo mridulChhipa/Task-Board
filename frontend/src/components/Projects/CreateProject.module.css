@@ -5,50 +5,11 @@
   padding: 1rem 0;
 }
 
-.inputArea {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: rgb(80, 80, 80);
-}
-
-.formControl {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  background-color: #ffffff;
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
-  outline: none;
-}
-
-.formControl:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.formControl::placeholder {
-  color: #9ca3af;
-}
-
 .buttonGroup {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 1rem;
-}
-
-textarea.formControl {
-  min-height: 100px;
-  resize: vertical;
 }
 
 select {
