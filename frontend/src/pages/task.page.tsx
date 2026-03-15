@@ -5,7 +5,7 @@ import styles from './task.page.module.css';
 import type { Task } from '../types/boards.types';
 import Button from '../components/Button/Button';
 import { AuthContext } from '../context/AuthContext';
-import type { ThreadDTO } from '../types/comment.types';
+import type { CommentDTO, ThreadDTO } from '../types/comment.types';
 import Thread from '../components/Thread/Thread';
 import Form, {
   FormControl,
@@ -39,9 +39,23 @@ export default function TaskPage() {
         }
 
         const data = await res.json();
-        const task: Task = data.task;
 
-        setTask(task);
+        // const task: Task = data.task;
+        // console.log(task);
+        // setTask(task);
+
+        const rawTask = data.task;
+
+        const formattedTask: Task = {
+          ...rawTask,
+          threads: rawTask.threads.map((thread: any) => ({
+            ...thread,
+            comments: thread.comments.map((x: CommentDTO) => x.id),
+          })),
+        };
+
+        // console.log(formattedTask);
+        setTask(formattedTask);
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -129,11 +143,7 @@ export default function TaskPage() {
       {task.threads &&
         task.threads.map((thread, idx) => {
           return (
-            <Thread
-              deleteThread={deleteThread}
-              key={idx}
-              thread={thread}
-            />
+            <Thread deleteThread={deleteThread} key={idx} thread={thread} />
           );
         })}
 

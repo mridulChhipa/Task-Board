@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState, type SubmitEvent } from 'react';
-import type { CommentDTO, ThreadDTO } from '../../types/comment.types';
+import type { ThreadDTO } from '../../types/comment.types';
 import { IconDelete } from '../Boards/boards.images';
 import Button from '../Button/Button';
 import Form, { InputArea, TextAreaControl } from '../Forms/Form';
@@ -17,7 +17,7 @@ export default function Thread({ thread, deleteThread }: Props) {
   if (thread.isDeleted) return <></>;
 
   const [comment, setComment] = useState<string>();
-  const [comments, setComments] = useState<CommentDTO[]>([]);
+  const [comments, setComments] = useState<string[]>(thread.comments ?? []);
 
   const { tid: taskId } = useParams();
   const authContext = useContext(AuthContext);
@@ -41,7 +41,7 @@ export default function Thread({ thread, deleteThread }: Props) {
             isDeleted: false,
             parentId: null,
           }),
-        }
+        },
       );
 
       if (!res.ok) {
@@ -51,9 +51,9 @@ export default function Thread({ thread, deleteThread }: Props) {
         });
       }
 
-      const commentData = await res.json();
+      const data = await res.json();
 
-      setComments((prevComments) => [...prevComments, commentData.comment.id]);
+      setComments([...comments, data.comment.id]);
       setComment('');
     } catch (err) {
       console.error(err);
@@ -66,8 +66,14 @@ export default function Thread({ thread, deleteThread }: Props) {
         `http://localhost:3000/api/comment/delete-comment/${id}`,
         {
           method: 'PATCH',
-          // credentials: 'include',
-        }
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            threadId: thread.id,
+          }),
+        },
       );
 
       if (!response.ok) {
@@ -75,15 +81,17 @@ export default function Thread({ thread, deleteThread }: Props) {
         throw new Error(`Delete Error: ${errorText}`);
       }
 
-      setComments((prevComments) => prevComments.filter((c: any) => c.id !== id));
+      setComments((prevComments) =>
+        prevComments.filter((c: string) => c !== id),
+      );
     } catch (error) {
       console.error('Error deleting comment:', error);
     }
   }
 
-  useEffect(() => {
+  useEffect(() => {}, [handleCommentSubmit, comments]);
 
-  }, []);
+  // console.log("Thread: ", thread);
 
   return (
     <div className={styles.threadContainer}>
@@ -97,17 +105,19 @@ export default function Thread({ thread, deleteThread }: Props) {
         </span>
       </div>
       <div className={styles.meta}>
-        Posted by User {thread.authorId} on {new Date(thread.createdAt).toDateString()}
+        Posted by User {thread.authorId} on{' '}
+        {new Date(thread.createdAt).toDateString()}
       </div>
       <div className={styles.content}>{thread.content}</div>
 
       <section className={styles.commentSection}>
         <h3>Comments ({comments.length})</h3>
-        {comments.map((comment) => (
+        {comments.map((comment, idx) => (
           <Comment
-            key={comment.id}
-            commentId={comment.id}
-            deleteHandler={() => deleteComment(comment.id)}
+            key={idx}
+            threadId={thread.id}
+            commentId={comment}
+            deleteHandler={() => deleteComment(comment)}
           />
         ))}
       </section>

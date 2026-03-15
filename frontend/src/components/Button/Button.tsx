@@ -7,9 +7,11 @@ interface ButtonProps {
   type?: 'button' | 'submit' | 'reset';
   onClick?: () => void;
   disabled?: boolean;
+  size?: string;
 }
 
 function Button({
+  size = 'medium',
   children,
   priority = 'first',
   type,
@@ -18,7 +20,7 @@ function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`${styles.button} ${styles[priority]}`}
+      className={`${styles.button} ${styles[size]} ${styles[priority]}`}
       onClick={onClick}
       disabled={disabled}
       type={type}

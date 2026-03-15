@@ -91,7 +91,8 @@ export class CommentController {
   ): Promise<void> {
     try {
       const commentBody: CommentBody = req.body;
-      const comment: CommentDTO = await commentService.createComment(commentBody);
+      const comment: CommentDTO =
+        await commentService.createComment(commentBody);
 
       res.status(201).json({
         status: 'success',
@@ -141,8 +142,9 @@ export class CommentController {
       if (typeof cid !== 'string') {
         throw new Error('Invalid tid');
       }
-
-      await commentService.deleteComment(cid, req.body.threadId);
+      console.log('Body', req.body);
+      const { threadId } = req.body;
+      await commentService.deleteComment(cid, threadId);
 
       res.status(204).json({
         status: 'success',
@@ -166,10 +168,11 @@ export class CommentController {
         throw new Error('cid type error');
       }
 
-      const data = commentService.fetchComment(cid);
+      const comment = await commentService.fetchComment(cid);
+      // console.log("From fetchComment controller", comment);
       res.status(200).json({
         status: 'success',
-        data,
+        comment,
       });
     } catch (err) {
       next(err);
@@ -187,10 +190,10 @@ export class CommentController {
         throw new Error('tid type error');
       }
 
-      const data = commentService.fetchComment(tid);
+      const thread = await commentService.fetchComment(tid);
       res.status(200).json({
         status: 'success',
-        data,
+        thread,
       });
     } catch (err) {
       next(err);

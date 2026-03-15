@@ -174,8 +174,8 @@ model Thread {
 model Comment {
   id        String    @id @default(uuid())
   content   String
-  threadId  String
-  thread    Thread    @relation(fields: [threadId], references: [id])
+  threadId  String?
+  thread    Thread?    @relation(fields: [threadId], references: [id])
   authorId  Int
   author    User      @relation(fields: [authorId], references: [id])
   isDeleted Boolean   @default(false)

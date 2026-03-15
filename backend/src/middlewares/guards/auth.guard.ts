@@ -22,11 +22,11 @@ export function authenticateToken(
       throw new Error('Authentication required - invalid format');
     }
 
-    console.log(
-      '============\n Refresh Token from guard: ',
-      token,
-      '\n=================',
-    );
+    // console.log(
+    //   '============\n Refresh Token from guard: ',
+    //   token,
+    //   '\n=================',
+    // );
 
     const payload = verifyToken(token, process.env.JWT_REFRESH_SECRET ?? '');
     if (payload.type !== TokenType.REFRESH) {
@@ -35,7 +35,7 @@ export function authenticateToken(
 
     const authReq = req as AuthenticatedRequest;
     authReq.user = payload;
-    console.log(payload);
+    // console.log(payload);
     next();
   } catch (err) {
     next(err);

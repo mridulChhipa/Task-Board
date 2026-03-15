@@ -161,8 +161,7 @@ export class TaskService {
         await syncStatusWithChildren(existingTask.parentId);
       }
     } catch (error) {
-      console.log(error);
-      throw error;
+      throw new Error('Error deleting task: ', { cause: error });
     }
   }
 
@@ -174,14 +173,18 @@ export class TaskService {
         },
         include: {
           children: true,
-          threads: true,
+          threads: {
+            include: {
+              comments: true,
+            },
+          },
         },
       });
 
       if (!existingTask) {
         throw new Error('Task with the given taskId does not exist');
       }
-      console.log(existingTask);
+      // console.log(existingTask);
 
       // VSCode automatically tells if await is needed or not
       return toTaskDTO(existingTask);

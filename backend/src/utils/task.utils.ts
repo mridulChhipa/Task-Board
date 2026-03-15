@@ -4,7 +4,7 @@ import { ThreadDTO } from '../types/comment.types';
 import type { PriorityType, TaskDTO, TaskType } from '../types/task.types';
 
 type TaskWithChildren = Prisma.TaskGetPayload<{
-  include: { children: true, threads: true, };
+  include: { children: true; threads: true };
 }>;
 
 type PrismaTask = Prisma.TaskGetPayload<Record<string, never>>;
@@ -29,7 +29,9 @@ export function toTaskDTO(task: TaskWithChildren): TaskDTO {
     threads: task.threads?.map((thread) => {
       return thread as ThreadDTO;
     }),
-    children: task.children?.map((child) => { return child.id }),
+    children: task.children?.map((child) => {
+      return child.id;
+    }),
   };
 }
 

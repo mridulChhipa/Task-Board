@@ -14,7 +14,7 @@ const Form = ({ children, className, ...props }: FormProps) => {
 };
 
 interface FormControlProps {
-  type?: string;
+  type?: 'text' | 'number' | 'checkbox' | string;
   name: string;
   id?: string;
   placeholder?: string;
@@ -34,6 +34,8 @@ export function FormControl({
   checked = false,
   required = false,
 }: FormControlProps) {
+  const isCheckbox = type === 'checkbox';
+
   return (
     <input
       type={type}
@@ -43,7 +45,7 @@ export function FormControl({
       value={value}
       onChange={onChange}
       required={required}
-      checked={checked}
+      checked={isCheckbox ? checked : undefined}
       className={styles.formControl}
     />
   );

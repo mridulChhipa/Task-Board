@@ -38,7 +38,7 @@ authRouter.get(
   authenticateToken,
   (req: Request, res: Response, next: NextFunction) => {
     const authReq = req as AuthenticatedRequest;
-    console.log(' ================ \n In the /me route \n ==============');
+    // console.log(' ================ \n In the /me route \n ==============');
     if (!authReq.user) {
       return res.status(401).json({ error: 'Not authenticated' });
     }

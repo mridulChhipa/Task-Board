@@ -1,4 +1,4 @@
-import { ThreadDTO } from "./comment.types";
+import { ThreadDTO } from './comment.types';
 
 export enum TaskType {
   STORY = 'STORY',

@@ -43,8 +43,7 @@ export class AuthService {
         password: body.password,
       });
     } catch (error) {
-      console.error('Error registering user:', error);
-      throw error;
+      throw new Error('Error registering user:', { cause: error });
     }
   }
 
@@ -80,8 +79,7 @@ export class AuthService {
       tokens.userId = user.id;
       return tokens;
     } catch (error) {
-      console.error('Error logging in user:', error);
-      throw error;
+      throw new Error('Error logging in user:', { cause: error });
     }
   }
 
@@ -101,30 +99,29 @@ export class AuthService {
         },
       });
     } catch (error) {
-      console.error('Error logging out user:', error);
-      throw error;
+      throw new Error('Error Logging out user: ', { cause: error });
     }
   }
 
   async refresh(refreshToken: string): Promise<AuthToken> {
     try {
-      console.log(
-        '================ \n Refresh Token from service for refresh: ',
-        refreshToken,
-        '\n===============',
-      );
+      // console.log(
+      //   '================ \n Refresh Token from service for refresh: ',
+      //   refreshToken,
+      //   '\n===============',
+      // );
 
       const payload = verifyToken(
         refreshToken,
         process.env.JWT_REFRESH_SECRET ?? '',
       );
 
-      console.log('Token \n Verified, ', TokenType.REFRESH, payload.type);
+      // console.log('Token \n Verified, ', TokenType.REFRESH, payload.type);
       if (payload.type !== TokenType.REFRESH) {
         throw new Error('Invalid token type');
       }
 
-      console.log('Payload \n Type \nVerified');
+      // console.log('Payload \n Type \nVerified');
 
       const session = await db.session.findUnique({
         where: {
@@ -135,12 +132,12 @@ export class AuthService {
         },
       });
 
-      console.log(
-        '=======================\nPayload Verified\n',
-        session,
-        refreshToken,
-        '\n=================',
-      );
+      // console.log(
+      //   '=======================\nPayload Verified\n',
+      //   session,
+      //   refreshToken,
+      //   '\n=================',
+      // );
 
       if (
         !session ||
@@ -168,8 +165,7 @@ export class AuthService {
 
       return tokens;
     } catch (error) {
-      console.error('Error refreshing token:', error);
-      throw error;
+      throw new Error('Error refreshing token:', { cause: error });
     }
   }
 
@@ -237,8 +233,7 @@ export class AuthService {
 
       return userData;
     } catch (error) {
-      console.log('User Details Catch: ', error);
-      throw error;
+      throw new Error('User Details Catch: ', { cause: error });
     }
   }
 
@@ -306,8 +301,7 @@ export class AuthService {
 
       return userData;
     } catch (error) {
-      console.log('User Details Catch: ', error);
-      throw error;
+      throw new Error('User Details Catch: ', { cause: error });
     }
   }
 
@@ -333,8 +327,7 @@ export class AuthService {
         },
       });
     } catch (error) {
-      console.error('Error updating user:', error);
-      throw error;
+      throw new Error('Error updating user:', { cause: error });
     }
   }
 }
