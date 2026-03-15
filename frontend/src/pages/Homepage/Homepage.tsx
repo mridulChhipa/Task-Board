@@ -2,6 +2,7 @@ import styles from './Homepage.module.css';
 import LandingPhoto from '../../assets/landing_photo.png';
 import Feature1 from '../../assets/Feature1.png';
 import Feature2 from '../../assets/Feature2.png';
+import Feature3 from '../../assets/Feature2.png';
 import Logo from '../../assets/logo.png';
 import type { ReactNode } from 'react';
 import Button from '../../components/Button/Button';
@@ -165,7 +166,7 @@ function HomePage() {
         <Features imgSrc={Feature2} imgLoc="left">
           <UsageIntro />
         </Features>
-        <Features imgSrc={Feature1} imgLoc="right">
+        <Features imgSrc={Feature3} imgLoc="right">
           <Notifications />
         </Features>
       </div>

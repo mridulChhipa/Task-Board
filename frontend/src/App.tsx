@@ -8,6 +8,7 @@ import { AuthProvider } from './context/AuthProvider.tsx';
 import Loader from './components/ui/Loader.tsx';
 import ProjectPage from './pages/Projects/project.page.tsx';
 import { ProjectProvider } from './context/ProjectProvider.tsx';
+import Account from './pages/Account/Account.tsx';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
               </ProjectProvider>
             }
           />
+          <Route path="/account" element={<Account />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

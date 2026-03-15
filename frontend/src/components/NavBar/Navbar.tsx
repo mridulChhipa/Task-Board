@@ -1,16 +1,20 @@
 import styles from './Navbar.module.css';
 import logo from '../../assets/logo.png';
-import { Link, NavLink } from 'react-router';
+import { Link, NavLink, useNavigate } from 'react-router';
 import { useContext, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import settingsIcon from '../../assets/settingsIcon.svg';
 import { useLogout } from '../../utils/auth.utils';
 
 function NavBar() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [dropOpen, setDropOpen] = useState(false);
   const userData = useContext(AuthContext);
-  const logout = useLogout();
+  const logout = () => {
+    useLogout();
+    navigate('/');
+  };
 
   // console.log('From Nav,', userData);
 
@@ -131,7 +135,7 @@ function NavBar() {
                         <NavLink to="/account">Account</NavLink>
                       </li>
                       <li className={styles.dropItem}>
-                        <NavLink to="/projects">Projects</NavLink>
+                        <NavLink to="/dashboard">Projects</NavLink>
                       </li>
                       <hr />
                       <li className={styles.dropItem}>
