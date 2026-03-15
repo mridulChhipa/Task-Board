@@ -11,10 +11,11 @@ function NavBar() {
   const [open, setOpen] = useState(false);
   const [dropOpen, setDropOpen] = useState(false);
   const userData = useContext(AuthContext);
-  const logout = () => {
-    useLogout();
+  const logoutFn = useLogout();
+  function logout() {
     navigate('/');
-  };
+    logoutFn();
+  }
 
   // console.log('From Nav,', userData);
 

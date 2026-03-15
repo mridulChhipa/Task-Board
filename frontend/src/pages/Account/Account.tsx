@@ -1,7 +1,6 @@
 import { useContext, useState } from "react";
 import { AuthContext, DispatchContext } from "../../context/AuthContext";
 import styles from "./Account.module.css";
-import dummyAvatar from "../../assets/dummyAvatar.svg";
 import Button from "../../components/Button/Button";
 
 export default function Account() {
@@ -39,7 +38,7 @@ export default function Account() {
         {user?.avatar ? (
           <img src={user.avatar} className={styles.avatar} />
         ) : (
-          <img src={dummyAvatar} className={styles.avatar} />
+          <img src={"../../components/Boards/boards.images.tsx"} className={styles.avatar} />
         )}
       </div>
       <form onSubmit={updateUser} className={styles.createForm}>
