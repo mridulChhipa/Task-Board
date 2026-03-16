@@ -1,10 +1,10 @@
 import type { Prisma } from '../../generated/prisma/client';
 import { db } from '../config/db';
 import { ThreadDTO } from '../types/comment.types';
-import type { PriorityType, TaskDTO, TaskType } from '../types/task.types';
+import type { ActivityDTO, ActivityType, PriorityType, TaskDTO, TaskType } from '../types/task.types';
 
 type TaskWithChildren = Prisma.TaskGetPayload<{
-  include: { children: true; threads: true };
+  include: { children: true; threads: true, activities: true, };
 }>;
 
 type PrismaTask = Prisma.TaskGetPayload<Record<string, never>>;
@@ -19,7 +19,6 @@ export function toTaskDTO(task: TaskWithChildren): TaskDTO {
     assignee: task.assignee,
     reporter: task.reporter,
     dueDate: task.dueDate,
-    // stackPosition: task.stackPosition,
     statusId: task.statusId,
     parentId: task.parentId,
     createdAt: task.createdAt,
@@ -32,7 +31,20 @@ export function toTaskDTO(task: TaskWithChildren): TaskDTO {
     children: task.children?.map((child) => {
       return child.id;
     }),
-  };
+    activities: task.activities.map((activity): ActivityDTO => ({
+      id: activity.id,
+      type: activity.type as ActivityType,
+      timestamp: activity.timestamp.toISOString(),
+      metadata: {
+        threadId: activity.threadId,
+        commentId: activity.commentId,
+        oldStatusId: activity.oldStatusId,
+        newStatusId: activity.newStatusId,
+        oldAssignee: activity.oldAssignee,
+        newAssignee: activity.newAssignee,
+      }
+    })),
+  }
 }
 
 // Lock the Story: Start a transaction and lock the specific Story row.

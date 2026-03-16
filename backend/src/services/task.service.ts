@@ -173,6 +173,7 @@ export class TaskService {
         },
         include: {
           children: true,
+          activities: true,
           threads: {
             include: {
               comments: true,

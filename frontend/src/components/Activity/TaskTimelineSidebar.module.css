@@ -1,0 +1,151 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 40;
+}
+
+.sidebar {
+  /* 1. Define the size and prevent it from squishing */
+  width: 320px;
+  height: 100vh;
+  flex-shrink: 0; 
+  
+  /* 2. Make it sticky so it stays visible while the left side scrolls */
+  position: sticky;
+  top: 0;
+  
+  /* 3. Standard styling */
+  background-color: #ffffff;
+  border-left: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f9fafb;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 1.25rem;
+}
+
+.closeButton:hover {
+  color: #4b5563;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+.emptyState {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 2.5rem;
+}
+
+.timeline {
+  position: relative;
+  border-left: 2px solid #f3f4f6;
+  margin-left: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.timelineItem {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.timelineDot {
+  position: absolute;
+  left: -9px;
+  top: 0.375rem;
+  height: 1rem;
+  width: 1rem;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 4px solid #3b82f6;
+  box-shadow: 0 0 0 4px #ffffff;
+}
+
+.itemContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.timestamp {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.activityText {
+  font-size: 0.875rem;
+  color: #374151;
+  margin: 0;
+}
+
+.author {
+  font-weight: 500;
+}
+
+.statusOld {
+  background-color: #f3f4f6;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  color: #4b5563;
+}
+
+.statusNew {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+}
+
+.commentBox {
+  background-color: #f9fafb;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  margin-top: 0.25rem;
+  border: 1px solid #f3f4f6;
+}
+
+.commentQuote {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-style: italic;
+  margin: 0.25rem 0 0 0;
+}
+
+.unknownActivity {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}

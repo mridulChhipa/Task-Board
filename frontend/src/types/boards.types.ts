@@ -1,5 +1,15 @@
 import type { ThreadDTO } from './comment.types';
 
+export type ActivityType =
+  | 'TASK_STATUS_UPDATED'
+  | 'TASK_ASSIGNEE_CHANGED'
+  | 'COMMENT_ADDED'
+  | 'COMMENT_EDITED'
+  | 'COMMENT_DELETED'
+  | 'THREAD_ADDED'
+  | 'THREAD_EDITED'
+  | 'THREAD_DELETED';
+
 export interface Workflow {
   id: string;
   name: string;
@@ -17,7 +27,6 @@ export interface Task {
   priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   assignee: number;
   reporter: number;
-  // stackPosition: number;
   dueDate?: Date;
   statusId: string;
   createdAt: Date;
@@ -26,4 +35,19 @@ export interface Task {
   closedAt?: string;
   parentId?: string;
   threads?: ThreadDTO[];
+  activities?: ActivityDTO[];
+}
+
+export interface ActivityDTO {
+  id: string;
+  type: ActivityType;
+  timestamp: string; // Using string because Dates become ISO strings when sent via JSON
+  metadata: {
+    threadId?: string | null;
+    commentId?: string | null;
+    oldStatusId?: string | null;
+    newStatusId?: string | null;
+    oldAssignee?: number | null;
+    newAssignee?: number | null;
+  };
 }

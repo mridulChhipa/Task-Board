@@ -14,7 +14,8 @@ import type {
 
 import { generateAuthTokens, verifyToken } from '../utils/jwt';
 import { GlobalRole } from '../../generated/prisma/enums';
-import type { ProjectDetails, ProjectRole } from '../types/project.types';
+import { ProjectDetails, ProjectRole } from '../types/project.types';
+import { projectService } from './project.service';
 
 export class AuthService {
   async register(body: RegisterBody): Promise<AuthToken> {
@@ -218,6 +219,20 @@ export class AuthService {
           members: allMembers,
           isArchived: currProj.isArchived,
         });
+      }
+
+      if (rawUserData.globalRole === 'GLOBAL_ADMIN') {
+        const globalProjects = await projectService.fetchGlobalAdminProjects();
+        for (const currProj of globalProjects) {
+          allProjs.push({
+            id: currProj.id,
+            name: currProj.name,
+            description: currProj.description ?? '',
+            role: ProjectRole.PROJECT_ADMIN,
+            members: currProj.members,
+            isArchived: currProj.isArchived,
+          });
+        }
       }
 
       const userData: UserWithProjs = {

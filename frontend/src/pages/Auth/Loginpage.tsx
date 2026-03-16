@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import styles from './auth.module.css';
 import Button from '../../components/Button/Button';
 import { AuthContext, DispatchContext } from '../../context/AuthContext';
@@ -57,6 +57,8 @@ export default function LogInPage() {
 
       const userData = await userRes.json();
 
+      console.log(userData);
+
       dispatch({
         type: 'LOGIN',
         payload: {
@@ -80,10 +82,12 @@ export default function LogInPage() {
       setIsLoading(false);
     }
   }
-
-  if (authContext.user) {
-    navigate('/dashboard');
-  }
+  
+  useEffect(() => {
+    if (authContext.user) {
+      navigate('/dashboard');
+    }
+  }, [authContext.user, navigate]);
 
   return (
     <div className={styles.loginform}>

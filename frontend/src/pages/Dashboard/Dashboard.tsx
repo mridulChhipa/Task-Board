@@ -52,13 +52,7 @@ function DashBoard() {
     if (userId) {
       fetchUser();
     }
-    void user;
-    // console.log("From dashboard", userId);
-    // if (user) {
-    //   setProjects(user.projects as Project[]);
-    // }
-    // using useState in a useEffect causes performance issues due to re-renders
-  }, [userId, user, fetchUser]);
+  }, [fetchUser]);
 
   async function handleCreate(e: SubmitEvent) {
     e.preventDefault();

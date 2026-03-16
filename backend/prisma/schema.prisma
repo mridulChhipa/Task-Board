@@ -105,24 +105,25 @@ enum Priority {
 }
 
 model Task {
-  id            String    @id @default(uuid())
-  title         String
-  description   String?
-  type          TaskType  @default(TASK)
-  priority      Priority  @default(MEDIUM)
-  assignee      Int
-  reporter      Int
-  dueDate       DateTime?
-  statusId      String
-  status        Workflow  @relation(fields: [statusId], references: [id])
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  resolvedAt    DateTime?
-  closedAt      DateTime?
-  parentId      String?
-  parent        Task?     @relation("TaskToTask", fields: [parentId], references: [id], onDelete: Cascade)
-  children      Task[]    @relation("TaskToTask")
-  threads       Thread[]
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  type        TaskType   @default(TASK)
+  priority    Priority   @default(MEDIUM)
+  assignee    Int
+  reporter    Int
+  dueDate     DateTime?
+  statusId    String
+  status      Workflow   @relation(fields: [statusId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  resolvedAt  DateTime?
+  closedAt    DateTime?
+  parentId    String?
+  parent      Task?      @relation("TaskToTask", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Task[]     @relation("TaskToTask")
+  threads     Thread[]
+  activities  Activity[]
 }
 
 enum ActivityType {
@@ -140,6 +141,7 @@ model Activity {
   id             String       @id @default(uuid())
   type           ActivityType
   taskId         String
+  task           Task         @relation(fields: [taskId], references: [id])
   threadId       String?
   commentId      String?
   oldStatusId    String?
@@ -175,7 +177,7 @@ model Comment {
   id        String    @id @default(uuid())
   content   String
   threadId  String?
-  thread    Thread?    @relation(fields: [threadId], references: [id])
+  thread    Thread?   @relation(fields: [threadId], references: [id])
   authorId  Int
   author    User      @relation(fields: [authorId], references: [id])
   isDeleted Boolean   @default(false)

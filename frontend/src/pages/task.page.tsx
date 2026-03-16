@@ -12,6 +12,7 @@ import Form, {
   InputArea,
   TextAreaControl,
 } from '../components/Forms/Form';
+import { TaskTimelineSidebar } from '../components/Activity/TaskTimelineSidebar';
 
 export default function TaskPage() {
   const { tid } = useParams<{ tid: string }>();
@@ -26,6 +27,7 @@ export default function TaskPage() {
   const authContext = useContext(AuthContext);
 
   const [threads, setThreads] = useState<ThreadDTO[]>([]);
+  // const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
     async function fetchTask() {
@@ -66,7 +68,7 @@ export default function TaskPage() {
     if (tid) {
       fetchTask();
     }
-  }, [tid, threads]);
+  }, [tid, threads, task]);
 
   if (loading) {
     return <div>Loading task...</div>;
@@ -122,7 +124,7 @@ export default function TaskPage() {
         `http://localhost:3000/api/comment/delete-thread/${id}`,
         {
           method: 'PATCH',
-          // credentials: 'include',
+          credentials: 'include',
         },
       );
 
@@ -136,41 +138,47 @@ export default function TaskPage() {
       throw new Error('Error deleting thread', { cause: error });
     }
   }
+
   return (
-    <div className={styles.taskContainer}>
-      <h1>{task.title}</h1>
-      <p>{task.description}</p>
-      {task.threads &&
-        task.threads.map((thread, idx) => {
-          return (
-            <Thread deleteThread={deleteThread} key={idx} thread={thread} />
-          );
-        })}
+    <div style={{
+      display: 'flex',
+    }}>
+      <div className={styles.taskContainer}>
+        <h1>{task.title}</h1>
+        <p>{task.description}</p>
+        {task.threads &&
+          task.threads.map((thread, idx) => {
+            return (
+              <Thread deleteThread={deleteThread} key={idx} thread={thread} />
+            );
+          })}
 
-      <Form onSubmit={handleThreadSubmit}>
-        <InputArea>
-          <FormControl
-            required={true}
-            name="title"
-            id="title"
-            placeholder="Title"
-            value={threadTitle}
-            onChange={(e) => setThreadTitle(e.target.value)}
-          />
-        </InputArea>
-        <InputArea>
-          <TextAreaControl
-            required={true}
-            name="desc"
-            id="desc"
-            placeholder="Description"
-            value={threadContent}
-            onChange={(e) => setThreadContent(e.target.value)}
-          />
-        </InputArea>
+        <Form onSubmit={handleThreadSubmit}>
+          <InputArea>
+            <FormControl
+              required={true}
+              name="title"
+              id="title"
+              placeholder="Title"
+              value={threadTitle}
+              onChange={(e) => setThreadTitle(e.target.value)}
+            />
+          </InputArea>
+          <InputArea>
+            <TextAreaControl
+              required={true}
+              name="desc"
+              id="desc"
+              placeholder="Description"
+              value={threadContent}
+              onChange={(e) => setThreadContent(e.target.value)}
+            />
+          </InputArea>
 
-        <Button type="submit">Start New Thread</Button>
-      </Form>
+          <Button type="submit">Start New Thread</Button>
+        </Form>
+      </div>
+      <TaskTimelineSidebar activities={task.activities} />
     </div>
   );
 }

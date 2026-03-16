@@ -106,6 +106,7 @@ export function Comment({ commentId, deleteHandler, threadId }: Props) {
 
       setReplies([...replies, data.comment.id]);
       setReply('');
+      setReplyModal(false);
     } catch (err) {
       console.error(err);
     }
