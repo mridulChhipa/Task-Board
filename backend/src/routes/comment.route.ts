@@ -10,11 +10,11 @@ commentRouter.post('/create-comment', (req, res, next) => {
   commentController.createComment(req, res, next);
 });
 
-commentRouter.post('/update-thread/:tid', (req, res, next) => {
+commentRouter.patch('/update-thread/:tid', (req, res, next) => {
   commentController.updateThread(req, res, next);
 });
 
-commentRouter.post('/update-comment/:cid', (req, res, next) => {
+commentRouter.patch('/update-comment/:cid', (req, res, next) => {
   commentController.updateComment(req, res, next);
 });
 

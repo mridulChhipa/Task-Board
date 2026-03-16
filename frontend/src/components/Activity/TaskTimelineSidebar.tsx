@@ -27,30 +27,38 @@ const ActivityContent: React.FC<{ activity: ActivityDTO }> = ({ activity }) => {
       return (
         <p className={styles.activityText}>
           <span className={styles.author}>{author}</span> changed status from{' '}
-          <span className={styles.statusOld}>{metadata.oldStatusId || 'None'}</span> to{' '}
-          <span className={styles.statusNew}>{metadata.newStatusId}</span>
+          <span className={styles.statusOld}>
+            {metadata.oldStatusId || 'None'}
+          </span>{' '}
+          to <span className={styles.statusNew}>{metadata.newStatusId}</span>
         </p>
       );
 
     case 'TASK_ASSIGNEE_CHANGED':
       return (
         <p className={styles.activityText}>
-          <span className={styles.author}>{author}</span> assigned task to User #{metadata.newAssignee}
+          <span className={styles.author}>{author}</span> assigned task to User
+          #{metadata.newAssignee}
         </p>
       );
 
     case 'COMMENT_ADDED':
       return (
         <div className={styles.commentBox}>
-          <p className={styles.activityText}><span className={styles.author}>{author}</span> added a comment:</p>
-          <p className={styles.commentQuote}>"Reference comment #{metadata.commentId}"</p>
+          <p className={styles.activityText}>
+            <span className={styles.author}>{author}</span> added a comment:
+          </p>
+          <p className={styles.commentQuote}>
+            "Reference comment #{metadata.commentId}"
+          </p>
         </div>
       );
 
     case 'COMMENT_EDITED':
       return (
         <p className={styles.activityText}>
-          <span className={styles.author}>{author}</span> edited comment #{metadata.commentId}
+          <span className={styles.author}>{author}</span> edited comment #
+          {metadata.commentId}
         </p>
       );
 
@@ -64,15 +72,21 @@ const ActivityContent: React.FC<{ activity: ActivityDTO }> = ({ activity }) => {
     case 'THREAD_ADDED':
       return (
         <div className={styles.commentBox}>
-          <p className={styles.activityText}><span className={styles.author}>{author}</span> started a new thread:</p>
-          <p className={styles.commentQuote}>"Reference thread #{metadata.threadId}"</p>
+          <p className={styles.activityText}>
+            <span className={styles.author}>{author}</span> started a new
+            thread:
+          </p>
+          <p className={styles.commentQuote}>
+            "Reference thread #{metadata.threadId}"
+          </p>
         </div>
       );
 
     case 'THREAD_EDITED':
       return (
         <p className={styles.activityText}>
-          <span className={styles.author}>{author}</span> edited thread #{metadata.threadId}
+          <span className={styles.author}>{author}</span> edited thread #
+          {metadata.threadId}
         </p>
       );
 
@@ -88,10 +102,11 @@ const ActivityContent: React.FC<{ activity: ActivityDTO }> = ({ activity }) => {
   }
 };
 
-export const TaskTimelineSidebar = ({ activities = [] }: TaskTimelineSidebarProps) => {
-
-  const sortedActivities = [...activities].sort((a, b) =>
-    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+export const TaskTimelineSidebar = ({
+  activities = [],
+}: TaskTimelineSidebarProps) => {
+  const sortedActivities = [...activities].sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
   );
 
   return (

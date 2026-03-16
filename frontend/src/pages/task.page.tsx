@@ -140,9 +140,11 @@ export default function TaskPage() {
   }
 
   return (
-    <div style={{
-      display: 'flex',
-    }}>
+    <div
+      style={{
+        display: 'flex',
+      }}
+    >
       <div className={styles.taskContainer}>
         <h1>{task.title}</h1>
         <p>{task.description}</p>

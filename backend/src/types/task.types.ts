@@ -36,8 +36,6 @@ export interface CreateTaskBody {
   parentId: string | null;
 }
 
-
-
 export interface TaskDTO {
   id: string;
   title: string;

@@ -1,4 +1,4 @@
-import type { FormHTMLAttributes, ReactNode } from 'react';
+import type { FormHTMLAttributes, InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from 'react';
 import styles from './form.module.css';
 
 interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
@@ -13,15 +13,7 @@ const Form = ({ children, className, ...props }: FormProps) => {
   );
 };
 
-interface FormControlProps {
-  type?: 'text' | 'number' | 'checkbox' | string;
-  name: string;
-  id?: string;
-  placeholder?: string;
-  value?: string | number | readonly string[];
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  required?: boolean;
-  checked?: boolean;
+interface FormControlProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export function FormControl({
@@ -33,6 +25,7 @@ export function FormControl({
   onChange,
   checked = false,
   required = false,
+  ...props
 }: FormControlProps) {
   const isCheckbox = type === 'checkbox';
 
@@ -47,18 +40,12 @@ export function FormControl({
       required={required}
       checked={isCheckbox ? checked : undefined}
       className={styles.formControl}
+      {...props}
     />
   );
 }
 
-interface TextAreaControlProps {
-  name: string;
-  id?: string;
-  placeholder?: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  required?: boolean;
-  rows?: number;
+interface TextAreaControlProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
 }
 
 export function TextAreaControl({
@@ -69,6 +56,7 @@ export function TextAreaControl({
   onChange,
   required = false,
   rows = 4,
+  ...props
 }: TextAreaControlProps) {
   return (
     <textarea
@@ -80,6 +68,7 @@ export function TextAreaControl({
       required={required}
       rows={rows}
       className={styles.formControl}
+      {...props}
     />
   );
 }
@@ -88,7 +77,6 @@ interface LabelProps {
   children: ReactNode;
   htmlFor: string;
 }
-3;
 export function Label({ children, htmlFor }: LabelProps) {
   return (
     <label htmlFor={htmlFor} className={styles.label}>

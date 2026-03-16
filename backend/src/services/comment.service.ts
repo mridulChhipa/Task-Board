@@ -1,3 +1,4 @@
+import { error } from 'node:console';
 import { db } from '../config/db';
 import type {
   CommentBody,
@@ -170,10 +171,11 @@ export class CommentService {
     { content, isDeleted, threadId }: UpdateCommentBody,
   ): Promise<void> {
     try {
+      console.log(id, threadId, content, isDeleted);
       const existingComment = await db.comment.findUnique({
         where: {
           id,
-          threadId,
+          // threadId,
         },
       });
 
@@ -188,7 +190,7 @@ export class CommentService {
         },
         where: {
           id,
-          threadId,
+          // threadId,
         },
       });
     } catch (error) {

@@ -1,4 +1,10 @@
-import { useContext, useEffect, useState, type SubmitEvent } from 'react';
+import {
+  useContext,
+  useEffect,
+  useState,
+  type KeyboardEvent,
+  type SubmitEvent,
+} from 'react';
 import type { CommentDTO } from '../../types/comment.types';
 import styles from './comment.module.css';
 import Button from '../Button/Button';
@@ -21,6 +27,8 @@ export function Comment({ commentId, deleteHandler, threadId }: Props) {
   const [replies, setReplies] = useState<string[]>([]);
   const [reply, setReply] = useState('');
   const [replyModal, setReplyModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState('');
 
   const { tid: taskId } = useParams();
   const authContext = useContext(AuthContext);
@@ -41,11 +49,64 @@ export function Comment({ commentId, deleteHandler, threadId }: Props) {
       const data = await res.json();
       // console.log("Comment Data: ", data);
       setComment(data.comment);
-      setReplies([...replies, data.comment.replies ?? []]);
+      if (!isEditing) {
+        setEditedContent(data.comment.content ?? '');
+      }
+      setReplies(data.comment.replies ?? []);
     } catch (err) {
       throw new Error("Can't fetch comment", { cause: err });
     }
   }
+
+  const handleSave = async () => {
+    if (!comment) return;
+    const hasContentChange = editedContent !== (comment.content ?? '');
+
+    console.log('Saving comment updates:', { content: editedContent, commentId: comment.id });
+    if (hasContentChange) {
+      try {
+        const res = await fetch(
+          `http://localhost:3000/api/comment/update-comment/${comment.id}`,
+          {
+            credentials: 'include',
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              taskId,
+              threadId,
+              content: editedContent,
+              isDeleted: false,
+            }),
+          },
+        );
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error("Can't update comment at the moment", {
+            cause: errorText,
+          });
+        }
+
+        setComment({ ...comment, content: editedContent });
+      } catch (error) {
+        console.error('Failed to update comment', error);
+        setEditedContent(comment.content ?? '');
+      }
+    }
+
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSave();
+    } else if (e.key === 'Escape') {
+      setEditedContent(comment?.content ?? '');
+      setIsEditing(false);
+    }
+  };
 
   async function deleteReply(id: string) {
     try {
@@ -114,7 +175,8 @@ export function Comment({ commentId, deleteHandler, threadId }: Props) {
 
   useEffect(() => {
     fetchComment(commentId);
-  }, [replies]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [commentId]);
 
   if (!comment || comment.isDeleted) return <></>;
 
@@ -177,7 +239,25 @@ export function Comment({ commentId, deleteHandler, threadId }: Props) {
           Parent ID: {comment.parentId ? comment.parentId : 'None'}
         </div>
 
-        <div className={styles.content}>{comment.content}</div>
+        <div className={styles.content}>
+          {isEditing ? (
+            <TextAreaControl
+              value={editedContent}
+              onChange={(e) => setEditedContent(e.target.value)}
+              onBlur={handleSave}
+              onKeyDown={handleKeyDown}
+              rows={4}
+            />
+          ) : (
+            <p
+              onClick={() => setIsEditing(true)}
+              style={{ cursor: 'text', margin: 0 }}
+              title="Click to edit"
+            >
+              {comment.content}
+            </p>
+          )}
+        </div>
         <div style={{ marginTop: '8px', marginBottom: '8px' }}>
           <Button size="mini" onClick={() => setReplyModal(true)}>
             Reply
