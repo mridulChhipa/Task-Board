@@ -1,5 +1,5 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import type { Server as HttpServer } from 'http';
+import { get, type Server as HttpServer } from 'http';
 
 type WSMessage =
   | { messageType: 'NEW_USER'; userId: number }
@@ -13,6 +13,7 @@ let wsServer: WebsocketService;
 
 export function initWSServer(httpServer: HttpServer) {
   wsServer = new WebsocketService(httpServer);
+  return wsServer;
 }
 
 export function shutdownWSServer() {
@@ -42,6 +43,7 @@ export class WebsocketService {
       const data = JSON.parse(message.toString()) as WSMessage;
       if (data.messageType === 'NEW_USER') {
         this.addUser(ws, data.userId);
+        console.log("User added to hashmap")
       } else if (data.messageType === 'NOTIFICATION') {
         this.sendNotification(
           data.senderId,
@@ -74,6 +76,7 @@ export class WebsocketService {
     notification: string,
   ) {
     const recieverSockets = recieverIds.map((id) => this.userSockets.get(id));
+    console.log('Reciever Sockets: ', recieverSockets);
     recieverSockets.map((socket) => {
       if (!socket) {
         return;
@@ -85,10 +88,12 @@ export class WebsocketService {
       socket.send(
         JSON.stringify({ messageType: 'NOTIFICATION', senderId, notification }),
       );
+      console.log("Sent notification");
     });
   }
 
   removeUser(userId: number) {
+    this.getSocket(userId)?.close();
     this.userSockets.delete(userId);
   }
 

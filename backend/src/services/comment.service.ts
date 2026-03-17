@@ -8,9 +8,11 @@ import type {
   UpdateCommentBody,
   UpdateThreadBody,
 } from '../types/comment.types';
-// import { NotifType } from '../types/notifcation.types';
+import { NotifType } from '../types/notifcation.types';
 import { toCommentDTO, toThreadDTO } from '../utils/comment.utils';
-// import { notifcationService } from './notification.service';
+import { notificationService } from './notification.service';
+import { send } from 'node:process';
+import { sendNotif } from '../websocket/WebsocketsService';
 
 export class CommentService {
   async createThread({
@@ -126,11 +128,6 @@ export class CommentService {
     parentId,
   }: CommentBody): Promise<CommentDTO> {
     try {
-      console.log(
-        '=============Creating Comment with content: \n',
-        content,
-        '\n=======================',
-      );
       const createdComment = await db.comment.create({
         data: {
           threadId,
@@ -140,8 +137,17 @@ export class CommentService {
         },
       });
 
+      const task = await db.task.findUnique({
+        where: {
+          id: taskId,
+        }
+      });
+
+      if(!task) {
+        throw new Error('Task not found');
+      }
+
       if (createdComment) {
-        console.log(createdComment);
         await db.activity.create({
           data: {
             type: 'COMMENT_ADDED',
@@ -151,19 +157,20 @@ export class CommentService {
           },
         });
 
-        // await notifcationService.createNotification({
-        //   taskId,
-        //   type: NotifType.COMMENT_ADDED,
-        //   senderId: authorId,
-        //   userId: recId,
-        //   commentId: createdComment.id,
-        //   threadId: null,
-        // });
+        await notificationService.createNotification({
+          taskId,
+          type: NotifType.COMMENT_ADDED,
+          senderId: authorId,
+          userId: task.assignee,
+          commentId: createdComment.id,
+          threadId: createdComment.threadId,
+        });
+
+        sendNotif(authorId, [task.assignee], `New comment added to task: ${task.title}`);
       }
 
       return createdComment as CommentDTO;
     } catch (error) {
-      console.log(error);
       throw new Error('Error creating comment: ', { cause: error });
     }
   }
@@ -173,7 +180,6 @@ export class CommentService {
     { content, isDeleted, threadId }: UpdateCommentBody,
   ): Promise<void> {
     try {
-      console.log(id, threadId, content, isDeleted);
       const existingComment = await db.comment.findUnique({
         where: {
           id,
@@ -222,14 +228,12 @@ export class CommentService {
         },
       });
     } catch (error) {
-      console.log(error);
       throw new Error('Error deleting comment: ', { cause: error });
     }
   }
 
   async fetchComment(id: string): Promise<CommentDTO> {
     try {
-      // console.log("Fetching: ", id);
       const existingComment = await db.comment.findUnique({
         where: {
           id,
@@ -238,8 +242,6 @@ export class CommentService {
           replies: true,
         },
       });
-
-      // console.log("Existing: ", existingComment);
 
       if (!existingComment) {
         throw new Error();

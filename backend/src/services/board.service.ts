@@ -207,8 +207,6 @@ export class BoardService {
         workflows: allCols,
       };
 
-      console.log(bdto);
-
       return bdto;
     } catch (error) {
       throw new Error('Board Deletions...Failed with: ', { cause: error });

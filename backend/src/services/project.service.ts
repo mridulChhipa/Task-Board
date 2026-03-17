@@ -10,6 +10,7 @@ import {
   type UpdateBody,
   type UpdateRoleBody,
 } from '../types/project.types';
+import { sendNotif } from '../websocket/WebsocketsService';
 
 export class ProjectService {
   async create({ name, description }: CreateBody): Promise<Project> {
@@ -165,7 +166,7 @@ export class ProjectService {
 
   async updateUserRole(
     projectId: string,
-    { userMail, role }: UpdateRoleBody,
+    { userMail, role}: UpdateRoleBody,
   ): Promise<void> {
     try {
       const user = await db.user.findUnique({

@@ -16,6 +16,8 @@ import { generateAuthTokens, verifyToken } from '../utils/jwt';
 import { GlobalRole } from '../../generated/prisma/enums';
 import { ProjectDetails, ProjectRole } from '../types/project.types';
 import { projectService } from './project.service';
+import { NotificationWebSocket } from '../websocket/Websockets';
+import { wsServer } from '../index';
 
 export class AuthService {
   async register(body: RegisterBody): Promise<AuthToken> {
@@ -77,6 +79,10 @@ export class AuthService {
         },
       });
 
+      const ws = new NotificationWebSocket(user.id, (senderId, notification) => {
+        console.log(`Notification from user ${senderId}: ${notification}`);
+      });
+
       tokens.userId = user.id;
       return tokens;
     } catch (error) {
@@ -99,6 +105,8 @@ export class AuthService {
           id: payload.jti,
         },
       });
+
+      wsServer.removeUser(payload.sub);
     } catch (error) {
       throw new Error('Error Logging out user: ', { cause: error });
     }
@@ -106,24 +114,14 @@ export class AuthService {
 
   async refresh(refreshToken: string): Promise<AuthToken> {
     try {
-      // console.log(
-      //   '================ \n Refresh Token from service for refresh: ',
-      //   refreshToken,
-      //   '\n===============',
-      // );
-
       const payload = verifyToken(
         refreshToken,
         process.env.JWT_REFRESH_SECRET ?? '',
       );
 
-      // console.log('Token \n Verified, ', TokenType.REFRESH, payload.type);
       if (payload.type !== TokenType.REFRESH) {
         throw new Error('Invalid token type');
       }
-
-      // console.log('Payload \n Type \nVerified');
-
       const session = await db.session.findUnique({
         where: {
           id: payload.jti,
@@ -132,13 +130,6 @@ export class AuthService {
           user: true,
         },
       });
-
-      // console.log(
-      //   '=======================\nPayload Verified\n',
-      //   session,
-      //   refreshToken,
-      //   '\n=================',
-      // );
 
       if (
         !session ||
@@ -164,6 +155,10 @@ export class AuthService {
         },
       });
 
+      const ws = new NotificationWebSocket(session.user.id, (senderId, notification) => {
+        console.log(`Notification from user ${senderId}: ${notification}`);
+      });
+
       return tokens;
     } catch (error) {
       throw new Error('Error refreshing token:', { cause: error });
@@ -172,11 +167,6 @@ export class AuthService {
 
   async userDetails(userId: number): Promise<UserWithProjs> {
     try {
-      console.log(
-        '================ \n UserId: ',
-        userId,
-        ' \n ==================',
-      );
       const rawUserData = await db.user.findUnique({
         where: {
           id: userId,
@@ -254,11 +244,6 @@ export class AuthService {
 
   async userDetailsByMail(userMail: string): Promise<UserWithProjs> {
     try {
-      console.log(
-        '================ \n UserMail: ',
-        userMail,
-        ' \n ==================',
-      );
       const rawUserData = await db.user.findUnique({
         where: {
           email: userMail,

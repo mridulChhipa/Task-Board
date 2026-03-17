@@ -13,7 +13,6 @@ projectRouter.get(
   '/all-projects/global',
   authorizeGlobalAdmin(),
   (req, res, next) => {
-    console.log('===========\nIn all projects route\n=============');
     projectController.fetchGlobalAdminProjects(req, res, next);
   },
 );

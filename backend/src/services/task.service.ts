@@ -4,6 +4,8 @@ import type { Priority, TaskType } from '../../generated/prisma/enums';
 import type { CreateTaskBody, TaskDTO } from '../types/task.types';
 import { notificationService } from './notification.service';
 import { NotifType } from '../types/notifcation.types';
+import { sendNotif } from '../websocket/WebsocketsService';
+import { send } from 'node:process';
 
 export class TaskService {
   async create({
@@ -31,6 +33,8 @@ export class TaskService {
           parentId,
         },
       });
+
+      sendNotif(reporter, [assignee], `You have been assigned a new task: ${title}`);
 
       if (parentId) {
         await syncStatusWithChildren(parentId);
@@ -87,6 +91,16 @@ export class TaskService {
         },
       });
 
+      await db.activity.create({
+        data: {
+          taskId,
+          type: 'TASK_ASSIGNEE_CHANGED',
+          oldAssigneeId: -1, // PlaceHolder value since old assignee does not exist
+          newAssigneeId: assignee,
+          userId: reporter,
+        },
+      });
+
       if (existingTask.parentId) {
         await syncStatusWithChildren(existingTask.parentId);
       }
@@ -111,6 +125,8 @@ export class TaskService {
             commentId: null,
             threadId: null,
           });
+
+          sendNotif(reporter, [assignee], `Assigned Task Status Updated: ${title}`);
         }
       }
 
@@ -134,10 +150,12 @@ export class TaskService {
             commentId: null,
             threadId: null,
           });
+
+          sendNotif(reporter, [assignee], `You have been assigned a new task: ${title}`);
         }
       }
     } catch (error) {
-      console.log(error);
+      throw new Error('Error updating Task: ', { cause: error });
     }
   }
 
@@ -200,8 +218,7 @@ export class TaskService {
 
       return toTaskDTO(existingTask);
     } catch (err) {
-      console.log('From service fetch task ', err);
-      throw err;
+      throw new Error('Error fetching task: ', { cause: err });
     }
   }
 }

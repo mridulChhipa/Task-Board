@@ -6,7 +6,7 @@ import { initWSServer, shutdownWSServer } from './websocket/WebsocketsService';
 const PORT = process.env.PORT;
 
 const httpServer = http.createServer(app);
-initWSServer(httpServer);
+export const wsServer = initWSServer(httpServer);
 
 httpServer.listen(PORT, () => {
   console.log('Server running on port 3000');

@@ -11,6 +11,8 @@ export class NotificationWebSocket {
     this.socket = new WebSocket('ws://localhost:3000');
     this.messageHandler = messageHandler;
     this.setup();
+    
+    console.log('WebSocket connection established for user', userId);
   }
 
   setup() {
