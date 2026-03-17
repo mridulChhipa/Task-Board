@@ -7,18 +7,21 @@ import {
 import type { ThreadDTO } from '../../types/comment.types';
 import { IconDelete } from '../Boards/boards.images';
 import Button from '../Button/Button';
-import Form, { FormControl, InputArea, TextAreaControl } from '../Forms/Form';
+import Form, { InputArea } from '../Forms/Form';
 import { Comment } from './Comment';
 import styles from './thread.module.css';
 import { useParams } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
+import InlineRichTextEditor from '../TextEditor/InlineRichTextEditor';
+import { sanitizeHtml } from '../../utils/sanitizer';
 
 interface Props {
   thread: ThreadDTO;
   deleteThread: (id: string) => Promise<void>;
+  refreshTask: () => void;
 }
 
-export default function Thread({ thread, deleteThread }: Props) {
+export default function Thread({ thread, deleteThread, refreshTask }: Props) {
   if (thread.isDeleted) return <></>;
 
   const { tid: taskId } = useParams();
@@ -120,6 +123,7 @@ export default function Thread({ thread, deleteThread }: Props) {
 
       setComments([...comments, data.comment.id]);
       setComment('');
+      refreshTask();
     } catch (err) {
       console.error(err);
     }
@@ -154,27 +158,17 @@ export default function Thread({ thread, deleteThread }: Props) {
     }
   }
 
-  // console.log("Thread: ", thread);
-
   return (
     <div className={styles.threadContainer}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         {isEditing && editingField === 'title' ? (
-          <FormControl
-            type="text"
+          <InlineRichTextEditor
             value={editedTitle}
             onChange={(e) => {
               setEditedTitle(e.target.value);
             }}
             onBlur={handleSave}
             onKeyDown={handleKeyDown}
-            autoFocus
-            style={{
-              fontSize: '1.5em',
-              fontWeight: 'bold',
-              flexGrow: 1,
-              marginRight: '1rem',
-            }}
           />
         ) : (
           <h2
@@ -184,10 +178,10 @@ export default function Thread({ thread, deleteThread }: Props) {
             }}
             style={{ cursor: 'text', flexGrow: 1, margin: 0 }}
             title="Click to edit"
-          >
-            {editedTitle}
-          </h2>
-        )}{' '}
+
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(editedTitle) }}
+          />
+        )}
         <span
           className={styles.deleteIcon}
           onClick={() => deleteThread(thread.id)}
@@ -201,7 +195,7 @@ export default function Thread({ thread, deleteThread }: Props) {
       </div>
       <div className={styles.content}>
         {isEditing && editingField === 'content' ? (
-          <TextAreaControl
+          <InlineRichTextEditor
             value={editedContent}
             onChange={(e) => setEditedContent(e.target.value)}
             onBlur={handleSave}
@@ -216,9 +210,8 @@ export default function Thread({ thread, deleteThread }: Props) {
             }}
             style={{ cursor: 'text', flexGrow: 1, margin: 0 }}
             title="Click to edit"
-          >
-            {thread.content}
-          </p>
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(editedContent) }}
+          />
         )}
       </div>
 
@@ -226,6 +219,7 @@ export default function Thread({ thread, deleteThread }: Props) {
         <h3>Comments ({comments.length})</h3>
         {comments.map((comment, idx) => (
           <Comment
+            refreshTask={refreshTask}
             key={idx}
             threadId={thread.id}
             commentId={comment}
@@ -236,7 +230,7 @@ export default function Thread({ thread, deleteThread }: Props) {
 
       <Form onSubmit={handleCommentSubmit}>
         <InputArea>
-          <TextAreaControl
+          <InlineRichTextEditor
             required={true}
             name="desc"
             id="desc"
