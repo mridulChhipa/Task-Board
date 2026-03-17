@@ -1,6 +1,8 @@
 import type { Prisma } from '../../generated/prisma/client';
 import { db } from '../config/db';
-import { ThreadDTO } from '../types/comment.types';
+import { UserDetails } from '../types/auth.types';
+import { ColumnDTO } from '../types/board.types';
+import { CommentDTO, ThreadDTO } from '../types/comment.types';
 import type {
   ActivityDTO,
   ActivityType,
@@ -10,10 +12,22 @@ import type {
 } from '../types/task.types';
 
 type TaskWithChildren = Prisma.TaskGetPayload<{
-  include: { children: true; threads: true; activities: true };
+  include: {
+    children: true,
+    threads: true,
+    activities: {
+      include: {
+        newAssignee: true,
+        oldAssignee: true,
+        oldStatus: true,
+        newStatus: true,
+        user: true,
+        comment: true,
+        thread: true,
+      }
+    }
+  };
 }>;
-
-type PrismaTask = Prisma.TaskGetPayload<Record<string, never>>;
 
 export function toTaskDTO(task: TaskWithChildren): TaskDTO {
   return {
@@ -43,12 +57,22 @@ export function toTaskDTO(task: TaskWithChildren): TaskDTO {
         type: activity.type as ActivityType,
         timestamp: activity.timestamp.toISOString(),
         metadata: {
-          threadId: activity.threadId,
-          commentId: activity.commentId,
-          oldStatusId: activity.oldStatusId,
-          newStatusId: activity.newStatusId,
-          oldAssignee: activity.oldAssignee,
-          newAssignee: activity.newAssignee,
+          thread: activity.thread as ThreadDTO,
+          comment: activity.comment as CommentDTO,
+          oldStatus: activity.oldStatus as ColumnDTO,
+          newStatus: activity.newStatus as ColumnDTO,
+          oldAssignee: (activity.oldAssignee ? {
+            ...activity.oldAssignee,
+            userId: activity.oldAssignee.id,
+          } : null) as UserDetails,
+          newAssignee: (activity.newAssignee ? {
+            ...activity.newAssignee,
+            userId: activity.newAssignee.id,
+          } : null) as UserDetails,
+          user: (activity.user ? {
+            ...activity.user,
+            userId: activity.user.id,
+          } : null) as UserDetails,
         },
       }),
     ),

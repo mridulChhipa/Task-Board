@@ -99,6 +99,7 @@ export class TaskService {
               taskId,
               oldStatusId: existingTask.statusId,
               newStatusId: statusId,
+              userId: reporter,
             },
           });
 
@@ -119,8 +120,9 @@ export class TaskService {
             data: {
               taskId,
               type: 'TASK_ASSIGNEE_CHANGED',
-              oldAssignee: existingTask.assignee,
-              newAssignee: assignee,
+              oldAssigneeId: existingTask.assignee,
+              newAssigneeId: assignee,
+              userId: reporter,
             },
           });
 
@@ -173,7 +175,17 @@ export class TaskService {
         },
         include: {
           children: true,
-          activities: true,
+          activities: {
+            include: {
+              user: true,
+              oldAssignee: true,
+              newAssignee: true,
+              oldStatus: true,
+              newStatus: true,
+              comment: true,
+              thread: true,
+            }
+          },
           threads: {
             include: {
               comments: true,
@@ -185,9 +197,7 @@ export class TaskService {
       if (!existingTask) {
         throw new Error('Task with the given taskId does not exist');
       }
-      // console.log(existingTask);
 
-      // VSCode automatically tells if await is needed or not
       return toTaskDTO(existingTask);
     } catch (err) {
       console.log('From service fetch task ', err);

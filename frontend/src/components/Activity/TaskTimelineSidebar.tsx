@@ -20,7 +20,7 @@ const formatTimestamp = (isoString: string) => {
 
 const ActivityContent: React.FC<{ activity: ActivityDTO }> = ({ activity }) => {
   const { type, metadata } = activity;
-  const author = 'Someone';
+  const author = activity.metadata.user?.name;
 
   switch (type) {
     case 'TASK_STATUS_UPDATED':
@@ -28,9 +28,9 @@ const ActivityContent: React.FC<{ activity: ActivityDTO }> = ({ activity }) => {
         <p className={styles.activityText}>
           <span className={styles.author}>{author}</span> changed status from{' '}
           <span className={styles.statusOld}>
-            {metadata.oldStatusId || 'None'}
+            {metadata.oldStatus?.name || 'None'}
           </span>{' '}
-          to <span className={styles.statusNew}>{metadata.newStatusId}</span>
+          to <span className={styles.statusNew}>{metadata.newStatus?.name}</span>
         </p>
       );
 
@@ -38,7 +38,7 @@ const ActivityContent: React.FC<{ activity: ActivityDTO }> = ({ activity }) => {
       return (
         <p className={styles.activityText}>
           <span className={styles.author}>{author}</span> assigned task to User
-          #{metadata.newAssignee}
+          #{metadata.newAssignee?.name}
         </p>
       );
 
@@ -49,7 +49,7 @@ const ActivityContent: React.FC<{ activity: ActivityDTO }> = ({ activity }) => {
             <span className={styles.author}>{author}</span> added a comment:
           </p>
           <p className={styles.commentQuote}>
-            "Reference comment #{metadata.commentId}"
+            "{metadata.comment?.content}"
           </p>
         </div>
       );
@@ -58,7 +58,7 @@ const ActivityContent: React.FC<{ activity: ActivityDTO }> = ({ activity }) => {
       return (
         <p className={styles.activityText}>
           <span className={styles.author}>{author}</span> edited comment #
-          {metadata.commentId}
+          {metadata.comment?.content}
         </p>
       );
 
@@ -77,7 +77,7 @@ const ActivityContent: React.FC<{ activity: ActivityDTO }> = ({ activity }) => {
             thread:
           </p>
           <p className={styles.commentQuote}>
-            "Reference thread #{metadata.threadId}"
+            "#{metadata.thread?.title}"
           </p>
         </div>
       );
@@ -86,7 +86,7 @@ const ActivityContent: React.FC<{ activity: ActivityDTO }> = ({ activity }) => {
       return (
         <p className={styles.activityText}>
           <span className={styles.author}>{author}</span> edited thread #
-          {metadata.threadId}
+          {metadata.thread?.title}
         </p>
       );
 

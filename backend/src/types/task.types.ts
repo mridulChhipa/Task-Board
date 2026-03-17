@@ -1,4 +1,6 @@
-import { ThreadDTO } from './comment.types';
+import { UserDetails } from './auth.types';
+import { ColumnDTO } from './board.types';
+import { CommentDTO, ThreadDTO } from './comment.types';
 
 export enum TaskType {
   STORY = 'STORY',
@@ -75,11 +77,12 @@ export interface ActivityDTO {
   type: ActivityType;
   timestamp: string; // Using string because Dates become ISO strings when sent via JSON
   metadata: {
-    threadId?: string | null;
-    commentId?: string | null;
-    oldStatusId?: string | null;
-    newStatusId?: string | null;
-    oldAssignee?: number | null;
-    newAssignee?: number | null;
+    thread?: ThreadDTO;
+    comment?: CommentDTO;
+    oldStatus?: ColumnDTO;
+    newStatus?: ColumnDTO;
+    oldAssignee?: UserDetails;
+    newAssignee?: UserDetails;
+    user?: UserDetails;
   };
 }

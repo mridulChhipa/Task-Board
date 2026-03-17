@@ -13,3 +13,5 @@ incorporate try catch blocks to catch all these random errors we've been throwin
 
 improve project user management ui. If possible insert a delete and edit button in the view users menu.
 add users can also be simplified.
+
+Assignee and status changes mein userId is shyd se not initialsed properly

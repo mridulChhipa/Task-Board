@@ -35,6 +35,7 @@ export class CommentService {
             type: 'THREAD_ADDED',
             threadId: createdThread.id,
             taskId: taskId,
+            userId: authorId,
           },
         });
 
@@ -146,6 +147,7 @@ export class CommentService {
             type: 'COMMENT_ADDED',
             commentId: createdComment.id,
             taskId: taskId,
+            userId: authorId,
           },
         });
 
