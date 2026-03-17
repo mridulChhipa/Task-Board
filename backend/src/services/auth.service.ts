@@ -16,7 +16,6 @@ import { generateAuthTokens, verifyToken } from '../utils/jwt';
 import { GlobalRole } from '../../generated/prisma/enums';
 import { ProjectDetails, ProjectRole } from '../types/project.types';
 import { projectService } from './project.service';
-import { NotificationWebSocket } from '../websocket/Websockets';
 import { wsServer } from '../index';
 
 export class AuthService {
@@ -77,10 +76,6 @@ export class AuthService {
           token: tokens.refreshToken,
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         },
-      });
-
-      const ws = new NotificationWebSocket(user.id, (senderId, notification) => {
-        console.log(`Notification from user ${senderId}: ${notification}`);
       });
 
       tokens.userId = user.id;
@@ -153,10 +148,6 @@ export class AuthService {
           token: tokens.refreshToken,
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         },
-      });
-
-      const ws = new NotificationWebSocket(session.user.id, (senderId, notification) => {
-        console.log(`Notification from user ${senderId}: ${notification}`);
       });
 
       return tokens;

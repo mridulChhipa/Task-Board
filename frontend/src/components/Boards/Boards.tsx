@@ -121,6 +121,10 @@ export default function Boards({ boards }: Props) {
   const [assignee, setAssignee] = useState('');
   const [dueDate, setDueDate] = useState('');
 
+  const [taskId, setTaskId] = useState('');
+  const [setParent, setSetParent] = useState(false);
+  // const [showChild, setShowChild] = useState(false);
+
   const [editModal, setEditModal] = useState(false);
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const setState = {
@@ -132,6 +136,7 @@ export default function Boards({ boards }: Props) {
     setDueDate: setDueDate,
     setEditModal: setEditModal,
     setCurrentTaskId: setCurrentTaskId,
+    setTaskId: setTaskId,
   };
 
   function dragstartHandler(event: React.DragEvent<HTMLDivElement>) {
@@ -323,7 +328,7 @@ export default function Boards({ boards }: Props) {
           reporter: reporterId,
           dueDate: dateObject,
           statusId: activeColumnId,
-          parentId: null, // change to parent task id if story type.
+          parentId: setParent ? taskId : null,
         }),
       });
       const data = await res.json();
@@ -377,7 +382,7 @@ export default function Boards({ boards }: Props) {
           priority: priority,
           reporter: user?.userId,
           assignee: assigneeId,
-          parentId: parentId,
+          parentId: setParent ? taskId : parentId,
           statusId: statusId,
           dueDate: dueDate !== '' ? new Date(dueDate) : null,
         }),
@@ -488,6 +493,25 @@ export default function Boards({ boards }: Props) {
                     value={dueDate}
                   />
                 </InputArea>
+                <div style={{ display: 'flex', flexDirection: 'row', gap: '0.5rem' }}>
+                  <Label htmlFor="showParent">Set parent story</Label>
+                  <input 
+                    type='checkbox'
+                    name='showParent'
+                    checked={setParent}
+                    onChange={(e) => setSetParent(e.target.checked)}
+                  />
+                </div>
+                {setParent && <InputArea>
+                  <Label htmlFor="parentTask">parentTask (contains last copied task ID)</Label>
+                  <FormControl
+                    type="string"
+                    name="parentTask"
+                    id="parentTask"
+                    value={taskId}
+                    disabled
+                  />
+                </InputArea>}
                 <div className={formStyles.buttonGroup}>
                   <Button
                     priority="second"
@@ -595,6 +619,25 @@ export default function Boards({ boards }: Props) {
                     value={dueDate}
                   />
                 </InputArea>
+                <div style={{ display: 'flex', flexDirection: 'row', gap: '0.5rem' }}>
+                  <Label htmlFor="showParent">Set parent story (uncheck to keep same parent)</Label>
+                  <input 
+                    type='checkbox'
+                    name='showParent'
+                    checked={setParent}
+                    onChange={(e) => setSetParent(e.target.checked)}
+                  />
+                </div>
+                <InputArea>
+                  <Label htmlFor="parentTask">parentTask (contains last copied task ID)</Label>
+                  <FormControl
+                    type="string"
+                    name="parentTask"
+                    id="parentTask"
+                    value={taskId}
+                    disabled
+                  />
+                </InputArea>
                 <div className={formStyles.buttonGroup}>
                   <Button
                     priority="second"
@@ -611,6 +654,7 @@ export default function Boards({ boards }: Props) {
             </div>
           </Modal>
         )}
+        {/* {showChild && showChildren(taskId)} */}
       </>
       <div className={styles.container}>
         <div className={styles.tabList} role="tablist">

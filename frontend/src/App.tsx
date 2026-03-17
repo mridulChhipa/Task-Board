@@ -47,4 +47,8 @@ function App() {
   );
 }
 
+export function handleNotification(senderId: number, notification: string) {
+  alert(`Notification from user ${senderId}: ${notification}`);
+}
+
 export default App;

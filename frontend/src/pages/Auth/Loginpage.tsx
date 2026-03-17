@@ -9,6 +9,8 @@ import Form, {
   InputArea,
   Label,
 } from '../../components/Forms/Form';
+import { NotificationWebSocket } from '../../utils/Websockets.utils';
+import { handleNotification } from '../../App';
 
 export default function LogInPage() {
   const navigate = useNavigate();
@@ -73,6 +75,8 @@ export default function LogInPage() {
           isLoading: false,
         },
       });
+
+      new NotificationWebSocket(loginData.userId, handleNotification);
 
       navigate('/dashboard');
     } catch (err) {

@@ -6,6 +6,8 @@ import {
   defaultAuth,
   AuthContext,
 } from './AuthContext';
+import { NotificationWebSocket } from '../utils/Websockets.utils';
+import { handleNotification } from '../App';
 
 let isRefreshing = false;
 let refreshPromise: Promise<Record<string, unknown> | null> | null = null;
@@ -34,6 +36,14 @@ async function tryRefreshToken(): Promise<Record<string, unknown> | null> {
       refreshPromise = null;
     });
 
+  if(!refreshPromise) {
+    throw new Error('Failed to refresh token');
+  }
+
+  // const userId: number = await refreshPromise.then((data) => data?.userId);
+  // new NotificationWebSocket(userId, (senderId, notification) => {
+  //   console.log(`Notification from user ${senderId}: ${notification}`);
+  // });
   return refreshPromise;
 }
 
@@ -82,6 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 isLoading: false,
               },
             });
+            new NotificationWebSocket(user.sub, handleNotification);
           });
       } catch (err) {
         console.log('Could not restore user', err);

@@ -179,3 +179,23 @@
   background-color: #e9ecef;
   transform: scale(0.95);
 }
+
+.copyIcon {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-dim);
+  padding: 3px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copyIcon:hover {
+  background-color: #f1f3f5;
+  color: #1bbd15;
+}
+
+.copyIcon:active {
+  background-color: #e9ecef;
+  transform: scale(0.95);
+}

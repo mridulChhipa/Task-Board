@@ -23,6 +23,7 @@ interface Props {
     setDueDate: React.Dispatch<React.SetStateAction<string>>;
     setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
     setCurrentTaskId: React.Dispatch<React.SetStateAction<string | null>>;
+    setTaskId: React.Dispatch<React.SetStateAction<string>>;
   };
 }
 

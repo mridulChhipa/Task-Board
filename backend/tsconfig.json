@@ -37,6 +37,6 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../frontend/src/utils/Websockets.utils.ts"],
   "exclude": ["node_modules", "dist"]
 }

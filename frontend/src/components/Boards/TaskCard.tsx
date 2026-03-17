@@ -7,8 +7,9 @@ import {
   IconSettings,
   IconUser,
   IconWarning,
+  IconCopy,
 } from './boards.images';
-import type { Priority, TaskType } from './Boards';
+import { type Priority, type TaskType } from './Boards';
 import { useNavigate } from 'react-router-dom';
 
 interface Props {
@@ -25,6 +26,7 @@ interface Props {
     setDueDate: React.Dispatch<React.SetStateAction<string>>;
     setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
     setCurrentTaskId: React.Dispatch<React.SetStateAction<string | null>>;
+    setTaskId: React.Dispatch<React.SetStateAction<string>>;
   };
 }
 
@@ -73,36 +75,59 @@ export function TaskCard({
             {task.type}
           </span>
           <span className={styles.taskId}>{task.id}</span>
-          <span
-            className={styles.deleteIcon}
-            onClick={(e) => {
-              e.stopPropagation();
-              deleteTask(task.id);
-            }}
-          >
-            <IconDelete />
-          </span>
-          <span
-            className={styles.settingsIcon}
-            onClick={async (e) => {
-              e.stopPropagation();
-              setState.setTaskName(task.title);
-              setState.setTaskDescription(task.description ?? '');
-              setState.setTaskType(task.type);
-              setState.setPriority(task.priority);
-              setState.setAssignee(await getMailfromId(task.assignee));
-              setState.setDueDate(
-                task.dueDate
-                  ? new Date(task.dueDate).toISOString().slice(0, 10)
-                  : '',
-              );
-              setState.setCurrentTaskId(task.id);
-              setState.setEditModal(true);
-              console.log('HI');
-            }}
-          >
-            <IconSettings />
-          </span>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div>
+              {task.type === 'STORY' &&
+                <span 
+                  className={styles.copyIcon}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setState.setTaskId(task.id);
+                  }}
+              >
+                <IconCopy />
+              </span>}
+              <span
+                className={styles.deleteIcon}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteTask(task.id);
+                }}
+              >
+                <IconDelete />
+              </span>
+              <span
+                className={styles.settingsIcon}
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  setState.setTaskName(task.title);
+                  setState.setTaskDescription(task.description ?? '');
+                  setState.setTaskType(task.type);
+                  setState.setPriority(task.priority);
+                  setState.setAssignee(await getMailfromId(task.assignee));
+                  setState.setDueDate(
+                    task.dueDate
+                      ? new Date(task.dueDate).toISOString().slice(0, 10)
+                      : '',
+                  );
+                  setState.setCurrentTaskId(task.id);
+                  setState.setEditModal(true);
+                  console.log('HI');
+                }}
+              >
+                <IconSettings />
+              </span>
+            </div>
+            <button 
+              style={{fontSize: '8px', width: '70px'}}
+              onClick={(e) => {
+                e.stopPropagation();
+                // showChildren(task.id);
+              }}   
+            >
+              View Children
+            </button>
+          </div>
         </div>
 
         <div className={styles.taskTitle}>{task.title}</div>
