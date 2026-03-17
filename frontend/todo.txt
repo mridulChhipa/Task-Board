@@ -15,3 +15,12 @@ improve project user management ui. If possible insert a delete and edit button 
 add users can also be simplified.
 
 Assignee and status changes mein userId is shyd se not initialsed properly
+
+###
+Issue: 
+  Resolved:
+    I removed tasks from useEffect in tasks.page.tsx which does not renders the newly posted reply or comments. 
+    If i add it then infinite re-renders occurs which causes bottleneck 
+
+Improvements:
+  In Props of kanban column.tsx, define React.Dispatch.setS... as something

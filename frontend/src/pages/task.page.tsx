@@ -8,11 +8,10 @@ import { AuthContext } from '../context/AuthContext';
 import type { CommentDTO, ThreadDTO } from '../types/comment.types';
 import Thread from '../components/Thread/Thread';
 import Form, {
-  FormControl,
   InputArea,
-  TextAreaControl,
 } from '../components/Forms/Form';
 import { TaskTimelineSidebar } from '../components/Activity/TaskTimelineSidebar';
+import InlineRichTextEditor from '../components/TextEditor/InlineRichTextEditor';
 
 export default function TaskPage() {
   const { tid } = useParams<{ tid: string }>();
@@ -28,6 +27,8 @@ export default function TaskPage() {
 
   const [threads, setThreads] = useState<ThreadDTO[]>([]);
   // const [isOpen, setIsOpen] = useState(true);
+
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     async function fetchTask() {
@@ -68,7 +69,7 @@ export default function TaskPage() {
     if (tid) {
       fetchTask();
     }
-  }, [tid, threads, task]);
+  }, [tid, threads, refreshKey]);
 
   if (loading) {
     return <div>Loading task...</div>;
@@ -151,23 +152,25 @@ export default function TaskPage() {
         {task.threads &&
           task.threads.map((thread, idx) => {
             return (
-              <Thread deleteThread={deleteThread} key={idx} thread={thread} />
+              <Thread refreshTask={() => { setRefreshKey(refreshKey + 1) }} deleteThread={deleteThread} key={idx} thread={thread} />
             );
           })}
-
+        <hr />
+        <h1>Have some ideas ? Start a new Thread</h1>
         <Form onSubmit={handleThreadSubmit}>
           <InputArea>
-            <FormControl
+            <InlineRichTextEditor
               required={true}
               name="title"
               id="title"
               placeholder="Title"
               value={threadTitle}
+              rows={1}
               onChange={(e) => setThreadTitle(e.target.value)}
             />
           </InputArea>
           <InputArea>
-            <TextAreaControl
+            <InlineRichTextEditor
               required={true}
               name="desc"
               id="desc"

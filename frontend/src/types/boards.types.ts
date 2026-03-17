@@ -50,6 +50,6 @@ export interface ActivityDTO {
     newStatus?: Workflow;
     oldAssignee?: User;
     newAssignee?: User;
-    user?: User
+    user?: User;
   };
 }

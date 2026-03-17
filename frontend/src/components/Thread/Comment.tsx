@@ -12,15 +12,18 @@ import { IconDelete } from '../Boards/boards.images';
 import { useParams } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import Modal from '../Modal/Modal';
-import Form, { InputArea, Label, TextAreaControl } from '../Forms/Form';
+import Form, { InputArea, Label } from '../Forms/Form';
+import InlineRichTextEditor from '../TextEditor/InlineRichTextEditor';
+import { sanitizeHtml } from '../../utils/sanitizer';
 
 interface Props {
   commentId: string;
   threadId: string;
   deleteHandler: (id: string) => Promise<void>;
+  refreshTask: () => void;
 }
 
-export function Comment({ commentId, deleteHandler, threadId }: Props) {
+export function Comment({ commentId, deleteHandler, threadId, refreshTask }: Props) {
   // console.log('Cid: ', commentId);
 
   const [comment, setComment] = useState<CommentDTO>();
@@ -168,6 +171,7 @@ export function Comment({ commentId, deleteHandler, threadId }: Props) {
       setReplies([...replies, data.comment.id]);
       setReply('');
       setReplyModal(false);
+      refreshTask();
     } catch (err) {
       console.error(err);
     }
@@ -175,26 +179,24 @@ export function Comment({ commentId, deleteHandler, threadId }: Props) {
 
   useEffect(() => {
     fetchComment(commentId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commentId]);
+  }, [commentId, replies]);
 
   if (!comment || comment.isDeleted) return <></>;
 
-  // console.log("Comment: ", comment);
   return (
     <>
       {replyModal && (
         <Modal onclick={() => setReplyModal(false)}>
           <Form onSubmit={handleReplySubmit}>
             <InputArea>
-              <Label htmlFor="name">Task Name</Label>
-              <TextAreaControl
-                placeholder="e.g. Create QGraphicsScene"
-                name="reply"
+              <Label htmlFor="reply">Your Reply</Label>
+              <InlineRichTextEditor
                 id="reply"
-                onChange={(e) => setReply(e.target.value)}
-                required
+                name="reply"
+                placeholder="Type your reply here..."
                 value={reply}
+                onChange={(e) => setReply(e.target.value)}
+                rows={4}
               />
             </InputArea>
 
@@ -202,11 +204,19 @@ export function Comment({ commentId, deleteHandler, threadId }: Props) {
               <Button
                 priority="second"
                 type="button"
-                onClick={() => setReplyModal(false)}
+                onClick={() => {
+                  setReplyModal(false);
+                  setReply(''); // Clear the editor if the user cancels
+                }}
               >
                 Cancel
               </Button>
-              <Button priority="first" type="submit">
+
+              <Button
+                priority="first"
+                type="submit"
+                disabled={!reply.trim() || reply === '<p><br></p>'}
+              >
                 Post Reply
               </Button>
             </div>
@@ -241,7 +251,7 @@ export function Comment({ commentId, deleteHandler, threadId }: Props) {
 
         <div className={styles.content}>
           {isEditing ? (
-            <TextAreaControl
+            <InlineRichTextEditor
               value={editedContent}
               onChange={(e) => setEditedContent(e.target.value)}
               onBlur={handleSave}
@@ -253,8 +263,9 @@ export function Comment({ commentId, deleteHandler, threadId }: Props) {
               onClick={() => setIsEditing(true)}
               style={{ cursor: 'text', margin: 0 }}
               title="Click to edit"
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(comment.content), }}
             >
-              {comment.content}
+              {/* {comment.content} */}
             </p>
           )}
         </div>
@@ -268,6 +279,7 @@ export function Comment({ commentId, deleteHandler, threadId }: Props) {
             {comment.replies.map((replyId) => (
               <Comment
                 key={replyId}
+                refreshTask={refreshTask}
                 commentId={replyId}
                 threadId={threadId}
                 deleteHandler={deleteReply}
