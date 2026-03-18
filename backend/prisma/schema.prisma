@@ -241,9 +241,9 @@ model UserNotification {
 model EdgeConstraint {
   id      String   @id @default(uuid())
   boardId String
-  board   Board    @relation(fields: [boardId], references: [id])
+  board   Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
   uId     String
-  u       Workflow @relation(name: "startedge", fields: [uId], references: [id])
+  u       Workflow @relation(name: "startedge", fields: [uId], references: [id], onDelete: Cascade)
   vId     String
-  v       Workflow @relation(name: "endedge", fields: [vId], references: [id])
+  v       Workflow @relation(name: "endedge", fields: [vId], references: [id], onDelete: Cascade)
 }
