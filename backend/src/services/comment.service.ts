@@ -9,10 +9,11 @@ import type {
   UpdateThreadBody,
 } from '../types/comment.types';
 import { NotifType } from '../types/notifcation.types';
-import { toCommentDTO, toThreadDTO } from '../utils/comment.utils';
+import { extractEmailMentions, toCommentDTO, toThreadDTO } from '../utils/comment.utils';
 import { notificationService } from './notification.service';
 import { send } from 'node:process';
 import { sendNotif } from '../websocket/WebsocketsService';
+import { User } from '../../generated/prisma/client';
 
 export class CommentService {
   async createThread({
@@ -143,7 +144,7 @@ export class CommentService {
         }
       });
 
-      if(!task) {
+      if (!task) {
         throw new Error('Task not found');
       }
 
@@ -165,6 +166,30 @@ export class CommentService {
           commentId: createdComment.id,
           threadId: createdComment.threadId,
         });
+
+        const mentions: string[] = extractEmailMentions(createdComment.content);
+
+        console.log(mentions);
+
+        for (const mention of mentions) {
+          console.log("Mentioned: ", mention);
+          const user = await db.user.findUnique({
+            where: {
+              email: mention,
+            }
+          });
+
+          if (user) {
+            await notificationService.createNotification({
+              userId: user.id,
+              senderId: authorId,
+              taskId: taskId,
+              type: NotifType.MENTIONED,
+              commentId: createdComment.id,
+              threadId: threadId,
+            });
+          }
+        }
 
         sendNotif(authorId, [task.assignee], `New comment added to task: ${task.title}`);
       }

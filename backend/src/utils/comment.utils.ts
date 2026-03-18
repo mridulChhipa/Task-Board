@@ -49,3 +49,10 @@ export function toThreadDTO(thread: ThreadWithChildren): ThreadDTO {
     comments: cmnts,
   };
 }
+
+export const extractEmailMentions = (text: string): string[] => {
+  const mentionRegex = /@[\w.%+-]+@[\w.-]+\.[a-zA-Z]{2,}/g;
+  const matches = text.match(mentionRegex);
+
+  return matches ? [...new Set(matches)] : [];
+};
