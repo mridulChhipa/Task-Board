@@ -14,10 +14,10 @@ import { useNavigate } from 'react-router-dom';
 
 interface Props {
   task: Task;
-  deleteTask: (id: string) => Promise<void>;
+  deleteTask?: (id: string) => Promise<void>;
   draggable?: boolean;
   dragstartHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
-  setState: {
+  setState?: {
     setTaskName: React.Dispatch<React.SetStateAction<string>>;
     setTaskDescription: React.Dispatch<React.SetStateAction<string>>;
     setTaskType: React.Dispatch<React.SetStateAction<TaskType>>;
@@ -27,6 +27,8 @@ interface Props {
     setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
     setCurrentTaskId: React.Dispatch<React.SetStateAction<string | null>>;
     setTaskId: React.Dispatch<React.SetStateAction<string>>;
+    setShowChild: React.Dispatch<React.SetStateAction<boolean>>;
+    setShowChildOf: React.Dispatch<React.SetStateAction<Task[] | null>>;
   };
 }
 
@@ -43,6 +45,19 @@ async function getMailfromId(id: number): Promise<string> {
     console.error('Error fetching user data', err);
     return '';
   }
+}
+
+async function childrenOf(task: Task | null): Promise<Task[]> {
+  if (!task) return [];
+  const children = await Promise.all(task.children.map(async (child: { id: string }) => {
+    const res = await fetch(`http://localhost:3000/api/task/${child.id}`, {
+      credentials: 'include',
+    });
+    const data = await res.json();
+    console.log(data);
+    return data.task as Task;
+  }));
+  return children;
 }
 
 export function TaskCard({
@@ -76,13 +91,13 @@ export function TaskCard({
           </span>
           <span className={styles.taskId}>{task.id}</span>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div>
+            <div style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
               {task.type === 'STORY' &&
                 <span 
                   className={styles.copyIcon}
                   onClick={(e) => {
                     e.stopPropagation();
-                    setState.setTaskId(task.id);
+                    setState?.setTaskId(task.id);
                   }}
               >
                 <IconCopy />
@@ -91,7 +106,7 @@ export function TaskCard({
                 className={styles.deleteIcon}
                 onClick={(e) => {
                   e.stopPropagation();
-                  deleteTask(task.id);
+                  deleteTask?.(task.id);
                 }}
               >
                 <IconDelete />
@@ -100,33 +115,33 @@ export function TaskCard({
                 className={styles.settingsIcon}
                 onClick={async (e) => {
                   e.stopPropagation();
-                  setState.setTaskName(task.title);
-                  setState.setTaskDescription(task.description ?? '');
-                  setState.setTaskType(task.type);
-                  setState.setPriority(task.priority);
-                  setState.setAssignee(await getMailfromId(task.assignee));
-                  setState.setDueDate(
+                  setState?.setTaskName(task.title);
+                  setState?.setTaskDescription(task.description ?? '');
+                  setState?.setTaskType(task.type);
+                  setState?.setPriority(task.priority);
+                  setState?.setAssignee(await getMailfromId(task.assignee));
+                  setState?.setDueDate(
                     task.dueDate
                       ? new Date(task.dueDate).toISOString().slice(0, 10)
                       : '',
                   );
-                  setState.setCurrentTaskId(task.id);
-                  setState.setEditModal(true);
-                  console.log('HI');
+                  setState?.setCurrentTaskId(task.id);
+                  setState?.setEditModal(true);
                 }}
               >
                 <IconSettings />
               </span>
             </div>
-            <button 
-              style={{fontSize: '8px', width: '70px'}}
-              onClick={(e) => {
+            {task.type === 'STORY' && <button className={styles.childButton}
+              onClick={async (e) => {
                 e.stopPropagation();
-                // showChildren(task.id);
+                setState?.setShowChild(true);
+                const taskWithChildren = await childrenOf(task);
+                setState?.setShowChildOf(taskWithChildren);
               }}   
             >
-              View Children
-            </button>
+              Children
+            </button>}
           </div>
         </div>
 

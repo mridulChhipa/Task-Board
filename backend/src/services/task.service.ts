@@ -91,6 +91,8 @@ export class TaskService {
         },
       });
 
+      console.log(parentId);
+
       await db.activity.create({
         data: {
           taskId,

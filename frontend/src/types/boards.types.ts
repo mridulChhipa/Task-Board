@@ -37,6 +37,7 @@ export interface Task {
   parentId?: string;
   threads?: ThreadDTO[];
   activities?: ActivityDTO[];
+  children: Task[];
 }
 
 export interface ActivityDTO {

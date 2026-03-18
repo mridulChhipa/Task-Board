@@ -82,3 +82,10 @@
 .addColumnMenu * {
   margin: 5px auto;
 }
+
+.childContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+}

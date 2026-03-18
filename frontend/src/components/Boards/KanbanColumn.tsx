@@ -24,6 +24,8 @@ interface Props {
     setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
     setCurrentTaskId: React.Dispatch<React.SetStateAction<string | null>>;
     setTaskId: React.Dispatch<React.SetStateAction<string>>;
+    setShowChild: React.Dispatch<React.SetStateAction<boolean>>;
+    setShowChildOf: React.Dispatch<React.SetStateAction<Task[] | null>>;
   };
 }
 

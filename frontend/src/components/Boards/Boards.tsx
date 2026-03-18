@@ -3,7 +3,7 @@ import styles from './boards.module.css';
 import formStyles from '../Projects/CreateProject.module.css';
 import type { Board } from '../../types/project.types';
 import { KanbanColumn } from './KanbanColumn';
-import type { Workflow } from '../../types/boards.types';
+import type { Task, Workflow } from '../../types/boards.types';
 import { addWorkflow } from '../../utils/board.utils';
 import { useParams } from 'react-router-dom';
 import { IconPlus } from './boards.images';
@@ -12,6 +12,7 @@ import type { SubmitEventHandler } from 'react';
 import Modal from '../Modal/Modal';
 import { AuthContext } from '../../context/AuthContext';
 import Form, { FormControl, InputArea, Label } from '../Forms/Form';
+// import { TaskCard } from './TaskCard';
 
 interface Props {
   boards: Board[];
@@ -88,6 +89,25 @@ async function sortWorkflows(workflows: Workflow[]): Promise<Workflow[]> {
   });
 }
 
+function ShowChildrenModal({ children }: { children: Task[] | null }) {
+  if(!children) return [];
+  // console.log(children);
+  return(
+    <>
+      <div className={styles.childContainer}>
+        {/* {children.map((child) => 
+          <TaskCard
+            key={child.id}
+            task={child}
+            draggable={false}
+            dragstartHandler={() => {}}
+          />
+        )} */}
+      </div>
+    </>
+  );
+}
+
 export default function Boards({ boards }: Props) {
   if (boards.length === 0) {
     return (
@@ -123,7 +143,8 @@ export default function Boards({ boards }: Props) {
 
   const [taskId, setTaskId] = useState('');
   const [setParent, setSetParent] = useState(false);
-  // const [showChild, setShowChild] = useState(false);
+  const [showChild, setShowChild] = useState(false);
+  const [showChildOf, setShowChildOf] = useState<Task[] | null>(null);
 
   const [editModal, setEditModal] = useState(false);
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
@@ -137,6 +158,8 @@ export default function Boards({ boards }: Props) {
     setEditModal: setEditModal,
     setCurrentTaskId: setCurrentTaskId,
     setTaskId: setTaskId,
+    setShowChild: setShowChild,
+    setShowChildOf: setShowChildOf,
   };
 
   function dragstartHandler(event: React.DragEvent<HTMLDivElement>) {
@@ -200,7 +223,9 @@ export default function Boards({ boards }: Props) {
         );
         workflow.orderIdx = newOrderIdx;
         const newWorkflowState = [...workflowState];
-        setWorkflowState(newWorkflowState);
+        const sortedWF = await sortWorkflows(newWorkflowState);
+        setWorkflowState(sortedWF);
+        boards[activeIndex].workflows = sortedWF;
       } catch (err) {
         throw new Error('Column update failed with error: ', { cause: err });
       }
@@ -279,6 +304,7 @@ export default function Boards({ boards }: Props) {
       });
       const sortedWF = await sortWorkflows(newWF);
       setWorkflowState(sortedWF);
+      boards[activeIndex].workflows = sortedWF;
     }
   }
 
@@ -343,6 +369,7 @@ export default function Boards({ boards }: Props) {
       );
       const sortedWF = await sortWorkflows(newWF);
       setWorkflowState(sortedWF);
+      boards[activeIndex].workflows = sortedWF;
     } catch (err) {
       console.error('Error creating task:', { cause: err });
     } finally {
@@ -387,9 +414,11 @@ export default function Boards({ boards }: Props) {
           dueDate: dueDate !== '' ? new Date(dueDate) : null,
         }),
       });
+      console.log(setParent, taskId, parentId);
       const newWF = workflowState.map((workflow) => workflow);
       const sortedWF = await sortWorkflows(newWF);
       setWorkflowState(sortedWF);
+      boards[activeIndex].workflows = sortedWF;
     } catch (err) {
       console.error('Error editing task: ', { cause: err });
     } finally {
@@ -500,6 +529,8 @@ export default function Boards({ boards }: Props) {
                     name='showParent'
                     checked={setParent}
                     onChange={(e) => setSetParent(e.target.checked)}
+                    disabled={taskType === 'STORY'}
+                    defaultChecked={false}
                   />
                 </div>
                 {setParent && <InputArea>
@@ -626,6 +657,8 @@ export default function Boards({ boards }: Props) {
                     name='showParent'
                     checked={setParent}
                     onChange={(e) => setSetParent(e.target.checked)}
+                    disabled={taskType === 'STORY'}
+                    defaultChecked={false}
                   />
                 </div>
                 <InputArea>
@@ -634,7 +667,7 @@ export default function Boards({ boards }: Props) {
                     type="string"
                     name="parentTask"
                     id="parentTask"
-                    value={taskId}
+                    value={taskType === 'STORY' ? '' : taskId}
                     disabled
                   />
                 </InputArea>
@@ -654,7 +687,9 @@ export default function Boards({ boards }: Props) {
             </div>
           </Modal>
         )}
-        {/* {showChild && showChildren(taskId)} */}
+        {showChild && <Modal onclick={() => setShowChild(false)}>
+            <ShowChildrenModal children={showChildOf} />
+          </Modal>}
       </>
       <div className={styles.container}>
         <div className={styles.tabList} role="tablist">
@@ -753,6 +788,7 @@ export default function Boards({ boards }: Props) {
                           )
                             .then((column) => {
                               setWorkflowState([...workflowState, column]);
+                              boards[activeIndex].workflows = [...workflowState, column];
                             })
                             .finally(() => {
                               setBoardName('');
