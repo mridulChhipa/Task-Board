@@ -117,6 +117,8 @@ export function KanbanColumn({
             deleteTask={deleteTask}
             key={task.id}
             task={task}
+            showDelete={true}
+            showSettings={true}
             dragstartHandler={taskDragstartHandler}
             draggable={true}
             setState={setState}

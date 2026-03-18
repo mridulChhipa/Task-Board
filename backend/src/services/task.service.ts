@@ -189,6 +189,7 @@ export class TaskService {
 
   async getTask(taskId: string): Promise<TaskDTO> {
     try {
+      console.log(taskId);
       const existingTask = await db.task.findUnique({
         where: {
           id: taskId,

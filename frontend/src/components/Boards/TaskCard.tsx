@@ -17,6 +17,8 @@ interface Props {
   deleteTask?: (id: string) => Promise<void>;
   draggable?: boolean;
   dragstartHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
+  showDelete: boolean;
+  showSettings: boolean;
   setState?: {
     setTaskName: React.Dispatch<React.SetStateAction<string>>;
     setTaskDescription: React.Dispatch<React.SetStateAction<string>>;
@@ -49,8 +51,8 @@ async function getMailfromId(id: number): Promise<string> {
 
 async function childrenOf(task: Task | null): Promise<Task[]> {
   if (!task) return [];
-  const children = await Promise.all(task.children.map(async (child: { id: string }) => {
-    const res = await fetch(`http://localhost:3000/api/task/${child.id}`, {
+  const children = await Promise.all(task.children.map(async (child: string) => {
+    const res = await fetch(`http://localhost:3000/api/task/${child}`, {
       credentials: 'include',
     });
     const data = await res.json();
@@ -64,6 +66,8 @@ export function TaskCard({
   task,
   dragstartHandler,
   deleteTask,
+  showDelete,
+  showSettings,
   setState,
 }: Props) {
   const overdue =
@@ -102,7 +106,7 @@ export function TaskCard({
               >
                 <IconCopy />
               </span>}
-              <span
+              {showDelete && <span
                 className={styles.deleteIcon}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -110,8 +114,8 @@ export function TaskCard({
                 }}
               >
                 <IconDelete />
-              </span>
-              <span
+              </span>}
+              {showSettings && <span
                 className={styles.settingsIcon}
                 onClick={async (e) => {
                   e.stopPropagation();
@@ -130,7 +134,7 @@ export function TaskCard({
                 }}
               >
                 <IconSettings />
-              </span>
+              </span>}
             </div>
             {task.type === 'STORY' && <button className={styles.childButton}
               onClick={async (e) => {

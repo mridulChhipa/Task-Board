@@ -12,7 +12,7 @@ import type { SubmitEventHandler } from 'react';
 import Modal from '../Modal/Modal';
 import { AuthContext } from '../../context/AuthContext';
 import Form, { FormControl, InputArea, Label } from '../Forms/Form';
-// import { TaskCard } from './TaskCard';
+import { TaskCard } from './TaskCard';
 
 interface Props {
   boards: Board[];
@@ -91,18 +91,20 @@ async function sortWorkflows(workflows: Workflow[]): Promise<Workflow[]> {
 
 function ShowChildrenModal({ children }: { children: Task[] | null }) {
   if(!children) return [];
-  // console.log(children);
+  console.log(children);
   return(
     <>
       <div className={styles.childContainer}>
-        {/* {children.map((child) => 
+        {children.map((child) => 
           <TaskCard
             key={child.id}
             task={child}
+            showDelete={false}
+            showSettings={false}
             draggable={false}
             dragstartHandler={() => {}}
           />
-        )} */}
+        )}
       </div>
     </>
   );
