@@ -10,7 +10,7 @@ export class NotificationService {
     taskId,
     commentId,
     type,
-  }: NotifBody): Promise<string> {
+  }: NotifBody): Promise<NotificationDTO> {
     try {
       const notif = await db.notification.create({
         data: {
@@ -26,11 +26,15 @@ export class NotificationService {
           userId,
           notificationId: notif.id,
         },
+        include: {
+          notification: true,
+          user: true,
+        }
       });
 
       sendNotif(senderId, [userId], notif.type);
 
-      return linkage.id;
+      return toNotifDTO(linkage);
     } catch (error) {
       throw new Error("Can't create notification: ", { cause: error });
     }

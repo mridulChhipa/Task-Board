@@ -171,6 +171,12 @@ export class CommentService {
 
         console.log(mentions);
 
+        const author = await db.user.findUnique({
+          where: {
+            id: authorId,
+          }
+        });
+
         for (const mention of mentions) {
           console.log("Mentioned: ", mention);
           const user = await db.user.findUnique({
@@ -180,7 +186,7 @@ export class CommentService {
           });
 
           if (user) {
-            await notificationService.createNotification({
+            const createdNotification = await notificationService.createNotification({
               userId: user.id,
               senderId: authorId,
               taskId: taskId,
@@ -188,6 +194,8 @@ export class CommentService {
               commentId: createdComment.id,
               threadId: threadId,
             });
+
+            sendNotif(authorId, [user.id], `${createdNotification.type}: You were mentioned in a comment on task: ${task.title} by ${author?.name}`);
           }
         }
 

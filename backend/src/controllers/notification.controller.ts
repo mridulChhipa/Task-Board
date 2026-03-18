@@ -6,10 +6,10 @@ export class NotificationController {
   async createNotification(req: Request, res: Response, next: NextFunction) {
     try {
       const body: NotifBody = req.body;
-      const nid = await notificationService.createNotification(body);
+      const notification = await notificationService.createNotification(body);
       res.status(201).json({
         status: 'success',
-        nid,
+        notification,
       });
 
       next();
