@@ -66,9 +66,9 @@ model Project {
 model ProjectMember {
   id        String           @id @default(uuid())
   projectId String
-  project   Project          @relation(fields: [projectId], references: [id])
+  project   Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
   userId    Int
-  user      User             @relation(fields: [userId], references: [id])
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   role      ProjectLevelRole
 
   @@unique([projectId, userId], name: "uniqueUser")
@@ -118,7 +118,7 @@ model Task {
   reporter    Int
   dueDate     DateTime?
   statusId    String
-  status      Workflow   @relation(fields: [statusId], references: [id])
+  status      Workflow   @relation(fields: [statusId], references: [id], onDelete: Cascade)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   resolvedAt  DateTime?
@@ -144,20 +144,20 @@ enum ActivityType {
 model Activity {
   id             String       @id @default(uuid())
   type           ActivityType
-  taskId         String
-  task           Task         @relation(fields: [taskId], references: [id])
+  taskId         String?
+  task           Task?        @relation(fields: [taskId], references: [id], onDelete: SetNull)
   threadId       String?
-  thread         Thread?      @relation(fields: [threadId], references: [id])
+  thread         Thread?      @relation(fields: [threadId], references: [id], onDelete: SetNull)
   commentId      String?
-  comment        Comment?     @relation(fields: [commentId], references: [id])
+  comment        Comment?     @relation(fields: [commentId], references: [id], onDelete: SetNull)
   oldStatusId    String?
-  oldStatus      Workflow?    @relation(name: "oldStatus", fields: [oldStatusId], references: [id])
+  oldStatus      Workflow?    @relation(name: "oldStatus", fields: [oldStatusId], references: [id], onDelete: SetNull)
   newStatusId    String?
-  newStatus      Workflow?    @relation(name: "newStatus", fields: [newStatusId], references: [id])
+  newStatus      Workflow?    @relation(name: "newStatus", fields: [newStatusId], references: [id], onDelete: SetNull)
   oldAssigneeId  Int?
-  oldAssignee    User?        @relation(name: "oldAssignee", fields: [oldAssigneeId], references: [id])
+  oldAssignee    User?        @relation(name: "oldAssignee", fields: [oldAssigneeId], references: [id], onDelete: SetNull)
   newAssigneeId  Int?
-  newAssignee    User?        @relation(name: "newAssignee", fields: [newAssigneeId], references: [id])
+  newAssignee    User?        @relation(name: "newAssignee", fields: [newAssigneeId], references: [id], onDelete: SetNull)
   threadAdded    Boolean      @default(false)
   commentAdded   Boolean      @default(false)
   editedThread   Boolean      @default(false)
@@ -167,7 +167,7 @@ model Activity {
   assignedTask   Boolean      @default(false)
   updatedStatus  Boolean      @default(false)
   timestamp      DateTime     @default(now())
-  user           User?        @relation(name: "commentUser", fields: [userId], references: [id])
+  user           User?        @relation(name: "commentUser", fields: [userId], references: [id], onDelete: SetNull)
   userId         Int?
 }
 
@@ -177,10 +177,10 @@ model Thread {
   content    String?
   comments   Comment[]
   authorId   Int
-  author     User       @relation(fields: [authorId], references: [id])
+  author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   isDeleted  Boolean    @default(false)
   taskId     String
-  task       Task       @relation(fields: [taskId], references: [id])
+  task       Task       @relation(fields: [taskId], references: [id], onDelete: Cascade)
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   activities Activity[]
@@ -190,12 +190,12 @@ model Comment {
   id         String     @id @default(uuid())
   content    String
   threadId   String?
-  thread     Thread?    @relation(fields: [threadId], references: [id])
+  thread     Thread?    @relation(fields: [threadId], references: [id], onDelete: Cascade)
   authorId   Int
-  author     User       @relation(fields: [authorId], references: [id])
+  author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   isDeleted  Boolean    @default(false)
   parentId   String?
-  parent     Comment?   @relation("C2R", fields: [parentId], references: [id])
+  parent     Comment?   @relation("C2R", fields: [parentId], references: [id], onDelete: Cascade)
   replies    Comment[]  @relation("C2R")
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt

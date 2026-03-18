@@ -8,7 +8,7 @@ import ProjectPage from './pages/Projects/project.page.tsx';
 import { ProjectProvider } from './context/ProjectProvider.tsx';
 import TaskPage from './pages/task.page.tsx';
 import LogInPage from './pages/Auth/Loginpage.tsx';
-import SignupPage from './pages/Auth/Signuppage.tsx';
+import SignupPage from './pages/Auth/SignUpPage.tsx';
 import Account from './pages/Account/Account.tsx';
 
 function App() {
