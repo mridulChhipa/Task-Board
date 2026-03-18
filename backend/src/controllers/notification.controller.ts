@@ -1,4 +1,4 @@
-import { notifcationService } from '../services/notification.service';
+import { notificationService } from '../services/notification.service';
 import type { Request, Response, NextFunction } from 'express';
 import type { NotifBody } from '../types/notifcation.types';
 
@@ -6,7 +6,7 @@ export class NotificationController {
   async createNotification(req: Request, res: Response, next: NextFunction) {
     try {
       const body: NotifBody = req.body;
-      const nid = await notifcationService.createNotification(body);
+      const nid = await notificationService.createNotification(body);
       res.status(201).json({
         status: 'success',
         nid,
@@ -25,7 +25,7 @@ export class NotificationController {
         throw new Error("Can't validate the nid");
       }
 
-      const notifcation = await notifcationService.fetchNotification(nid);
+      const notifcation = await notificationService.fetchNotification(nid);
       res.status(201).json({
         status: 'success',
         notifcation,

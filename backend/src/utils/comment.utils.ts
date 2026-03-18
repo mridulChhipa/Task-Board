@@ -20,7 +20,7 @@ export function toCommentDTO(comment: CommentWithChildren): CommentDTO {
     createdAt: comment.createdAt,
     updatedAt: comment.updatedAt,
     isDeleted: comment.isDeleted,
-    threadId: comment.threadId,
+    threadId: comment.threadId ?? '',
     authorId: comment.authorId,
     replies: repIds,
   };

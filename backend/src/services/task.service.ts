@@ -95,7 +95,7 @@ export class TaskService {
         data: {
           taskId,
           type: 'TASK_ASSIGNEE_CHANGED',
-          oldAssigneeId: -1, // PlaceHolder value since old assignee does not exist
+          oldAssigneeId: existingTask.assignee, // PlaceHolder value since old assignee does not exist
           newAssigneeId: assignee,
           userId: reporter,
         },
