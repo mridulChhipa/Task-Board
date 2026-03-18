@@ -75,11 +75,12 @@ model ProjectMember {
 }
 
 model Board {
-  id        String     @id @default(uuid())
-  name      String
-  projectId String
-  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  workflows Workflow[]
+  id              String           @id @default(uuid())
+  name            String
+  projectId       String
+  project         Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workflows       Workflow[]
+  edgeConstraints EdgeConstraint[]
 }
 
 model Workflow {
@@ -90,9 +91,11 @@ model Workflow {
   board    Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
   limit    Int    @default(5)
 
-  tasks         Task[]
-  activitiesOld Activity[] @relation("oldStatus")
-  activitiesNew Activity[] @relation("newStatus")
+  tasks            Task[]
+  activitiesOld    Activity[]       @relation("oldStatus")
+  activitiesNew    Activity[]       @relation("newStatus")
+  startConstraints EdgeConstraint[] @relation("startedge")
+  endConstraints   EdgeConstraint[] @relation("endedge")
 }
 
 enum TaskType {
@@ -233,4 +236,14 @@ model UserNotification {
   @@unique([userId, notificationId])
   @@index([userId])
   @@index([notificationId])
+}
+
+model EdgeConstraint {
+  id      String   @id @default(uuid())
+  boardId String
+  board   Board    @relation(fields: [boardId], references: [id])
+  uId     String
+  u       Workflow @relation(name: "startedge", fields: [uId], references: [id])
+  vId     String
+  v       Workflow @relation(name: "endedge", fields: [vId], references: [id])
 }
