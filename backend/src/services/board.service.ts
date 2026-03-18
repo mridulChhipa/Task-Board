@@ -1,3 +1,4 @@
+import { EdgeConstraint } from '../../generated/prisma/client';
 import { db } from '../config/db';
 import type { BoardDTO, ColumnDTO } from '../types/board.types';
 
@@ -152,6 +153,33 @@ export class BoardService {
       });
     } catch (error) {
       throw new Error('Column Deletion...Failed with: ', { cause: error });
+    }
+  }
+
+  async addEdge(boardId: string, sourceColId: string, targetColId: string): Promise<EdgeConstraint> {
+    try {
+      const newEdge = await db.edgeConstraint.create({
+        data: {
+          boardId,
+          uId: sourceColId,
+          vId: targetColId,
+        },
+      });
+      return newEdge;
+    } catch (error) {
+      throw new Error('Failed to add edge: ', { cause: error });
+    }
+  }
+
+  async deleteEdge(boardId: string, edgeId: string): Promise<void> {
+    try{
+      await db.edgeConstraint.delete({
+        where: {
+          id: edgeId,
+        },
+      });
+    } catch (error) {
+      throw new Error('Failed to delete edge: ', { cause: error });
     }
   }
 

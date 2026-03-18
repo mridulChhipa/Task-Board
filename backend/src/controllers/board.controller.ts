@@ -138,6 +138,59 @@ export class BoardController {
     }
   }
 
+  async addEdge(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try{
+      const boardId = req.params.boardId;
+
+      if(typeof boardId !== 'string'){
+        throw new Error('Invalid type for boardId');
+      }
+
+      const edge = await boardService.addEdge(
+        boardId,
+        req.body.sourceColId,
+        req.body.targetColId,
+      );
+
+      res.status(200).json({
+        status: 'success',
+        msg: 'Edge added Successfully',
+        edge,
+      });
+    }
+    catch(error){
+      next(error);
+    }
+  }
+
+  async deleteEdge(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try{
+      const boardId = req.params.boardId;
+      const edgeId = req.params.edgeId;
+
+      if(typeof boardId !== 'string' || typeof edgeId !== 'string'){
+        throw new Error('Invalid type for boardId or edgeId');
+      }
+
+      await boardService.deleteEdge(boardId, edgeId);
+
+      res.status(200).json({
+        status: 'success',
+        msg: 'Edge deleted Successfully',
+      });
+    } catch (err){
+      next(err);
+    }
+  }
+
   async deleteBoard(
     req: Request,
     res: Response,

@@ -91,7 +91,6 @@ async function sortWorkflows(workflows: Workflow[]): Promise<Workflow[]> {
 
 function ShowChildrenModal({ children }: { children: Task[] | null }) {
   if(!children) return [];
-  console.log(children);
   return(
     <>
       <div className={styles.childContainer}>

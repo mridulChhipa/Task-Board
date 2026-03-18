@@ -9,6 +9,14 @@ boardRouter.post('/create', (req, res, next) => {
   boardController.createBoard(req, res, next);
 });
 
+boardRouter.post('/:boardId/create-edge', (req, res, next) => {
+  boardController.addEdge(req, res, next);
+});
+
+boardRouter.delete('/:boardId/remove-edge/:edgeId', (req, res, next) => {
+  boardController.deleteEdge(req, res, next);
+});
+
 boardRouter.patch('/update/:boardId', (req, res, next) => {
   boardController.updateBoard(req, res, next);
 });

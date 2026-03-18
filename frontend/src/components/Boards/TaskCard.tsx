@@ -40,7 +40,6 @@ async function getMailfromId(id: number): Promise<string> {
       credentials: 'include',
     });
     const data = await res.json();
-    console.log(data);
     const email = data.data.personalData.email;
     return email;
   } catch (err) {
@@ -56,7 +55,6 @@ async function childrenOf(task: Task | null): Promise<Task[]> {
       credentials: 'include',
     });
     const data = await res.json();
-    console.log(data);
     return data.task as Task;
   }));
   return children;
