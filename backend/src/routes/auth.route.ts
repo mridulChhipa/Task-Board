@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authController } from '../controllers/auth.controller';
+import { db } from '../config/db';
 import type { Request, Response, NextFunction } from 'express';
 import { authenticateToken } from '../middlewares/guards/auth.guard';
 import type { AuthenticatedRequest } from '../types/auth.types';
@@ -43,7 +44,23 @@ authRouter.get(
       return res.status(401).json({ error: 'Not authenticated' });
     }
     void next;
-    res.json(authReq.user);
+    db.user
+      .findUnique({
+        where: { email: authReq.user.email },
+        select: { globalRole: true },
+      })
+      .then((user) => {
+        res.json({
+          ...authReq.user,
+          role: user?.globalRole ?? null,
+        });
+      })
+      .catch(() => {
+        res.json({
+          ...authReq.user,
+          role: null,
+        });
+      });
   },
 );
 

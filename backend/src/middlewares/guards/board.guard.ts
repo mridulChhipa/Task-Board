@@ -16,27 +16,30 @@ export function authorizeBoardRole(
 			const userId = authReq.user.sub;
 			const email = authReq.user.email;
 
-			const boardId =
-				authReq.params.boardId ??
-				authReq.body.boardId ??
+			const boardId = authReq.params.boardId ?? authReq.body.boardId;
+			const columnId =
 				authReq.params.colId ??
 				authReq.params.columnId ??
 				authReq.body.columnId;
 
-			if (!boardId) {
+			if (!boardId && !columnId) {
 				throw new Error('Board ID or Column ID is required for authorization');
 			}
 
-			if (typeof boardId !== 'string') {
+			if (boardId && typeof boardId !== 'string') {
 				throw new Error('Invalid Board ID format');
 			}
 
-			let resolvedBoardId = boardId;
+			if (columnId && typeof columnId !== 'string') {
+				throw new Error('Invalid Column ID format');
+			}
 
-			if (authReq.params.colId || authReq.params.columnId) {
+			let resolvedBoardId = boardId ?? '';
+
+			if (columnId) {
 				const workflow = await db.workflow.findUnique({
 					where: {
-						id: boardId,
+						id: columnId,
 					},
 					select: {
 						boardId: true,
