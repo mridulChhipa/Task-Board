@@ -13,3 +13,13 @@ export interface ColumnDTO {
   orderIdx: number;
   tasks?: string[];
 }
+
+export interface EdgeConstraintDTO {
+  id: String;
+  boardId: String;
+  board: BoardDTO;
+  uId: String;
+  u: ColumnDTO;
+  vId: String;
+  v: ColumnDTO;
+}

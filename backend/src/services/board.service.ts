@@ -1,6 +1,6 @@
 import { EdgeConstraint } from '../../generated/prisma/client';
 import { db } from '../config/db';
-import type { BoardDTO, ColumnDTO } from '../types/board.types';
+import type { BoardDTO, ColumnDTO, EdgeConstraintDTO } from '../types/board.types';
 
 export class BoardService {
   async create(projectId: string, name: string): Promise<string> {
@@ -156,7 +156,7 @@ export class BoardService {
     }
   }
 
-  async addEdge(boardId: string, sourceColId: string, targetColId: string): Promise<EdgeConstraint> {
+  async addEdge(boardId: string, sourceColId: string, targetColId: string): Promise<EdgeConstraintDTO> {
     try {
       const newEdge = await db.edgeConstraint.create({
         data: {
@@ -164,15 +164,47 @@ export class BoardService {
           uId: sourceColId,
           vId: targetColId,
         },
+        include: {
+          board: true,
+          u: true,
+          v: true,
+        },
       });
-      return newEdge;
+      const edge: EdgeConstraintDTO = {
+        id: newEdge.id,
+        boardId: newEdge.boardId,
+        uId: newEdge.uId,
+        vId: newEdge.vId,
+        board: {
+          id: newEdge.board.id,
+          name: newEdge.board.name,
+          projectId: newEdge.board.projectId,
+          workflows: [],
+        },
+        u: {
+          id: newEdge.u.id,
+          name: newEdge.u.name,
+          boardId: newEdge.u.boardId,
+          limit: newEdge.u.limit,
+          orderIdx: newEdge.u.orderIdx,
+        },
+        v: {
+          id: newEdge.v.id,
+          name: newEdge.v.name,
+          boardId: newEdge.v.boardId,
+          limit: newEdge.v.limit,
+          orderIdx: newEdge.v.orderIdx,
+        },
+      };
+
+      return edge;
     } catch (error) {
       throw new Error('Failed to add edge: ', { cause: error });
     }
   }
 
   async deleteEdge(boardId: string, edgeId: string): Promise<void> {
-    try{
+    try {
       await db.edgeConstraint.delete({
         where: {
           id: edgeId,

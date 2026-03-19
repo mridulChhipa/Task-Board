@@ -1,5 +1,6 @@
 import type { User } from '../context/AuthContext';
 import type { CommentDTO, ThreadDTO } from './comment.types';
+import type { Board } from './project.types';
 
 export type ActivityType =
   | 'TASK_STATUS_UPDATED'
@@ -53,4 +54,14 @@ export interface ActivityDTO {
     newAssignee?: User;
     user?: User;
   };
+}
+
+export interface EdgeConstraint {
+  id: String;
+  boardId: String;
+  board: Board;
+  uId: String;
+  u: Workflow;
+  vId: String;
+  v: Workflow;
 }

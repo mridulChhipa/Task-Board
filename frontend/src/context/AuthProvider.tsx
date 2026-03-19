@@ -36,7 +36,7 @@ async function tryRefreshToken(): Promise<Record<string, unknown> | null> {
       refreshPromise = null;
     });
 
-  if(!refreshPromise) {
+  if (!refreshPromise) {
     throw new Error('Failed to refresh token');
   }
 
@@ -88,10 +88,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                   projects: [],
                   avatar: '',
                   role: user.role,
+                  notifications: [],
                 },
+
                 isLoading: false,
               },
             });
+
             new NotificationWebSocket(user.sub, handleNotification);
           });
       } catch (err) {
