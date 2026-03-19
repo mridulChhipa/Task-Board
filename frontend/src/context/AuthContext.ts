@@ -1,15 +1,15 @@
 import { createContext } from 'react';
 import type { Project } from '../types/project.types';
-import type { NotificationDTO } from '../types/Notification';
+import type { NotificationDTO } from '../types/Notification.types';
 
 export interface User {
   userId: number;
   name: string;
   email: string;
+  avatar: string;
   role: 'GLOBAL_ADMIN' | 'USER' | null;
   projects: Project[];
-  avatar: string;
-  notifications?: NotificationDTO[];
+  notifications: NotificationDTO[];
 }
 
 export interface AuthContextType {
@@ -30,7 +30,7 @@ export interface DispatchType {
 }
 
 export const DispatchContext = createContext<React.Dispatch<DispatchType>>(
-  () => {},
+  () => { },
 );
 
 export function authReducer(

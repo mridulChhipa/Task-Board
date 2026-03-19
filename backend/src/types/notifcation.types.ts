@@ -19,5 +19,6 @@ export interface NotifBody {
 export interface NotificationDTO extends NotifBody {
   id: string;
   recipientName: string;
+  senderName: string;
   read: boolean;
 }

@@ -8,8 +8,8 @@ import type {
   LoginBody,
   AuthToken,
   RegisterBody,
-  UserWithProjs,
   UserDetails,
+  CompleteUser,
 } from '../types/auth.types';
 
 import { generateAuthTokens, verifyToken } from '../utils/jwt';
@@ -17,6 +17,8 @@ import { GlobalRole } from '../../generated/prisma/enums';
 import { ProjectDetails, ProjectRole } from '../types/project.types';
 import { projectService } from './project.service';
 import { wsServer } from '../index';
+import { Not } from '../../generated/prisma/internal/prismaNamespace';
+import { NotifType } from '../types/notifcation.types';
 
 export class AuthService {
   async register(body: RegisterBody): Promise<AuthToken> {
@@ -156,7 +158,7 @@ export class AuthService {
     }
   }
 
-  async userDetails(userId: number): Promise<UserWithProjs> {
+  async userDetails(userId: number): Promise<CompleteUser> {
     try {
       const rawUserData = await db.user.findUnique({
         where: {
@@ -216,7 +218,7 @@ export class AuthService {
         }
       }
 
-      const userData: UserWithProjs = {
+      const userData: CompleteUser = {
         personalData: {
           userId: rawUserData.id,
           name: rawUserData.name,
@@ -225,6 +227,7 @@ export class AuthService {
           globalRole: rawUserData.globalRole,
         },
         projectData: allProjs,
+        notifications: [],
       };
 
       return userData;
@@ -233,7 +236,7 @@ export class AuthService {
     }
   }
 
-  async userDetailsByMail(userMail: string): Promise<UserWithProjs> {
+  async userDetailsByMail(userMail: string): Promise<CompleteUser> {
     try {
       const rawUserData = await db.user.findUnique({
         where: {
@@ -241,6 +244,12 @@ export class AuthService {
         },
         include: {
           projects: true,
+          notifications: {
+            include: {
+              recipient: true,
+              sender: true,
+            }
+          },
         },
       });
 
@@ -279,7 +288,7 @@ export class AuthService {
         });
       }
 
-      const userData: UserWithProjs = {
+      const userData: CompleteUser = {
         personalData: {
           userId: rawUserData.id,
           email: rawUserData.email,
@@ -288,6 +297,18 @@ export class AuthService {
           globalRole: rawUserData.globalRole,
         },
         projectData: allProjs,
+        notifications: rawUserData.notifications.map((notif) => ({
+          id: notif.id,
+          recipientId: notif.recipientId,
+          senderId: notif.senderId,
+          taskId: notif.taskId,
+          commentId: notif.commentId,
+          threadId: notif.threadId,
+          type: notif.type as NotifType,
+          recipientName: notif.recipient.name,
+          senderName: notif.sender.name,
+          read: notif.read,
+        })),
       };
 
       return userData;

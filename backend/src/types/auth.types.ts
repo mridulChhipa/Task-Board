@@ -1,5 +1,6 @@
 import type { Request } from 'express';
 import type { ProjectDetails } from './project.types';
+import { NotificationDTO } from './notifcation.types';
 
 // export enum TokenType {
 //   ACCESS = 'ACCESS',
@@ -48,7 +49,8 @@ export interface UserDetails {
   globalRole: string;
 }
 
-export interface UserWithProjs {
+export interface CompleteUser {
   personalData: UserDetails;
   projectData: ProjectDetails[];
+  notifications: NotificationDTO[];
 }

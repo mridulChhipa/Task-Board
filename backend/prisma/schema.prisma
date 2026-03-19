@@ -25,20 +25,21 @@ enum ProjectLevelRole {
 }
 
 model User {
-  id                    Int                @id @default(autoincrement())
+  id                    Int             @id @default(autoincrement())
   name                  String
   password              String
-  email                 String             @unique
+  email                 String          @unique
   avatar                String?
-  globalRole            GlobalRole         @default(USER)
+  globalRole            GlobalRole      @default(USER)
   comments              Comment[]
   threads               Thread[]
   sessions              Session[]
   projects              ProjectMember[]
   notifications         Notification[]
-  commentActivities     Activity[]         @relation("commentUser")
-  oldAssigneeActivities Activity[]         @relation("oldAssignee")
-  newAssigneeActivities Activity[]         @relation("newAssignee")
+  sentNotifications     Notification[]  @relation("senderType")
+  commentActivities     Activity[]      @relation("commentUser")
+  oldAssigneeActivities Activity[]      @relation("oldAssignee")
+  newAssigneeActivities Activity[]      @relation("newAssignee")
 }
 
 model Session {
@@ -206,12 +207,13 @@ model Comment {
 }
 
 model Notification {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   type        NotifType
-  read        Boolean  @default(false)
+  read        Boolean   @default(false)
   recipientId Int
-  recipient   User     @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  recipient   User      @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   senderId    Int
+  sender      User      @relation("senderType", fields: [senderId], references: [id], onDelete: Cascade)
   taskId      String?
   commentId   String?
   threadId    String?
@@ -225,7 +227,6 @@ enum NotifType {
   REPLY // Personal
   THREAD_STARTED
 }
-
 
 model EdgeConstraint {
   id      String   @id @default(uuid())
