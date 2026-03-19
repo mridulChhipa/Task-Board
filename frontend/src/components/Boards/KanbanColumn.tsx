@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type SubmitEvent } from 'react';
 import type { Task, Workflow } from '../../types/boards.types';
-import { IconPlus } from './boards.images';
+import { IconDelete, IconPlus, IconSettings } from './boards.images';
 import { TaskCard } from './TaskCard';
 import styles from './column.module.css';
 import type { TaskType, Priority } from './Boards';
@@ -9,6 +9,9 @@ interface Props {
   id: string;
   workflow: Workflow;
   onAddTask: () => void;
+  deleteColumn: () => void;
+  renameColumn: (name: string) => Promise<void>;
+  canEditWorkflow: boolean;
   draggable?: boolean;
   dragstartHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
   dropHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
@@ -33,6 +36,9 @@ export function KanbanColumn({
   id,
   workflow,
   onAddTask,
+  deleteColumn,
+  renameColumn,
+  canEditWorkflow,
   draggable,
   dragstartHandler,
   dropHandler,
@@ -41,6 +47,8 @@ export function KanbanColumn({
   setState,
 }: Props) {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [draftName, setDraftName] = useState(workflow.name);
 
   async function deleteTask(taskId: string) {
     try {
@@ -85,6 +93,30 @@ export function KanbanColumn({
     fetchTasks();
   }, [workflow.tasks]);
 
+  useEffect(() => {
+    setDraftName(workflow.name);
+  }, [workflow.name]);
+
+  useEffect(() => {
+    if (!canEditWorkflow && isEditingName) {
+      setIsEditingName(false);
+    }
+  }, [canEditWorkflow, isEditingName]);
+
+  async function handleRenameSubmit(
+    event?: SubmitEvent,
+  ) {
+    event?.preventDefault();
+    const nextName = draftName.trim();
+    if (nextName === '' || nextName === workflow.name) {
+      setIsEditingName(false);
+      setDraftName(workflow.name);
+      return;
+    }
+    await renameColumn(nextName);
+    setIsEditingName(false);
+  }
+
   return (
     <div
       className={styles.kanbanColumn}
@@ -97,18 +129,75 @@ export function KanbanColumn({
     >
       <div className={styles.columnHeader}>
         <div className={styles.columnHeaderLeft}>
-          <span className={styles.columnTitle}>{workflow.name}</span>
+          {isEditingName && canEditWorkflow ? (
+            <form
+              className={styles.columnEditForm}
+              onSubmit={handleRenameSubmit}
+            >
+              <input
+                className={styles.columnEditInput}
+                type="text"
+                aria-label="Column name"
+                value={draftName}
+                onChange={(event) => setDraftName(event.target.value)}
+                autoFocus
+              />
+              <div className={styles.columnEditActions}>
+                <button
+                  className={styles.columnEditBtn}
+                  type="submit"
+                >
+                  Save
+                </button>
+                <button
+                  className={styles.columnEditBtn}
+                  type="button"
+                  onClick={() => {
+                    setIsEditingName(false);
+                    setDraftName(workflow.name);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            <span className={styles.columnTitle}>{workflow.name}</span>
+          )}
           {workflow.tasks?.length > 0 && (
             <span className={styles.columnCount}>{tasks.length}</span>
           )}
         </div>
-        <button
-          className={styles.columnAddBtn}
-          onClick={onAddTask}
-          title="Add task"
-        >
-          <IconPlus />
-        </button>
+
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button
+            className={styles.columnAddBtn}
+            onClick={onAddTask}
+            title="Add task"
+          >
+            <IconPlus />
+          </button>
+
+          {canEditWorkflow && (
+            <>
+              <button
+                className={styles.columnAddBtn}
+                onClick={() => setIsEditingName(true)}
+                title="Rename column"
+              >
+                <IconSettings size={12} />
+              </button>
+
+              <button
+                className={styles.columnAddBtn}
+                onClick={deleteColumn}
+                title="Delete column"
+              >
+                <IconDelete />
+              </button>
+            </>
+          )}
+        </div>
       </div>
       <div className={styles.columnBody}>
         {/* {workflow.id} */}

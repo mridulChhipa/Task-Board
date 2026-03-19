@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, type SubmitEvent } from "react";
 import { AuthContext, DispatchContext } from "../../context/AuthContext";
 import styles from "./Account.module.css";
 import Button from "../../components/Button/Button";
@@ -9,7 +9,7 @@ export default function Account() {
   const[name, setName] = useState(user?.name || "");
   const[avatarURL, setAvatarURL] = useState(user?.avatar || "");
 
-  async function updateUser(e: React.FormEvent<HTMLFormElement>) {
+  async function updateUser(e: SubmitEvent) {
     e.preventDefault();
     if(!user) return;
     const res = await fetch(`http://localhost:3000/api/auth/update-user`, {

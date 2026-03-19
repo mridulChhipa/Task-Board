@@ -8,9 +8,10 @@ import { addWorkflow } from '../../utils/board.utils';
 import { useParams } from 'react-router-dom';
 import { IconPlus } from './boards.images';
 import Button from '../Button/Button';
-import type { SubmitEventHandler } from 'react';
+import type { SubmitEvent, SubmitEventHandler } from 'react';
 import Modal from '../Modal/Modal';
 import { AuthContext } from '../../context/AuthContext';
+import { ProjectContext } from '../../context/ProjectContext';
 import Form, { FormControl, InputArea, Label } from '../Forms/Form';
 import { TaskCard } from './TaskCard';
 
@@ -90,18 +91,18 @@ async function sortWorkflows(workflows: Workflow[]): Promise<Workflow[]> {
 }
 
 function ShowChildrenModal({ children }: { children: Task[] | null }) {
-  if(!children) return [];
-  return(
+  if (!children) return [];
+  return (
     <>
       <div className={styles.childContainer}>
-        {children.map((child) => 
+        {children.map((child) =>
           <TaskCard
             key={child.id}
             task={child}
             showDelete={false}
             showSettings={false}
             draggable={false}
-            dragstartHandler={() => {}}
+            dragstartHandler={() => { }}
           />
         )}
       </div>
@@ -120,6 +121,8 @@ export default function Boards({ boards }: Props) {
   }
 
   const { user } = useContext(AuthContext);
+  const { project } = useContext(ProjectContext);
+  const canEditWorkflows = project?.role === 'PROJECT_ADMIN' || user?.role === 'GLOBAL_ADMIN';
   const [activeIndex, setActiveIndex] = useState(0);
   const activeBoard = boards[activeIndex];
   const [workflowState, setWorkflowState] = useState(activeBoard.workflows);
@@ -364,9 +367,9 @@ export default function Boards({ boards }: Props) {
       const newWF = workflowState.map((workflow) =>
         workflow.id === activeColumnId
           ? ({
-              ...workflow,
-              tasks: [...workflow.tasks, newTaskId],
-            } as Workflow)
+            ...workflow,
+            tasks: [...workflow.tasks, newTaskId],
+          } as Workflow)
           : workflow,
       );
       const sortedWF = await sortWorkflows(newWF);
@@ -385,7 +388,7 @@ export default function Boards({ boards }: Props) {
     }
   };
 
-  const handleEdit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleEdit = async (e: SubmitEvent) => {
     e.preventDefault();
     try {
       const ogres = await fetch(
@@ -434,6 +437,63 @@ export default function Boards({ boards }: Props) {
       setCurrentTaskId(null);
     }
   };
+
+  async function deleteColumn(workflowId: string) {
+    try {
+      await fetch(`http://localhost:3000/api/project/${projectId}/board/${activeBoard.id}/remove-column/${workflowId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      activeBoard.workflows = activeBoard.workflows.filter(
+        (workflow) => workflow.id !== workflowId,
+      );
+
+      setWorkflowState(
+        workflowState.filter((workflow) => workflow.id !== workflowId),
+      );
+
+    } catch (err) {
+      throw new Error('Error deleting column: ', { cause: err });
+    }
+  }
+
+  async function renameColumn(workflowId: string, name: string) {
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
+
+    const target = workflowState.find((workflow) => workflow.id === workflowId);
+    if (!target) return;
+
+    try {
+      await fetch(
+        `http://localhost:3000/api/project/${activeBoard.projectId}/board/${activeBoard.id}/update-column/${workflowId}`,
+        {
+          method: 'PUT',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: trimmedName,
+            limit: target.limit,
+            orderIdx: target.orderIdx,
+          }),
+        },
+      );
+
+      const updated = workflowState.map((workflow) =>
+        workflow.id === workflowId
+          ? { ...workflow, name: trimmedName }
+          : workflow,
+      );
+
+      setWorkflowState(updated);
+      boards[activeIndex].workflows = updated;
+    } catch (err) {
+      throw new Error('Error renaming column: ', { cause: err });
+    }
+  }
 
   return (
     <>
@@ -526,7 +586,7 @@ export default function Boards({ boards }: Props) {
                 </InputArea>
                 <div style={{ display: 'flex', flexDirection: 'row', gap: '0.5rem' }}>
                   <Label htmlFor="showParent">Set parent story</Label>
-                  <input 
+                  <input
                     type='checkbox'
                     name='showParent'
                     checked={setParent}
@@ -653,7 +713,7 @@ export default function Boards({ boards }: Props) {
                 </InputArea>
                 <div style={{ display: 'flex', flexDirection: 'row', gap: '0.5rem' }}>
                   <Label htmlFor="showParent">Set parent story (uncheck to keep same parent)</Label>
-                  <input 
+                  <input
                     type='checkbox'
                     name='showParent'
                     checked={setParent}
@@ -693,8 +753,8 @@ export default function Boards({ boards }: Props) {
           {/* {activeBoard.} */}
         </Modal>}
         {showChild && <Modal onclick={() => setShowChild(false)}>
-            <ShowChildrenModal children={showChildOf} />
-          </Modal>}
+          <ShowChildrenModal children={showChildOf} />
+        </Modal>}
       </>
       <div className={styles.container}>
         <div className={styles.tabList} role="tablist" style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -753,8 +813,15 @@ export default function Boards({ boards }: Props) {
                         setShowAddTaskModal(true);
                         setActiveColumnId(workflow.id);
                       }}
-                      draggable={true}
-                      dragstartHandler={dragstartHandler}
+                      deleteColumn={async () => await deleteColumn(workflow.id)}
+                      renameColumn={async (name) =>
+                        await renameColumn(workflow.id, name)
+                      }
+                      canEditWorkflow={canEditWorkflows}
+                      draggable={canEditWorkflows}
+                      dragstartHandler={
+                        canEditWorkflows ? dragstartHandler : undefined
+                      }
                       dropHandler={(e) => dropHandler(e, workflowState)}
                       dragoverHandler={dragoverHandler}
                       taskDragstartHandler={taskDragstartHandler}
@@ -763,7 +830,7 @@ export default function Boards({ boards }: Props) {
                   );
                 })}
 
-              {activeBoard && (
+              {activeBoard && canEditWorkflows && (
                 <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
                   <button
                     className={styles.columnAddBtn}
@@ -792,17 +859,17 @@ export default function Boards({ boards }: Props) {
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         <Button
                           onClick={() => {
-                            if(boardName === ''){
+                            if (boardName === '') {
                               setIsAdding(false);
                               return;
                             }
                             let ret = false;
                             activeBoard.workflows.map((workflow) => {
-                              if(workflow.name.toLowerCase() === boardName.toLowerCase()){
+                              if (workflow.name.toLowerCase() === boardName.toLowerCase()) {
                                 ret = true;
                               }
                             });
-                            if(ret){
+                            if (ret) {
                               setIsAdding(false);
                               return;
                             }
@@ -821,7 +888,7 @@ export default function Boards({ boards }: Props) {
                                 setBoardName('');
                                 setBoardLimit(0);
                               });
-                              setIsAdding(false);
+                            setIsAdding(false);
                           }}
                         >
                           Add

@@ -78,6 +78,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .then((res) => res.json()) // Return the promise here
           .then((user) => {
             // This 'user' is now the actual object
+            console.log('Restored user:', user);
             dispatch({
               type: 'LOGIN',
               payload: {
