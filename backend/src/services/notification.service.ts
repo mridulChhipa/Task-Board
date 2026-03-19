@@ -53,6 +53,35 @@ export class NotificationService {
       throw new Error("Can't create notification: ", { cause: error });
     }
   }
+
+  async deleteNotification(notificationId: string): Promise<void> {
+    try {
+      await db.notification.delete({
+        where: {
+          id: notificationId,
+        },
+      });
+    }
+    catch (error) {
+      throw new Error("Can't delete notification: ", { cause: error });
+    }
+  }
+
+  async readNotification(notificationId: string): Promise<void> {
+    try {
+      await db.notification.update({
+        where: {
+          id: notificationId,
+        },
+        data: {
+          read: true,
+        },
+      });
+    }
+    catch (error) {
+      throw new Error("Can't read notification: ", { cause: error });
+    }
+  }
 }
 
 export const notificationService = new NotificationService();
