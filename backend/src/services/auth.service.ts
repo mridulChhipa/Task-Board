@@ -17,7 +17,6 @@ import { GlobalRole } from '../../generated/prisma/enums';
 import { ProjectDetails, ProjectRole } from '../types/project.types';
 import { projectService } from './project.service';
 import { wsServer } from '../index';
-import { Not } from '../../generated/prisma/internal/prismaNamespace';
 import { NotifType } from '../types/notifcation.types';
 
 export class AuthService {
@@ -166,6 +165,12 @@ export class AuthService {
         },
         include: {
           projects: true,
+          notifications: {
+            include: {
+              recipient: true,
+              sender: true,
+            }
+          },
         },
       });
 
@@ -227,7 +232,18 @@ export class AuthService {
           globalRole: rawUserData.globalRole,
         },
         projectData: allProjs,
-        notifications: [],
+        notifications: rawUserData.notifications.map((notif) => ({
+          id: notif.id,
+          recipientId: notif.recipientId,
+          senderId: notif.senderId,
+          taskId: notif.taskId,
+          commentId: notif.commentId,
+          threadId: notif.threadId,
+          type: notif.type as NotifType,
+          recipientName: notif.recipient.name,
+          senderName: notif.sender.name,
+          read: notif.read,
+        })),
       };
 
       return userData;

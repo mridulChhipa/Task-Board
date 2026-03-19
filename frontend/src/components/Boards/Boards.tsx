@@ -531,7 +531,6 @@ export default function Boards({ boards }: Props) {
                     checked={setParent}
                     onChange={(e) => setSetParent(e.target.checked)}
                     disabled={taskType === 'STORY'}
-                    defaultChecked={false}
                   />
                 </div>
                 {setParent && <InputArea>

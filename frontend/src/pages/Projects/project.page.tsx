@@ -12,7 +12,6 @@ import {
 } from '../../context/ProjectContext';
 import type { Board, Project } from '../../types/project.types';
 import Boards from '../../components/Boards/Boards';
-import { CommentTest } from '../../tests/CommentTest';
 
 export default function ProjectPage() {
   const [showAddModal, setShowAddModal] = useState(false);
