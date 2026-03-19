@@ -35,7 +35,7 @@ model User {
   threads               Thread[]
   sessions              Session[]
   projects              ProjectMember[]
-  notifications         UserNotification[]
+  notifications         Notification[]
   commentActivities     Activity[]         @relation("commentUser")
   oldAssigneeActivities Activity[]         @relation("oldAssignee")
   newAssigneeActivities Activity[]         @relation("newAssignee")
@@ -206,14 +206,15 @@ model Comment {
 }
 
 model Notification {
-  id         String             @id @default(uuid())
-  type       NotifType
-  read       Boolean            @default(false)
-  recipients UserNotification[]
-  senderId   Int
-  taskId     String?
-  commentId  String?
-  threadId   String?
+  id          String   @id @default(uuid())
+  type        NotifType
+  read        Boolean  @default(false)
+  recipientId Int
+  recipient   User     @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  senderId    Int
+  taskId      String?
+  commentId   String?
+  threadId    String?
 }
 
 enum NotifType {
@@ -225,18 +226,6 @@ enum NotifType {
   THREAD_STARTED
 }
 
-model UserNotification {
-  id             String       @id @default(cuid())
-  userId         Int
-  notificationId String
-  timestamp      DateTime     @default(now())
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, notificationId])
-  @@index([userId])
-  @@index([notificationId])
-}
 
 model EdgeConstraint {
   id      String   @id @default(uuid())

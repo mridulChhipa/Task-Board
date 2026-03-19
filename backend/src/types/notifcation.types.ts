@@ -8,7 +8,7 @@ export enum NotifType {
 }
 
 export interface NotifBody {
-  userId: number;
+  recipientId: number;
   senderId: number;
   taskId: string | null;
   commentId: string | null;
@@ -18,6 +18,6 @@ export interface NotifBody {
 
 export interface NotificationDTO extends NotifBody {
   id: string;
-  timestamp: Date;
-  userName: string;
+  recipientName: string;
+  read: boolean;
 }

@@ -1,14 +1,14 @@
 import { db } from '../config/db';
 import type { NotifBody, NotificationDTO } from '../types/notifcation.types';
 import { toNotifDTO } from '../utils/notification.utils';
-import { sendNotif } from '../websocket/WebsocketsService';
 
 export class NotificationService {
   async createNotification({
-    userId,
+    recipientId,
     senderId,
     taskId,
     commentId,
+    threadId,
     type,
   }: NotifBody): Promise<NotificationDTO> {
     try {
@@ -17,38 +17,29 @@ export class NotificationService {
           senderId,
           taskId,
           commentId,
+          threadId,
           type,
-        },
-      });
-
-      const linkage = await db.userNotification.create({
-        data: {
-          userId,
-          notificationId: notif.id,
+          recipientId: recipientId,
         },
         include: {
-          notification: true,
-          user: true,
-        }
+          recipient: true,
+        },
       });
 
-      sendNotif(senderId, [userId], notif.type);
-
-      return toNotifDTO(linkage);
+      return toNotifDTO(notif);
     } catch (error) {
       throw new Error("Can't create notification: ", { cause: error });
     }
   }
 
-  async fetchNotification(userNotifId: string): Promise<NotificationDTO> {
+  async fetchNotification(notificationId: string): Promise<NotificationDTO> {
     try {
-      const notif = await db.userNotification.findUnique({
+      const notif = await db.notification.findUnique({
         where: {
-          id: userNotifId,
+          id: notificationId,
         },
         include: {
-          notification: true,
-          user: true,
+          recipient: true,
         },
       });
 

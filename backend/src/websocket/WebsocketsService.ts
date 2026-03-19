@@ -4,11 +4,11 @@ import { get, type Server as HttpServer } from 'http';
 type WSMessage =
   | { messageType: 'NEW_USER'; userId: number }
   | {
-      messageType: 'NOTIFICATION';
-      senderId: number;
-      recieverIds: number[];
-      notification: string;
-    };
+    messageType: 'NOTIFICATION';
+    senderId: number;
+    recieverId: number;
+    notification: string;
+  };
 let wsServer: WebsocketService;
 
 export function initWSServer(httpServer: HttpServer) {
@@ -22,10 +22,10 @@ export function shutdownWSServer() {
 
 export function sendNotif(
   senderId: number,
-  recieverIds: number[],
+  recieverId: number,
   notification: string,
 ) {
-  wsServer.sendNotification(senderId, recieverIds, notification);
+  wsServer.sendNotification(senderId, recieverId, notification);
 }
 
 export class WebsocketService {
@@ -47,7 +47,7 @@ export class WebsocketService {
       } else if (data.messageType === 'NOTIFICATION') {
         this.sendNotification(
           data.senderId,
-          data.recieverIds,
+          data.recieverId,
           data.notification,
         );
       }
@@ -72,24 +72,23 @@ export class WebsocketService {
 
   sendNotification(
     senderId: number,
-    recieverIds: number[],
+    recieverId: number,
     notification: string,
   ) {
-    const recieverSockets = recieverIds.map((id) => this.userSockets.get(id));
-    console.log('Reciever Sockets: ', recieverSockets);
-    recieverSockets.map((socket) => {
-      if (!socket) {
-        return;
-      }
-      if (socket.readyState !== WebSocket.OPEN) {
+    const recieverSocket = this.userSockets.get(recieverId);
+    console.log('Reciever Socket: ', recieverSocket);
+    if (recieverSocket) {
+      if (recieverSocket.readyState !== WebSocket.OPEN) {
         console.error('WebSocket is not open');
         return;
       }
-      socket.send(
+      recieverSocket.send(
         JSON.stringify({ messageType: 'NOTIFICATION', senderId, notification }),
       );
       console.log("Sent notification");
-    });
+    } else {
+      console.error('No WebSocket found for userId: ', recieverId);
+    }
   }
 
   removeUser(userId: number) {

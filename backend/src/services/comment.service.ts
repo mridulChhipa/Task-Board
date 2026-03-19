@@ -1,4 +1,3 @@
-import { error } from 'node:console';
 import { db } from '../config/db';
 import type {
   CommentBody,
@@ -11,9 +10,7 @@ import type {
 import { NotifType } from '../types/notifcation.types';
 import { extractEmailMentions, toCommentDTO, toThreadDTO } from '../utils/comment.utils';
 import { notificationService } from './notification.service';
-import { send } from 'node:process';
 import { sendNotif } from '../websocket/WebsocketsService';
-import { User } from '../../generated/prisma/client';
 
 export class CommentService {
   async createThread({
@@ -41,15 +38,6 @@ export class CommentService {
             userId: authorId,
           },
         });
-
-        // await notifcationService.createNotification({
-        //   taskId,
-        //   type: NotifType.THREAD_STARTED,
-        //   senderId: authorId,
-        //   userId: recId,
-        //   commentId: null,
-        //   threadId: createdThread.id,
-        // });
       }
 
       return createdThread as ThreadDTO;
@@ -162,7 +150,7 @@ export class CommentService {
           taskId,
           type: NotifType.COMMENT_ADDED,
           senderId: authorId,
-          userId: task.assignee,
+          recipientId: task.assignee,
           commentId: createdComment.id,
           threadId: createdComment.threadId,
         });
@@ -187,7 +175,7 @@ export class CommentService {
 
           if (user) {
             const createdNotification = await notificationService.createNotification({
-              userId: user.id,
+              recipientId: user.id,
               senderId: authorId,
               taskId: taskId,
               type: NotifType.MENTIONED,
@@ -195,11 +183,11 @@ export class CommentService {
               threadId: threadId,
             });
 
-            sendNotif(authorId, [user.id], `${createdNotification.type}: You were mentioned in a comment on task: ${task.title} by ${author?.name}`);
+            sendNotif(authorId, user.id, `${createdNotification.type}: You were mentioned in a comment on task: ${task.title} by ${author?.name}`);
           }
         }
 
-        sendNotif(authorId, [task.assignee], `New comment added to task: ${task.title}`);
+        sendNotif(authorId, task.assignee, `New comment added to task: ${task.title}`);
       }
 
       return createdComment as CommentDTO;
@@ -216,7 +204,6 @@ export class CommentService {
       const existingComment = await db.comment.findUnique({
         where: {
           id,
-          // threadId,
         },
       });
 
@@ -231,7 +218,6 @@ export class CommentService {
         },
         where: {
           id,
-          // threadId,
         },
       });
     } catch (error) {

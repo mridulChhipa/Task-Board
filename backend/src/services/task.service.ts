@@ -34,7 +34,16 @@ export class TaskService {
         },
       });
 
-      sendNotif(reporter, [assignee], `You have been assigned a new task: ${title}`);
+      await notificationService.createNotification({
+        recipientId: assignee,
+        senderId: reporter,
+        taskId: createdTask.id,
+        commentId: null,
+        threadId: null,
+        type: NotifType.TASK_ASSIGNED,
+      });
+
+      sendNotif(reporter, assignee, `You have been assigned a new task: ${title}`);
 
       if (parentId) {
         await syncStatusWithChildren(parentId);
@@ -123,12 +132,12 @@ export class TaskService {
             taskId,
             type: NotifType.STATUS_CHANGED,
             senderId: reporter,
-            userId: assignee,
+            recipientId: assignee,
             commentId: null,
             threadId: null,
           });
 
-          sendNotif(reporter, [assignee], `Assigned Task Status Updated: ${title}`);
+          sendNotif(reporter, assignee, `Assigned Task Status Updated: ${title}`);
         }
       }
 
@@ -148,12 +157,12 @@ export class TaskService {
             taskId,
             type: NotifType.TASK_ASSIGNED,
             senderId: reporter,
-            userId: assignee,
+            recipientId: assignee,
             commentId: null,
             threadId: null,
           });
 
-          sendNotif(reporter, [assignee], `You have been assigned a new task: ${title}`);
+          sendNotif(reporter, assignee, `You have been assigned a new task: ${title}`);
         }
       }
     } catch (error) {

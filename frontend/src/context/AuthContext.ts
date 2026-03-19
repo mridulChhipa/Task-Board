@@ -1,5 +1,6 @@
 import { createContext } from 'react';
 import type { Project } from '../types/project.types';
+import type { NotificationDTO } from '../types/Notification';
 
 export interface User {
   userId: number;
@@ -8,6 +9,7 @@ export interface User {
   role: 'GLOBAL_ADMIN' | 'USER' | null;
   projects: Project[];
   avatar: string;
+  notifications?: NotificationDTO[];
 }
 
 export interface AuthContextType {

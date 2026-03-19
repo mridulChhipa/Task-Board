@@ -1,23 +1,22 @@
 import type { Prisma } from '../../generated/prisma/client';
 import type { NotificationDTO, NotifType } from '../types/notifcation.types';
 
-type UserNotifWithUserAndNotif = Prisma.UserNotificationGetPayload<{
+type NotificationWithRecipient = Prisma.NotificationGetPayload<{
   include: {
-    user: true;
-    notification: true;
+    recipient: true;
   };
 }>;
 
-export function toNotifDTO(notif: UserNotifWithUserAndNotif): NotificationDTO {
+export function toNotifDTO(notif: NotificationWithRecipient): NotificationDTO {
   return {
-    id: notif.notificationId,
-    timestamp: notif.timestamp,
-    senderId: notif.notification.senderId,
-    userId: notif.userId,
-    userName: notif.user.name,
-    type: notif.notification.type as NotifType,
-    taskId: notif.notification.taskId,
-    commentId: notif.notification.commentId,
-    threadId: notif.notification.threadId,
+    id: notif.id,
+    senderId: notif.senderId,
+    recipientId: notif.recipient.id,
+    recipientName: notif.recipient.name,
+    type: notif.type as NotifType,
+    taskId: notif.taskId,
+    commentId: notif.commentId,
+    threadId: notif.threadId,
+    read: notif.read,
   };
 }
