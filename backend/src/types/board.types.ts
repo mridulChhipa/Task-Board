@@ -3,6 +3,7 @@ export interface BoardDTO {
   name: string;
   projectId: string;
   workflows: ColumnDTO[];
+  edgeConstraints: EdgeConstraintDTO[];
 }
 
 export interface ColumnDTO {
@@ -17,7 +18,6 @@ export interface ColumnDTO {
 export interface EdgeConstraintDTO {
   id: String;
   boardId: String;
-  board: BoardDTO;
   uId: String;
   u: ColumnDTO;
   vId: String;

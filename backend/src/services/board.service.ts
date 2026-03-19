@@ -175,12 +175,6 @@ export class BoardService {
         boardId: newEdge.boardId,
         uId: newEdge.uId,
         vId: newEdge.vId,
-        board: {
-          id: newEdge.board.id,
-          name: newEdge.board.name,
-          projectId: newEdge.board.projectId,
-          workflows: [],
-        },
         u: {
           id: newEdge.u.id,
           name: newEdge.u.name,
@@ -239,6 +233,7 @@ export class BoardService {
               tasks: true,
             },
           },
+          edgeConstraints: true,
         },
       });
 
@@ -260,11 +255,36 @@ export class BoardService {
         allCols.push(currCol);
       }
 
+      const us = await Promise.all(board.edgeConstraints.map(async (edge) => {
+        return await db.edgeConstraint.findUnique({
+          where: {
+            id: edge.uId,
+          },
+        });
+      }));
+
+      const vs = await Promise.all(board.edgeConstraints.map(async (edge) => {
+        return await db.edgeConstraint.findUnique({
+          where: {
+            id: edge.vId,
+          },
+        });
+      }));
+
+
       const bdto: BoardDTO = {
         id: board.id,
         projectId: board.projectId,
         name: board.name,
         workflows: allCols,
+        edgeConstraints: board.edgeConstraints.map((edge, index) => ({
+          id: edge.id,
+          boardId: edge.boardId,
+          uId: edge.uId,
+          vId: edge.vId,
+          u: allCols.find((col) => col.id === edge.uId)!,
+          v: allCols.find((col) => col.id === edge.vId)!,
+        })),
       };
 
       return bdto;
