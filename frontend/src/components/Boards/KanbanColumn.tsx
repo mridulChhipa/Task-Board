@@ -64,7 +64,7 @@ export function KanbanColumn({
 
   useEffect(() => {
     async function fetchTasks() {
-      if (workflow.tasks.length === 0) {
+      if (workflow.tasks === undefined || workflow.tasks.length === 0) {
         setTasks([]);
         return;
       }

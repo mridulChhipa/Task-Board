@@ -294,11 +294,6 @@ function DashBoard() {
             `Failed to remove user: ${res.status} ${res.statusText} - ${test}`,
           );
         }
-
-        // Update 2 things
-        // added user's project list
-        // project's user list
-        // ask chuppa how to do...
       } catch (err) {
         throw new Error('Error reomving user from project', { cause: err });
       } finally {
@@ -493,6 +488,12 @@ function DashBoard() {
           </div>
           <div className={styles.notifications}>
             <h2>Your Notifications</h2>
+            <ul>
+              {(user?.notifications === undefined || user?.notifications.length === 0) && <li>No notifications</li>}
+              {user?.notifications.map((notification, index) => (
+                <li key={index}>{notification.id}</li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>

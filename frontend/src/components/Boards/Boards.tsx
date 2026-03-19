@@ -146,6 +146,7 @@ export default function Boards({ boards }: Props) {
   const [setParent, setSetParent] = useState(false);
   const [showChild, setShowChild] = useState(false);
   const [showChildOf, setShowChildOf] = useState<Task[] | null>(null);
+  const [showEdgeModal, setShowEdgeModal] = useState(false);
 
   const [editModal, setEditModal] = useState(false);
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
@@ -688,34 +689,45 @@ export default function Boards({ boards }: Props) {
             </div>
           </Modal>
         )}
+        {showEdgeModal && <Modal onclick={() => setShowEdgeModal(false)}>
+          <h2>Manage Task Transitions</h2>
+          {/* {activeBoard.} */}
+        </Modal>}
         {showChild && <Modal onclick={() => setShowChild(false)}>
             <ShowChildrenModal children={showChildOf} />
           </Modal>}
       </>
       <div className={styles.container}>
-        <div className={styles.tabList} role="tablist">
-          {boards.map((board, idx) => {
-            const isActive = idx === activeIndex;
-
-            return (
-              <button
-                key={idx}
-                type="button"
-                role="tab"
-                tabIndex={isActive ? 0 : -1}
-                aria-selected={isActive}
-                aria-controls={`board-panel-${idx}`}
-                id={`board-tab-${idx}`}
-                className={`${styles.tab} ${isActive ? styles.active : ''}`}
-                onClick={() => {
-                  setActiveIndex(idx);
-                  setWorkflowState(boards[idx].workflows);
-                }}
-              >
-                {board.name}
-              </button>
-            );
-          })}
+        <div className={styles.tabList} role="tablist" style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div>
+            {boards.map((board, idx) => {
+              const isActive = idx === activeIndex;
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  role="tab"
+                  tabIndex={isActive ? 0 : -1}
+                  aria-selected={isActive}
+                  aria-controls={`board-panel-${idx}`}
+                  id={`board-tab-${idx}`}
+                  className={`${styles.tab} ${isActive ? styles.active : ''}`}
+                  onClick={() => {
+                    setActiveIndex(idx);
+                    setWorkflowState(boards[idx].workflows);
+                  }}
+                >
+                  {board.name}
+                </button>
+              );
+            })}
+          </div>
+          <Button
+            onClick={
+              () => setShowEdgeModal(true)
+            }>
+            Transitions
+          </Button>
         </div>
         {activeBoard && (
           <div
@@ -753,7 +765,7 @@ export default function Boards({ boards }: Props) {
                 })}
 
               {activeBoard && (
-                <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
                   <button
                     className={styles.columnAddBtn}
                     onClick={() => {
@@ -778,27 +790,44 @@ export default function Boards({ boards }: Props) {
                         name="limit"
                         onChange={(e) => setBoardLimit(e.target.valueAsNumber)}
                       />
-                      <Button
-                        onClick={() => {
-                          addWorkflow(
-                            activeBoard.id,
-                            boardName,
-                            workflowState.length,
-                            projectId ?? '',
-                            boardLimit,
-                          )
-                            .then((column) => {
-                              setWorkflowState([...workflowState, column]);
-                              boards[activeIndex].workflows = [...workflowState, column];
-                            })
-                            .finally(() => {
-                              setBoardName('');
-                              setBoardLimit(0);
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <Button
+                          onClick={() => {
+                            if(boardName === ''){
+                              setIsAdding(false);
+                              return;
+                            }
+                            let ret = false;
+                            activeBoard.workflows.map((workflow) => {
+                              if(workflow.name.toLowerCase() === boardName.toLowerCase()){
+                                ret = true;
+                              }
                             });
-                        }}
-                      >
-                        Add
-                      </Button>
+                            if(ret){
+                              setIsAdding(false);
+                              return;
+                            }
+                            addWorkflow(
+                              activeBoard.id,
+                              boardName,
+                              workflowState.length,
+                              projectId ?? '',
+                              boardLimit,
+                            )
+                              .then((column) => {
+                                setWorkflowState([...workflowState, column]);
+                                boards[activeIndex].workflows = [...workflowState, column];
+                              })
+                              .finally(() => {
+                                setBoardName('');
+                                setBoardLimit(0);
+                              });
+                              setIsAdding(false);
+                          }}
+                        >
+                          Add
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </div>
