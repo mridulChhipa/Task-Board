@@ -23,8 +23,6 @@ function App() {
       <BrowserRouter>
       <Loader />
       <NavBar />
-      <button onClick={() => handleNotification(1, "You have a new notification!")}>Send Notification</button>
-
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/signin" element={<LogInPage />} />

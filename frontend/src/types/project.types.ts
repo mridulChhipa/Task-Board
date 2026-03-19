@@ -1,4 +1,4 @@
-import type { Workflow } from './boards.types';
+import type { EdgeConstraint, Workflow } from './boards.types';
 
 export interface Project {
   id: string;
@@ -17,4 +17,5 @@ export interface Board {
   name: string;
   projectId: string;
   workflows: Workflow[];
+  edges: EdgeConstraint[];
 }

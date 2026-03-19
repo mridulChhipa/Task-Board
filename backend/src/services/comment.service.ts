@@ -38,6 +38,26 @@ export class CommentService {
             userId: authorId,
           },
         });
+
+        const task = await db.task.findUnique({
+          where: {
+            id: taskId,
+          }
+        });
+
+        if(!task){
+          throw new Error('Task not found');
+        }
+
+        await notificationService.createNotification({
+          recipientId: task.assignee,
+          senderId: authorId,
+          taskId: taskId,
+          commentId: null,
+          threadId: createdThread.id,
+          type: NotifType.THREAD_STARTED,
+        });
+
       }
 
       return createdThread as ThreadDTO;

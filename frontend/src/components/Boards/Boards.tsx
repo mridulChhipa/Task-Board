@@ -3,7 +3,7 @@ import styles from './boards.module.css';
 import formStyles from '../Projects/CreateProject.module.css';
 import type { Board } from '../../types/project.types';
 import { KanbanColumn } from './KanbanColumn';
-import type { Task, Workflow } from '../../types/boards.types';
+import type { EdgeConstraint, Task, Workflow } from '../../types/boards.types';
 import { addWorkflow } from '../../utils/board.utils';
 import { useParams } from 'react-router-dom';
 import { IconPlus } from './boards.images';
@@ -150,6 +150,7 @@ export default function Boards({ boards }: Props) {
   const [showChild, setShowChild] = useState(false);
   const [showChildOf, setShowChildOf] = useState<Task[] | null>(null);
   const [showEdgeModal, setShowEdgeModal] = useState(false);
+  const [edges, setEdges] = useState<EdgeConstraint[]>([]);
 
   const [editModal, setEditModal] = useState(false);
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
@@ -450,7 +451,9 @@ export default function Boards({ boards }: Props) {
       );
 
       setWorkflowState(
-        workflowState.filter((workflow) => workflow.id !== workflowId),
+        workflowState
+          .filter((workflow) => workflow.id !== workflowId)
+          .map((workflow, idx) => ({ ...workflow, orderIdx: idx })),
       );
 
     } catch (err) {
@@ -749,7 +752,10 @@ export default function Boards({ boards }: Props) {
           </Modal>
         )}
         {showEdgeModal && <Modal onclick={() => setShowEdgeModal(false)}>
-          <h2>Manage Task Transitions</h2>
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
+            <h2>Manage Task Transitions</h2>
+            <Button onClick={() => {}}>Add Transition</Button>
+          </div>
           {/* {activeBoard.} */}
         </Modal>}
         {showChild && <Modal onclick={() => setShowChild(false)}>
@@ -774,6 +780,7 @@ export default function Boards({ boards }: Props) {
                   onClick={() => {
                     setActiveIndex(idx);
                     setWorkflowState(boards[idx].workflows);
+                    // setEdges(boards[idx].edges);
                   }}
                 >
                   {board.name}

@@ -1,4 +1,3 @@
-import { DispatchContext } from '../context/AuthContext';
 import type { Workflow } from '../types/boards.types';
 import type { Board } from '../types/project.types';
 
