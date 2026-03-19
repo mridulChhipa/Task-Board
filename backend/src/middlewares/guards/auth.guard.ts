@@ -9,24 +9,12 @@ export function authenticateToken(
   next: NextFunction,
 ): void {
   try {
-    // const authHeader = req.headers.authorization;
 
-    // if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    //   throw new Error('Authentication required - no token');
-    // }
-
-    // const token = authHeader.split(' ')[1];
     const token = req.cookies.refreshToken;
 
     if (!token) {
       throw new Error('Authentication required - invalid format');
     }
-
-    // console.log(
-    //   '============\n Refresh Token from guard: ',
-    //   token,
-    //   '\n=================',
-    // );
 
     const payload = verifyToken(token, process.env.JWT_REFRESH_SECRET ?? '');
     if (payload.type !== TokenType.REFRESH) {
@@ -35,7 +23,6 @@ export function authenticateToken(
 
     const authReq = req as AuthenticatedRequest;
     authReq.user = payload;
-    // console.log(payload);
     next();
   } catch (err) {
     next(err);

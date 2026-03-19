@@ -1,8 +1,7 @@
 import type { Response, Request, NextFunction, RequestHandler } from 'express';
-import type { ProjectRole } from '../../types/project.types';
+import { GlobalRole, type ProjectRole } from '../../types/project.types';
 import type { AuthenticatedRequest } from '../../types/auth.types';
 import { db } from '../../config/db';
-import { GlobalRole } from '../../../generated/prisma/enums';
 
 export function authorizeProjectRole(
   allowedRoles: ProjectRole[],
