@@ -63,7 +63,12 @@ export class NotificationController {
         throw new Error("Can't validate the nid");
       }
 
-      await notificationService.readNotification(nid);
+      const read = req.body.read;
+      if (typeof read !== 'boolean') {
+        throw new Error("Can't validate the read status");
+      }
+
+      await notificationService.readNotification(nid, read);
       res.status(200).json({
         status: 'success',
         data: null,

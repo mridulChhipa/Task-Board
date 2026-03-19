@@ -1,11 +1,11 @@
-export type NotifType = {
-  TASK_ASSIGNED: 'TASK_ASSIGNED', // Personal
-  STATUS_CHANGED: 'STATUS_CHANGED', // Broadcast
-  COMMENT_ADDED: 'COMMENT_ADDED', // Boardcast
-  THREAD_STARTED: 'THREAD_STARTED', // Boardcast
-  MENTIONED: 'MENTIONED', // Personal
-  REPLY: 'REPLY', // Personal
-}
+export type NotifType =
+  | 'TASK_ASSIGNED' // Personal
+  | 'STATUS_CHANGED' // Broadcast
+  | 'COMMENT_ADDED' // Boardcast
+  | 'THREAD_STARTED' // Boardcast
+  | 'MENTIONED' // Personal
+  | 'REPLY' // Personal
+
 
 export interface NotifBody {
   recipientId: number;

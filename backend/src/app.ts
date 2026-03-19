@@ -7,6 +7,7 @@ import { errorHandler } from './middlewares/error.handler';
 import { projectRouter } from './routes/project.route';
 import { taskRouter } from './routes/task.route';
 import { commentRouter } from './routes/comment.route';
+import { notificationRouter } from './routes/notification.route';
 
 const app: Application = express();
 
@@ -30,6 +31,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/project', projectRouter);
 app.use('/api/task', taskRouter);
 app.use('/api/comment', commentRouter);
+app.use('/api/notification', notificationRouter);
 
 app.use(errorHandler);
 

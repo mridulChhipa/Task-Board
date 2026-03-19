@@ -16,8 +16,65 @@ import UpdateProject from '../../components/Projects/UpdateProject';
 import AddUser from '../../components/Projects/AddUser';
 import {
   DummyAvatar,
+  IconDelete,
+  IconEnvelopeOpen,
+  IconEnvelopeClosed,
   IconSettings,
 } from '../../components/Boards/boards.images';
+import type { NotificationDTO, NotifType } from '../../types/Notification.types';
+  
+function typeToString(notif: NotifDisplay): string {
+  switch (notif.type) {
+    case 'TASK_ASSIGNED':
+      return 'Task ' + notif.taskName + ' is assigned to you';
+    case 'STATUS_CHANGED':
+      return 'Status changed of task ' + notif.taskName;
+    case 'COMMENT_ADDED':
+      return 'A comment was added to task ' + notif.taskName;
+    case 'THREAD_STARTED':
+      return 'A thread was started on task ' + notif.taskName;
+    case 'MENTIONED':
+      return 'You were mentioned in a comment in task ' + notif.taskName;
+    case 'REPLY':
+      return 'Someone replied to your comment in task ' + notif.taskName;
+    default:
+      return 'You have a new notification';
+  }
+}
+
+type NotifDisplay = {
+  type: NotifType;
+  taskName: string;
+  id: string;
+  read: boolean;
+  sender: string;
+}
+
+async function setNotifications(notifications: NotificationDTO[], setNotifs: React.Dispatch<React.SetStateAction<NotifDisplay[]>>) {
+  setNotifs(await Promise.all(
+    notifications.map(async (notif) => {
+      const res = await fetch(`http://localhost:3000/api/task/${notif.taskId}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      const taskName = data.task.title;
+      const res2 = await fetch(`http://localhost:3000/api/auth/${notif.senderId}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data2 = await res2.json();
+      const senderName = data2.data.personalData.name;
+      return {
+        type: notif.type,
+        taskName,
+        id: notif.id,
+        read: notif.read,
+        sender: senderName,
+      } as NotifDisplay;
+    })
+  ));
+}
 
 export type Operation = 'View' | 'Add' | 'Edit' | 'Remove';
 export interface ProjectMember {
@@ -44,6 +101,9 @@ function DashBoard() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifs, setNotifs] = useState<NotifDisplay[]>([]);
+
   const fetchUser = useFetchUser();
   const projects = (user?.projects as Project[]) ?? [];
   const userId = user?.userId;
@@ -53,6 +113,12 @@ function DashBoard() {
       fetchUser();
     }
   }, [fetchUser]);
+
+  useEffect(() => {
+    if (user?.notifications) {
+      void setNotifications(user.notifications, setNotifs);
+    }
+  }, [user?.notifications]);
 
   async function handleCreate(e: SubmitEvent) {
     e.preventDefault();
@@ -222,11 +288,6 @@ function DashBoard() {
             `Failed to assign user: ${res.status} ${res.statusText} - ${test}`,
           );
         }
-
-        // Update 2 things
-        // added user's project list
-        // project's user list
-        // ask chuppa how to do...
       } catch (err) {
         throw new Error('Error adding user to project', { cause: err });
       } finally {
@@ -257,13 +318,6 @@ function DashBoard() {
             `Failed to edit user role: ${res.status} ${res.statusText} - ${test}`,
           );
         }
-
-        // Update 2 things
-        // edited user's project list: role update
-        // project's user list's role element
-        // ask chuppa how to do...
-        // use websockets? too much mehnat...
-        // let it be and let update on refresh?
       } catch (err) {
         throw new Error('Error editing user role', { cause: err });
       } finally {
@@ -295,7 +349,7 @@ function DashBoard() {
           );
         }
       } catch (err) {
-        throw new Error('Error reomving user from project', { cause: err });
+        throw new Error('Error removing user from project', { cause: err });
       } finally {
         setAddUser(false);
         setUserToAdd('');
@@ -389,6 +443,52 @@ function DashBoard() {
             projectMembers={projectMembers}
           />
         </Modal>
+      )}
+
+      {showNotifications && (
+        <Modal onclick={async () => {
+          setShowNotifications(false);
+        }}>
+            <h2>Your Notifications</h2>
+            {(user?.notifications === undefined || user?.notifications.length === 0) && <p>No notifications</p>}
+            {notifs.map((notification) => {
+              return (
+                <div className={styles.notification}>
+                  <div className={styles.notifText}>{typeToString(notification)}</div>
+                  <div className={styles.notifSender}>From: {notification.sender}</div>
+                  <div style={{ display: 'flex', flexDirection: 'row', gap: '15px' }}>
+                    <span onClick={async () => {
+                      console.log('current status: ', notification.read);
+                      setNotifs((prev) => prev.map((n) => n.id === notification.id ? {...n, read: !notification.read} : n));
+                      await fetch(`http://localhost:3000/api/notification/${notification.id}`, {
+                        method: 'PATCH',
+                        credentials: 'include',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ read: notification.read }),
+                      });
+                      console.log("status changed to: ", !notification.read);
+                    }}
+                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                      {notification.read ? <IconEnvelopeClosed size={15} /> : <IconEnvelopeOpen size={15} />}
+                    </span>
+                    <span onClick={async () => {
+                      setNotifs(notifs.filter((n) => n.id !== notification.id));
+                      await fetch(`http://localhost:3000/api/notification/${notification.id}`, {
+                        method: 'DELETE',
+                        credentials: 'include',
+                      });
+                    }}
+                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                      <IconDelete size={15} />
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+        </Modal>
+
       )}
 
       <div className={styles.mainContainer}>
@@ -486,14 +586,19 @@ function DashBoard() {
               </div>
             )}
           </div>
-          <div className={styles.notifications}>
+          <div className={styles.notifications} style={{ textAlign: 'center'}}>
             <h2>Your Notifications</h2>
             <ul>
-              {(user?.notifications === undefined || user?.notifications.length === 0) && <li>No notifications</li>}
-              {user?.notifications.map((notification, index) => (
-                <li key={index}>{notification.id}</li>
-              ))}
+              {(notifs === undefined || notifs.length === 0) && <li>No notifications</li>}
+              {notifs?.filter((n) => !n.read).map((notification, index) => {
+                if(index < 5)return <li key={index}>{typeToString(notification)}</li>;
+              })}
             </ul>
+            <Button onClick={async () => {
+              setShowNotifications(true);
+            }}>
+              View All
+            </Button>
           </div>
         </div>
       </div>

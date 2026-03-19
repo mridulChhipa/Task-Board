@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { notificationController } from "../controllers/notification.controller";
+import { authenticateToken } from "../middlewares/guards/auth.guard";
 
-const notificationRouter = Router();
+export const notificationRouter = Router();
+notificationRouter.use(authenticateToken);
 
 notificationRouter.post("/create", (req, res, next) => {
   notificationController.createNotification(req, res, next);

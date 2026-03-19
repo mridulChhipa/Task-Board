@@ -25,6 +25,50 @@ export const IconWarning = () => (
     <circle cx="5.5" cy="7.8" r="0.55" fill="currentColor" />
   </svg>
 );
+export const IconEnvelopeOpen = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 14 14" fill="none">
+    <path
+      d="M1.5 5L7 2L12.5 5"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeLinejoin="round"
+    />
+    <rect
+      x="1.5"
+      y="5"
+      width="11"
+      height="6.5"
+      rx="1.5"
+      stroke="currentColor"
+      strokeWidth="1.2"
+    />
+    <path
+      d="M2 5.5L7 9L12 5.5"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+export const IconEnvelopeClosed = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 14 14" fill="none">
+    <rect
+      x="1.5"
+      y="3"
+      width="11"
+      height="8"
+      rx="1.5"
+      stroke="currentColor"
+      strokeWidth="1.2"
+    />
+    <path
+      d="M2 3.5L7 7L12 3.5"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 export const IconCalendar = () => (
   <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
     <rect

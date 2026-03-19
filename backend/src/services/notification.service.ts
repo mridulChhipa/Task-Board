@@ -67,14 +67,14 @@ export class NotificationService {
     }
   }
 
-  async readNotification(notificationId: string): Promise<void> {
+  async readNotification(notificationId: string, read: boolean): Promise<void> {
     try {
       await db.notification.update({
         where: {
           id: notificationId,
         },
         data: {
-          read: true,
+          read: read,
         },
       });
     }
