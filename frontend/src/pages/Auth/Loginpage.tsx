@@ -71,6 +71,7 @@ export default function LogInPage() {
             role: userData.data.personalData.globalRole,
             projects: userData.data.projectData,
             avatar: userData.data.personalData.avatar,
+            notifications: userData.data.notifications,
           },
           isLoading: false,
         },
