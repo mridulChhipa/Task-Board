@@ -12,7 +12,7 @@ import { IconDelete } from '../Boards/boards.images';
 import { useParams } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import Modal from '../Modal/Modal';
-import Form, { InputArea, Label } from '../Forms/Form';
+import Form, { InputArea, Label } from '../Form/Form';
 import InlineRichTextEditor from '../TextEditor/InlineRichTextEditor';
 import { sanitizeHtml } from '../../utils/sanitizer';
 
@@ -268,7 +268,6 @@ export function Comment({ commentId, deleteHandler, threadId, refreshTask }: Pro
               title="Click to edit"
               dangerouslySetInnerHTML={{ __html: sanitizeHtml(comment.content), }}
             >
-              {/* {comment.content} */}
             </p>
           )}
         </div>

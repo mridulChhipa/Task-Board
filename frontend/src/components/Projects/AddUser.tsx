@@ -3,7 +3,7 @@ import Button from '../Button/Button';
 import styles from './CreateProject.module.css';
 import tableStyles from '../../pages/Dashboard/Dashboard.module.css';
 import type { Operation, ProjectMember } from '../../pages/Dashboard/Dashboard';
-import Form, { FormControl, InputArea, Label } from '../Forms/Form';
+import Form, { FormControl, InputArea, Label } from '../Form/Form';
 
 interface Props {
   operation: Operation;
