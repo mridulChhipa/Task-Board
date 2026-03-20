@@ -153,6 +153,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 20px;
 }
 
 .mainContainer {
@@ -188,4 +189,8 @@
   font-size: 0.8rem;
   font-weight: 400;
   max-width: 150px;
+}
+
+.admin{
+  padding-top: 20px;
 }

@@ -78,7 +78,7 @@ export default function ProjectPage() {
   return (
     <>
       {showAddModal && (
-        <Modal>
+        <Modal onclick={() => setShowAddModal(false)}>
           <AddBoard
             name={boardName}
             setName={setBoardName}

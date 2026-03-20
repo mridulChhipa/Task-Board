@@ -22,6 +22,7 @@ import {
   IconSettings,
 } from '../../components/Boards/boards.images';
 import type { NotificationDTO, NotifType } from '../../types/Notification.types';
+import Form, { FormControl, InputArea, Label } from '../../components/Forms/Form';
   
 function typeToString(notif: NotifDisplay): string {
   switch (notif.type) {
@@ -103,6 +104,9 @@ function DashBoard() {
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifs, setNotifs] = useState<NotifDisplay[]>([]);
+
+  const [showAdminModal, setShowAdminModal] = useState(false);
+  const [globalAdminEmail, setGlobalAdminEmail] = useState('');
 
   const fetchUser = useFetchUser();
   const projects = (user?.projects as Project[]) ?? [];
@@ -359,6 +363,27 @@ function DashBoard() {
     }
   }
 
+  async function addGlobal(e: SubmitEvent) {
+    e.preventDefault();
+    try {
+      await fetch(`http://localhost:3000/api/auth/update-user`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: globalAdminEmail,
+          globalRole: 'GLOBAL_ADMIN',
+        }),
+      });
+      console.log('Global admin added successfully');
+    }
+    catch (err) {
+      throw new Error('Error adding global admin', { cause: err });
+    }
+  }
+
   async function getMembers(): Promise<ProjectMember[]> {
     async function getEmail(userId: number): Promise<string> {
       try {
@@ -491,6 +516,37 @@ function DashBoard() {
 
       )}
 
+      {showAdminModal && (
+        <Modal onclick={() => setShowAdminModal(false)}>
+          <h2>Add Global Administrators</h2>
+          <Form onSubmit={addGlobal}>
+            <InputArea>
+            <Label htmlFor='email'>User Email</Label>
+              <FormControl
+                type='email'
+                placeholder='e.g. admin@example.com'
+                name='email'
+                required
+                value={globalAdminEmail}
+                onChange={(e) => setGlobalAdminEmail(e.target.value)}
+              />
+            </InputArea>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <Button
+                priority="second"
+                type="button"
+                onClick={() => setShowAdminModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button priority="first" type="submit">
+                Add Global Admin
+              </Button>
+            </div>
+          </Form>
+        </Modal>
+      )}
+
       <div className={styles.mainContainer}>
         <div className={styles.dashboard}>
           <div className={styles.projectHeader}>
@@ -577,6 +633,13 @@ function DashBoard() {
           </table>
         </div>
         <div className={styles.sidebar}>
+          {user?.role === 'GLOBAL_ADMIN' && (
+            <div className={styles.admin}>
+              <Button onClick={() => setShowAdminModal(true)}>
+                Manage Global Admins
+              </Button>
+            </div>
+          )}
           <div className={styles.upper}>
             {user?.avatar ? (
               <img src={user.avatar} className={styles.avatar} />

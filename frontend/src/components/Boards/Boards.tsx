@@ -3,7 +3,7 @@ import styles from './boards.module.css';
 import formStyles from '../Projects/CreateProject.module.css';
 import type { Board } from '../../types/project.types';
 import { KanbanColumn } from './KanbanColumn';
-import type { EdgeConstraint, Task, Workflow } from '../../types/boards.types';
+import type { EdgeConstraint, ProjectMember, Task, Workflow } from '../../types/boards.types';
 import { addWorkflow } from '../../utils/board.utils';
 import { useParams } from 'react-router-dom';
 import { IconPlus } from './boards.images';
@@ -345,6 +345,15 @@ export default function Boards({ boards }: Props) {
     const dateObject = dueDate !== '' ? new Date(dueDate) : null;
 
     try {
+      const res1 = await fetch(`http://localhost:3000/api/project/${projectId}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const projectData = await res1.json();
+      const members = projectData.data.members.map((member: ProjectMember) => member.userId);
+      if(!members.includes(assigneeId)) {
+        throw new Error('Assignee is not a member of the project, failed to add task');
+      }
       const res = await fetch(`http://localhost:3000/api/task/create`, {
         method: 'POST',
         credentials: 'include',

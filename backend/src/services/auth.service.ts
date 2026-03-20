@@ -352,6 +352,7 @@ export class AuthService {
         data: {
           name: body.name,
           avatar: body.avatar,
+          globalRole: body.globalRole as GlobalRole,
         },
       });
     } catch (error) {
