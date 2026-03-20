@@ -29,7 +29,7 @@ export default function ProjectPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:3000/api/project/${project?.id}/board/create`,
+        `http://localhost:3000/api/project/${project.id}/board/create`,
         {
           method: 'POST',
           credentials: 'include',
@@ -38,16 +38,18 @@ export default function ProjectPage() {
           },
           body: JSON.stringify({
             name: boardName,
-            projectId: project?.id,
+            projectId: project.id,
           }),
         },
       );
 
       const resJson = await res.json();
       console.log(resJson);
-      const { bid } = resJson;
 
-      const board = await fetchBoard(bid, project.id);
+      // const { bid } = resJson;
+
+      // const board = await fetchBoard(bid, project.id);
+      const board: Board = resJson.board;
       console.log(board);
       const updatedBoards: Board[] = project.boards;
       updatedBoards.push(board);

@@ -18,8 +18,9 @@ export interface ColumnDTO {
 export interface EdgeConstraintDTO {
   id: String;
   boardId: String;
+  board?: BoardDTO;
   uId: String;
-  u: ColumnDTO;
+  u?: ColumnDTO;
   vId: String;
-  v: ColumnDTO;
+  v?: ColumnDTO;
 }

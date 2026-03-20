@@ -224,6 +224,7 @@ export class ProjectService {
                   tasks: true,
                 },
               },
+              edgeConstraints: true,
             },
           },
         },
@@ -280,7 +281,7 @@ export class ProjectService {
       }
       return allGlobalProjects;
     } catch (error) {
-      throw new Error("Can't fetch projects for global admin", {
+      throw new Error("Can't fetch projects for global admin [fetchglobaladmin]", {
         cause: error,
       });
     }

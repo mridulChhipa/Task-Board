@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { boardService } from '../services/board.service';
+import { BoardDTO } from '../types/board.types';
 
 export class BoardController {
   async createBoard(
@@ -14,10 +15,10 @@ export class BoardController {
         throw new Error('Invalid type for projectId');
       }
 
-      const bid = await boardService.create(projectId, req.body.name);
+      const board: BoardDTO = await boardService.create(projectId, req.body.name);
       res.status(201).json({
         status: 'success',
-        bid,
+        board,
       });
 
       next();
@@ -143,10 +144,10 @@ export class BoardController {
     res: Response,
     next: NextFunction,
   ): Promise<void> {
-    try{
+    try {
       const boardId = req.params.boardId;
 
-      if(typeof boardId !== 'string'){
+      if (typeof boardId !== 'string') {
         throw new Error('Invalid type for boardId');
       }
 
@@ -162,7 +163,7 @@ export class BoardController {
         edge,
       });
     }
-    catch(error){
+    catch (error) {
       next(error);
     }
   }
@@ -172,11 +173,11 @@ export class BoardController {
     res: Response,
     next: NextFunction,
   ): Promise<void> {
-    try{
+    try {
       const boardId = req.params.boardId;
       const edgeId = req.params.edgeId;
 
-      if(typeof boardId !== 'string' || typeof edgeId !== 'string'){
+      if (typeof boardId !== 'string' || typeof edgeId !== 'string') {
         throw new Error('Invalid type for boardId or edgeId');
       }
 
@@ -186,7 +187,7 @@ export class BoardController {
         status: 'success',
         msg: 'Edge deleted Successfully',
       });
-    } catch (err){
+    } catch (err) {
       next(err);
     }
   }
