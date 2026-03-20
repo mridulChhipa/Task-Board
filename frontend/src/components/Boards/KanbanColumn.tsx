@@ -12,6 +12,7 @@ interface Props {
   deleteColumn: () => void;
   renameColumn: (name: string) => Promise<void>;
   canEditWorkflow: boolean;
+  highlight: boolean;
   draggable?: boolean;
   dragstartHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
   dropHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
@@ -42,6 +43,7 @@ export function KanbanColumn({
   draggable,
   dragstartHandler,
   dropHandler,
+  highlight,
   dragoverHandler,
   taskDragstartHandler,
   setState,
@@ -119,7 +121,7 @@ export function KanbanColumn({
 
   return (
     <div
-      className={styles.kanbanColumn}
+      className={highlight? styles.kanbanColumnDisable : styles.kanbanColumn}
       id={id}
       draggable={draggable}
       onDragStart={dragstartHandler}

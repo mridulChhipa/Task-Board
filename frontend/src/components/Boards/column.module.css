@@ -35,6 +35,21 @@
   height: 100%;
 }
 
+.kanbanColumnDisable {
+  width: 280px;
+  flex-shrink: 0;
+  background: var(--bg-column);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-col);
+  overflow: hidden;
+  transition: border-color 0.2s;
+  transition: color 0.5s;
+  opacity: 0.4;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .kanbanColumn:hover {
   border-color: #3a3f4a;
 }

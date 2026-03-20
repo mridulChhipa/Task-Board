@@ -62,6 +62,7 @@ async function childrenOf(task: Task | null): Promise<Task[]> {
 
 export function TaskCard({
   task,
+  draggable,
   dragstartHandler,
   deleteTask,
   showDelete,
@@ -77,7 +78,7 @@ export function TaskCard({
     <>
       <div
         className={styles.taskCard}
-        draggable={true}
+        draggable={draggable}
         onDragStart={dragstartHandler}
         data-parent={task.statusId}
         data-id={task.id}

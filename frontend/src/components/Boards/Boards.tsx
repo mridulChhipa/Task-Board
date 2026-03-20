@@ -129,9 +129,9 @@ export default function Boards({ boards }: Props) {
   const [isAdding, setIsAdding] = useState(false);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
-
   useEffect(() => {
     setWorkflowState(activeBoard.workflows);
+    setDragHighlight(activeBoard.workflows.map(() => false));
     setEdges(activeBoard.edges ?? []);
   }, [activeIndex]);
 
@@ -139,6 +139,7 @@ export default function Boards({ boards }: Props) {
   const [boardName, setBoardName] = useState<string>('');
   const [boardLimit, setBoardLimit] = useState<number>(0);
 
+  const [dragHighlight, setDragHighlight] = useState<boolean[]>([]);
   const [taskName, setTaskName] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
   const [taskType, setTaskType] = useState<TaskType>('STORY');
@@ -183,13 +184,21 @@ export default function Boards({ boards }: Props) {
       'ogCol',
       event.currentTarget.dataset.parent ?? '',
     );
-    console.log(event.currentTarget.dataset.parent);
+    let allowed: boolean[] = workflowState.map(() => true);
+    for(const edge of edges){
+      const idx = workflowState.findIndex((workflow) => workflow.id === edge.vId);
+      if(edge.uId === event.currentTarget.dataset.parent) allowed[idx] = false;
+      else allowed[idx] = true;
+    }
+    setDragHighlight(allowed);
+    console.log(allowed);
   }
 
   async function dropHandler(
     event: React.DragEvent<HTMLDivElement>,
     workflows: Workflow[],
   ) {
+    setDragHighlight(dragHighlight.map(() => false));
     if (event.currentTarget.dataset.column === 'true') {
       const type = event.dataTransfer.getData('type');
       if (type === 'task') {
@@ -232,6 +241,7 @@ export default function Boards({ boards }: Props) {
         const newWorkflowState = [...workflowState];
         const sortedWF = await sortWorkflows(newWorkflowState);
         setWorkflowState(sortedWF);
+        setDragHighlight(sortedWF.map(() => false));
         boards[activeIndex].workflows = sortedWF;
       } catch (err) {
         throw new Error('Column update failed with error: ', { cause: err });
@@ -311,6 +321,7 @@ export default function Boards({ boards }: Props) {
       });
       const sortedWF = await sortWorkflows(newWF);
       setWorkflowState(sortedWF);
+      setDragHighlight(sortedWF.map(() => false));
       boards[activeIndex].workflows = sortedWF;
     }
   }
@@ -385,6 +396,7 @@ export default function Boards({ boards }: Props) {
       );
       const sortedWF = await sortWorkflows(newWF);
       setWorkflowState(sortedWF);
+      setDragHighlight(sortedWF.map(() => false));
       boards[activeIndex].workflows = sortedWF;
     } catch (err) {
       console.error('Error creating task:', { cause: err });
@@ -434,6 +446,7 @@ export default function Boards({ boards }: Props) {
       const newWF = workflowState.map((workflow) => workflow);
       const sortedWF = await sortWorkflows(newWF);
       setWorkflowState(sortedWF);
+      setDragHighlight(sortedWF.map(() => false));
       boards[activeIndex].workflows = sortedWF;
     } catch (err) {
       console.error('Error editing task: ', { cause: err });
@@ -460,11 +473,11 @@ export default function Boards({ boards }: Props) {
         (workflow) => workflow.id !== workflowId,
       );
 
-      setWorkflowState(
-        workflowState
+      const sortedWF = workflowState
           .filter((workflow) => workflow.id !== workflowId)
-          .map((workflow, idx) => ({ ...workflow, orderIdx: idx })),
-      );
+          .map((workflow, idx) => ({ ...workflow, orderIdx: idx }));
+      setWorkflowState(sortedWF);
+      setDragHighlight(sortedWF.map(() => false));
 
     } catch (err) {
       throw new Error('Error deleting column: ', { cause: err });
@@ -502,6 +515,7 @@ export default function Boards({ boards }: Props) {
       );
 
       setWorkflowState(updated);
+      setDragHighlight(updated.map(() => false));
       boards[activeIndex].workflows = updated;
     } catch (err) {
       throw new Error('Error renaming column: ', { cause: err });
@@ -521,9 +535,11 @@ export default function Boards({ boards }: Props) {
       if(fromEdgeName.toLowerCase() == toEdgeName.toLowerCase()){
         throw new Error('Cannot create edge between the same columns');
       }
+      // console.log(workflowState);
       for (const workflow of workflowState) {
-        if(workflow.name === fromEdgeName.toLowerCase()) fromEdgeId = workflow.id;
-        if(workflow.name === toEdgeName.toLowerCase()) toEdgeId = workflow.id;
+        console.log(workflow.name, fromEdgeName, toEdgeName);
+        if(workflow.name === fromEdgeName.toLowerCase().trim()) fromEdgeId = workflow.id;
+        if(workflow.name === toEdgeName.toLowerCase().trim()) toEdgeId = workflow.id;
       }
       if(fromEdgeId === '' || toEdgeId === '') {
         throw new Error('Invalid workflow names entered for edge creation');
@@ -927,6 +943,7 @@ export default function Boards({ boards }: Props) {
                   onClick={() => {
                     setActiveIndex(idx);
                     setWorkflowState(boards[idx].workflows);
+                    setDragHighlight(boards[idx].workflows.map(() => false));
                   }}
                 >
                   {board.name}
@@ -948,12 +965,13 @@ export default function Boards({ boards }: Props) {
             <div className={styles.kanbanBoard}>
               {workflowState
                 .sort((a, b) => a.orderIdx - b.orderIdx)
-                .map((workflow) => {
+                .map((workflow, index) => {
                   return (
                     <KanbanColumn
                       key={`${activeBoard.id}-${workflow.id}`}
                       id={workflow.orderIdx.toString()}
                       workflow={workflow}
+                      highlight={dragHighlight[index]}
                       onAddTask={() => {
                         if (
                           workflow.tasks.length >= workflow.limit &&
@@ -1032,6 +1050,7 @@ export default function Boards({ boards }: Props) {
                             )
                               .then((column) => {
                                 setWorkflowState([...workflowState, column]);
+                                setDragHighlight([...dragHighlight, false]);
                                 boards[activeIndex].workflows = [...workflowState, column];
                               })
                               .finally(() => {
