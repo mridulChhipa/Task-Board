@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                   projects: [],
                   avatar: '',
                   role: user.role,
-                  notifications: [],
+                  notifications: user.notifications || [],
                 },
 
                 isLoading: false,

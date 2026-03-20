@@ -65,3 +65,7 @@ export interface EdgeConstraint {
   vId: String;
   v?: Workflow;
 }
+
+export interface ProjectMember {
+ userId: number;
+}

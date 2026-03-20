@@ -47,12 +47,13 @@ authRouter.get(
     db.user
       .findUnique({
         where: { email: authReq.user.email },
-        select: { globalRole: true },
+        select: { globalRole: true, notifications: true },
       })
       .then((user) => {
         res.json({
           ...authReq.user,
           role: user?.globalRole ?? null,
+          notifications: user?.notifications ?? [],
         });
       })
       .catch(() => {

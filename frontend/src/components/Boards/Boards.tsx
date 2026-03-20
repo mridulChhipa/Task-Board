@@ -6,7 +6,7 @@ import { KanbanColumn } from './KanbanColumn';
 import type { EdgeConstraint, ProjectMember, Task, Workflow } from '../../types/boards.types';
 import { addWorkflow } from '../../utils/board.utils';
 import { useParams } from 'react-router-dom';
-import { IconPlus } from './boards.images';
+import { IconDelete, IconPlus } from './boards.images';
 import Button from '../Button/Button';
 import type { SubmitEvent, SubmitEventHandler } from 'react';
 import Modal from '../Modal/Modal';
@@ -120,8 +120,6 @@ export default function Boards({ boards }: Props) {
     );
   }
 
-  console.log('Rendering boards with data: ', boards);
-
   const { user } = useContext(AuthContext);
   const { project } = useContext(ProjectContext);
   const canEditWorkflows = project?.role === 'PROJECT_ADMIN' || user?.role === 'GLOBAL_ADMIN';
@@ -152,7 +150,6 @@ export default function Boards({ boards }: Props) {
   const [setParent, setSetParent] = useState(false);
   const [showChild, setShowChild] = useState(false);
   const [showChildOf, setShowChildOf] = useState<Task[] | null>(null);
-  const [showEdgeModal, setShowEdgeModal] = useState(false);
   const [showViewEdgesModal, setShowViewEdgesModal] = useState(false);
   const [edges, setEdges] = useState<EdgeConstraint[]>([]);
 
@@ -199,17 +196,17 @@ export default function Boards({ boards }: Props) {
         // check for wip limit, adjacent column, same columns
         const ogCol = event.dataTransfer.getData('ogCol');
         const currCol = workflows[Number(event.currentTarget.id)].id;
-        if (ogCol === currCol) return;
+        const foundEdge = edges.find((edge) => edge.uId === ogCol && edge.vId === currCol);
+        if (!foundEdge) throw new Error ('Task transfer not allowed due to edge constraints');
         const ogColIdx = workflows.find(
           (workflow) => workflow.id === ogCol,
         )?.orderIdx;
         const currColIdx = Number(event.currentTarget.id);
         if (ogColIdx === undefined) return;
-        if (ogColIdx + 1 !== currColIdx) return;
         const limit = workflows[currColIdx].limit;
         const taskCount = workflows[currColIdx].tasks.length;
         console.log(currColIdx);
-        if (limit != -1 && taskCount >= limit) return;
+        if (limit != -1 && taskCount >= limit) throw new Error('Task transfer not allowed due to WIP limit');
       }
       event.preventDefault();
     }
@@ -475,7 +472,7 @@ export default function Boards({ boards }: Props) {
   }
 
   async function renameColumn(workflowId: string, name: string) {
-    const trimmedName = name.trim();
+    const trimmedName = name.trim().toLowerCase();
     if (!trimmedName) return;
 
     const target = workflowState.find((workflow) => workflow.id === workflowId);
@@ -511,12 +508,26 @@ export default function Boards({ boards }: Props) {
     }
   }
 
-  const [fromEdgeId, setFromEdgeId] = useState<string>('');
-  const [toEdgeId, setToEdgeId] = useState<string>('');
+  const [fromEdgeName, setFromEdgeName] = useState<string>('');
+  const [toEdgeName, setToEdgeName] = useState<string>('');
+  const [isAddingEdge, setIsAddingEdge] = useState<boolean>(false);
 
   const handleAddEdge = async (e: SubmitEvent) => {
     e.preventDefault();
     try {
+      let fromEdgeId = '';
+      let toEdgeId = '';
+      setIsAddingEdge(false);
+      if(fromEdgeName.toLowerCase() == toEdgeName.toLowerCase()){
+        throw new Error('Cannot create edge between the same columns');
+      }
+      for (const workflow of workflowState) {
+        if(workflow.name === fromEdgeName.toLowerCase()) fromEdgeId = workflow.id;
+        if(workflow.name === toEdgeName.toLowerCase()) toEdgeId = workflow.id;
+      }
+      if(fromEdgeId === '' || toEdgeId === '') {
+        throw new Error('Invalid workflow names entered for edge creation');
+      }
       const response = await fetch(`http://localhost:3000/api/project/${projectId}/board/${activeBoard.id}/create-edge`, {
         method: 'POST',
         credentials: 'include',
@@ -798,40 +809,17 @@ export default function Boards({ boards }: Props) {
             </div>
           </Modal>
         )}
-        {showEdgeModal && <Modal onclick={() => setShowEdgeModal(false)}>
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
-            <h2>Manage Task Transitions</h2>
-            <Form onSubmit={handleAddEdge}>
-              <InputArea>
-                <Label htmlFor="from">From Workflow ID</Label>
-                <FormControl
-                  type="text"
-                  value={fromEdgeId}
-                  onChange={(e) => { setFromEdgeId(e.target.value) }}
-                  placeholder="e.g. 123e4567-e89b-12d3-a456-426614174000"
-                  name="from"
-                  id="from"
-                />
-              </InputArea>
-              <InputArea>
-                <Label htmlFor="to">To Workflow ID</Label>
-                <FormControl
-                  value={toEdgeId}
-                  onChange={(e) => { setToEdgeId(e.target.value) }}
-                  type="text"
-                  placeholder="e.g. 123e4567-e89b-12d3-a456-426614174000"
-                  name="to"
-                  id="to"
-                />
-              </InputArea>
-              <Button type='submit' onClick={() => { }}>Add Transition</Button>
-            </Form>
-          </div>
-        </Modal>}
         {showViewEdgesModal && (
           <Modal onclick={() => setShowViewEdgesModal(false)}>
             <div style={{ minWidth: '320px' }}>
-              <h2>Board Transitions</h2>
+              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h2>Board Transitions</h2>
+                <Button onClick={() => {
+                  setIsAddingEdge(true);
+                }}>
+                  Add Transition
+                </Button>
+              </div>
               {edges.length === 0 ? (
                 <p>No transitions added for this board yet.</p>
               ) : (
@@ -844,7 +832,8 @@ export default function Boards({ boards }: Props) {
                         key={edge.id.toString()}
                         style={{
                           display: 'flex',
-                          flexDirection: 'column',
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
                           gap: '0.25rem',
                           padding: '0.75rem',
                           border: '1px solid #e2e8f0',
@@ -852,14 +841,65 @@ export default function Boards({ boards }: Props) {
                         }}
                       >
                         <strong>
-                          {from?.name ?? edge.uId} -&gt; {to?.name ?? edge.vId}
+                          {from?.name.toUpperCase() ?? edge.uId} -&gt; {to?.name.toUpperCase() ?? edge.vId}
                         </strong>
-                        <span style={{ color: '#64748b', fontSize: '0.85rem' }}>
-                          {edge.uId} -&gt; {edge.vId}
+                        <span onClick={async () => {
+                          const res = await fetch(`http://localhost:3000/api/project/${projectId}/board/${activeBoard.id}/remove-edge/${edge.id}`, {
+                            method: 'DELETE',
+                            credentials: 'include',
+                          });
+                          const data = await res.json();
+                          console.log('delete response: ', data);
+                          const updatedEdges = edges.filter(e => e.id !== edge.id);
+                          setEdges(updatedEdges);
+                          activeBoard.edges = updatedEdges;
+                        }}>
+                          <IconDelete size={20}/>
                         </span>
                       </div>
                     );
                   })}
+                  {isAddingEdge && (
+                    <div
+                      key='add-edge'
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        gap: '0.25rem',
+                        padding: '0.75rem',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                      }}
+                    >
+                      <form onSubmit={handleAddEdge} style={{ display: 'flex', flexDirection: 'row', gap: '0.5rem'}}>
+                        <div>
+                          <InputArea>
+                            <Label htmlFor="from">From:</Label>
+                            <FormControl 
+                              type='text'
+                              value={fromEdgeName}
+                              onChange={(e) => { setFromEdgeName(e.target.value) }}
+                              placeholder="e.g. To Do"
+                            />
+                          </InputArea>
+                        </div>
+                        <div>
+                          <InputArea>
+                            <Label htmlFor="to">To:</Label>
+                            <FormControl
+                              type='text'
+                              value={toEdgeName}
+                              onChange={(e) => { setToEdgeName(e.target.value) }}
+                              placeholder="e.g. In Progress"
+                            />
+                          </InputArea>
+                        </div>
+                        <Button type="submit">Add</Button>
+                      </form>
+                    </div>
+
+                  )}
                 </div>
               )}
             </div>
@@ -870,7 +910,7 @@ export default function Boards({ boards }: Props) {
         </Modal>}
       </>
       <div className={styles.container}>
-        <div className={styles.tabList} role="tablist" style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div className={styles.tabList} role="tablist" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             {boards.map((board, idx) => {
               const isActive = idx === activeIndex;
@@ -887,7 +927,6 @@ export default function Boards({ boards }: Props) {
                   onClick={() => {
                     setActiveIndex(idx);
                     setWorkflowState(boards[idx].workflows);
-                    // setEdges(boards[idx].edges);
                   }}
                 >
                   {board.name}
@@ -895,14 +934,8 @@ export default function Boards({ boards }: Props) {
               );
             })}
           </div>
-          <Button
-            onClick={
-              () => setShowEdgeModal(true)
-            }>
-            Transitions
-          </Button>
           <Button onClick={() => setShowViewEdgesModal(true)}>
-            View edges
+            Transitions
           </Button>
         </div>
         {activeBoard && (
@@ -992,7 +1025,7 @@ export default function Boards({ boards }: Props) {
                             }
                             addWorkflow(
                               activeBoard.id,
-                              boardName,
+                              boardName.toLowerCase(),
                               workflowState.length,
                               projectId ?? '',
                               boardLimit,

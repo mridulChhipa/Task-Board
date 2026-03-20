@@ -423,7 +423,7 @@ function DashBoard() {
       throw new Error('Error fetching project members', { cause: err });
     }
   }
-
+  console.log(projects);
   return (
     <>
       {showCreateModal && (

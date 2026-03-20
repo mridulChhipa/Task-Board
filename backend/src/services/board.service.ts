@@ -19,10 +19,10 @@ export class BoardService {
       say second def-workflow fails then it removes the already created two 
       */
       const defaultWorkflows = [
-        { name: 'To Do', order: 0 },
-        { name: 'In Progress', order: 1 },
-        { name: 'Review', order: 2 },
-        { name: 'Done', order: 3 },
+        { name: 'to do', order: 0 },
+        { name: 'in progress', order: 1 },
+        { name: 'review', order: 2 },
+        { name: 'done', order: 3 },
       ];
 
       const createdWorkflows = [];
@@ -32,7 +32,7 @@ export class BoardService {
             name: defWorkflow.name,
             orderIdx: defWorkflow.order,
             boardId: createdBoard.id,
-            limit: defWorkflow.name === 'In Progress' ? 5 : -1,
+            limit: defWorkflow.name === 'in progress' ? 5 : -1,
           },
         });
         createdWorkflows.push(createdWorkflow);
