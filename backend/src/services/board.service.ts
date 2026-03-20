@@ -266,6 +266,23 @@ export class BoardService {
         allCols.push(currCol);
       }
 
+      const us = await Promise.all(board.edgeConstraints.map(async (edge) => {
+        return await db.edgeConstraint.findUnique({
+          where: {
+            id: edge.uId,
+          },
+        });
+      }));
+
+      const vs = await Promise.all(board.edgeConstraints.map(async (edge) => {
+        return await db.edgeConstraint.findUnique({
+          where: {
+            id: edge.vId,
+          },
+        });
+      }));
+
+
       const bdto: BoardDTO = {
         id: board.id,
         projectId: board.projectId,
