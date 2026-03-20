@@ -6,7 +6,7 @@ import Form, {
   FormControl,
   InputArea,
   Label,
-} from '../../components/Forms/Form';
+} from '../../components/Form/Form';
 
 function SignUpPage() {
   const navigate = useNavigate();

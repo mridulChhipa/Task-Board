@@ -1,7 +1,7 @@
 import type { SubmitEventHandler } from 'react';
 import Button from '../Button/Button';
 import styles from './CreateProject.module.css';
-import Form, { FormControl, InputArea, Label } from '../Forms/Form';
+import Form, { FormControl, InputArea, Label } from '../Form/Form';
 
 interface Props {
   name: string;

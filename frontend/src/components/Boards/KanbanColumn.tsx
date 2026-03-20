@@ -3,7 +3,7 @@ import type { Task, Workflow } from '../../types/boards.types';
 import { IconDelete, IconPlus, IconSettings } from './boards.images';
 import { TaskCard } from './TaskCard';
 import styles from './column.module.css';
-import type { TaskType, Priority } from './Boards';
+import type { TaskType, Priority } from '../../types/boards.types';
 import { handleError } from '../../App';
 
 interface Props {
@@ -204,17 +204,6 @@ export function KanbanColumn({
         </div>
       </div>
       <div className={styles.columnBody}>
-        {/* <p className={styles.workflowId}>
-          {workflow.id}
-          <span
-            className={styles.copyIcon}
-            onClick={(e) => {
-              e.stopPropagation();
-              navigator.clipboard.writeText(workflow.id);}}
-          >
-            <IconCopy />
-          </span>
-        </p> */}
         {tasks.map((task) => (
           <TaskCard
             deleteTask={deleteTask}

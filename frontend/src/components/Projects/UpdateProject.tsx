@@ -6,7 +6,7 @@ import Form, {
   InputArea,
   Label,
   TextAreaControl,
-} from '../Forms/Form';
+} from '../Form/Form';
 
 interface Props {
   updatedName: string;
