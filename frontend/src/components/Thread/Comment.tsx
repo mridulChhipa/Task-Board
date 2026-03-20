@@ -38,13 +38,13 @@ export function Comment({ commentId, deleteHandler, threadId, refreshTask }: Pro
 
   async function fetchComment(cid: string) {
     try {
-      const res = await fetch(`http://localhost:3000/api/comment/t/${cid}`, {
+      const res = await fetch(`http://localhost:3000/api/comment/t/${cid}?threadId=${encodeURIComponent(threadId)}`, {
         credentials: 'include',
       });
 
       if (!res.ok) {
         const errorText = await res.text();
-        throw new Error("Can't create thread at the moment", {
+        throw new Error("Can't fetch comment at the moment", {
           cause: errorText,
         });
       }
@@ -55,7 +55,9 @@ export function Comment({ commentId, deleteHandler, threadId, refreshTask }: Pro
       if (!isEditing) {
         setEditedContent(data.comment.content ?? '');
       }
-      setReplies(data.comment.replies ?? []);
+      const nextReplies = data.comment.replies ?? [];
+      setReplies(nextReplies);
+      setComment((prev) => (prev ? { ...prev, replies: nextReplies } : data.comment));
     } catch (err) {
       throw new Error("Can't fetch comment", { cause: err });
     }
@@ -151,6 +153,7 @@ export function Comment({ commentId, deleteHandler, threadId, refreshTask }: Pro
           },
           body: JSON.stringify({
             taskId,
+            threadId,
             authorId: authContext?.user?.userId,
             content: reply,
             isDeleted: false,
@@ -161,7 +164,7 @@ export function Comment({ commentId, deleteHandler, threadId, refreshTask }: Pro
 
       if (!res.ok) {
         const errorText = await res.text();
-        throw new Error("Can't create thread at the moment", {
+        throw new Error("Can't reply at the moment", {
           cause: errorText,
         });
       }
@@ -179,7 +182,7 @@ export function Comment({ commentId, deleteHandler, threadId, refreshTask }: Pro
 
   useEffect(() => {
     fetchComment(commentId);
-  }, [commentId, replies]);
+  }, [commentId]);
 
   if (!comment || comment.isDeleted) return <></>;
 
@@ -274,9 +277,9 @@ export function Comment({ commentId, deleteHandler, threadId, refreshTask }: Pro
             Reply
           </Button>
         </div>
-        {comment.replies && comment.replies.length > 0 && (
+        {replies.length > 0 && (
           <div className={styles.repliesList}>
-            {comment.replies.map((replyId) => (
+            {replies.map((replyId) => (
               <Comment
                 key={replyId}
                 refreshTask={refreshTask}

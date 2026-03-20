@@ -114,8 +114,6 @@ export const TaskTimelineSidebar = ({
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
   );
 
-  console.log('hi');
-  
   return (
     <>
       <div className={styles.sidebar}>

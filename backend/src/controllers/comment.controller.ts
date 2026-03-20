@@ -190,7 +190,7 @@ export class CommentController {
         throw new Error('tid type error');
       }
 
-      const thread = await commentService.fetchComment(tid);
+      const thread = await commentService.fetchThread(tid);
       res.status(200).json({
         status: 'success',
         thread,

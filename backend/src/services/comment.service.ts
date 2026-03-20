@@ -186,10 +186,16 @@ export class CommentService {
         });
 
         for (const mention of mentions) {
-          console.log("Mentioned: ", mention);
-          const user = await db.user.findUnique({
+          const normalizedEmail = mention.startsWith('@')
+            ? mention.slice(1)
+            : mention;
+          console.log("Mentioned: ", normalizedEmail);
+          const user = await db.user.findFirst({
             where: {
-              email: mention,
+              email: {
+                equals: normalizedEmail,
+                mode: 'insensitive',
+              },
             }
           });
 
@@ -299,7 +305,11 @@ export class CommentService {
           id,
         },
         include: {
-          comments: true,
+          comments: {
+            where: {
+              parentId: null,
+            },
+          },
         },
       });
 

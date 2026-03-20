@@ -59,6 +59,7 @@ export default function TaskPage() {
 
         // console.log(formattedTask);
         setTask(formattedTask);
+        setThreads(formattedTask.threads ?? []);
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -69,7 +70,7 @@ export default function TaskPage() {
     if (tid) {
       fetchTask();
     }
-  }, [tid, threads, refreshKey]);
+  }, [tid, refreshKey]);
 
   if (loading) {
     return <div>Loading task...</div>;
@@ -111,7 +112,16 @@ export default function TaskPage() {
       }
 
       const threadData = await res.json();
-      setThreads([...threads, threadData.thread as ThreadDTO]);
+      const newThread = threadData.thread as ThreadDTO;
+      setThreads((prev) => [...prev, newThread]);
+      setTask((prev) =>
+        prev
+          ? {
+            ...prev,
+            threads: [...(prev.threads ?? []), newThread],
+          }
+          : prev,
+      );
       setThreadContent('');
       setThreadTitle('');
     } catch (err) {
@@ -149,10 +159,10 @@ export default function TaskPage() {
       <div className={styles.taskContainer}>
         <h1>{task.title}</h1>
         <p>{task.description}</p>
-        {task.threads &&
-          task.threads.map((thread, idx) => {
+        {threads &&
+          threads.map((thread, idx) => {
             return (
-              <Thread refreshTask={() => { setRefreshKey(refreshKey + 1) }} deleteThread={deleteThread} key={idx} thread={thread} />
+              <Thread refreshTask={() => { setRefreshKey((prev) => prev + 1); }} deleteThread={deleteThread} key={idx} thread={thread} />
             );
           })}
         <hr />

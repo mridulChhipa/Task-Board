@@ -59,7 +59,7 @@ export default function Thread({ thread, deleteThread, refreshTask }: Props) {
 
         if (!res.ok) {
           const errorText = await res.text();
-          throw new Error("Can't create thread at the moment", {
+          throw new Error("Can't save thread updates at the moment", {
             cause: errorText,
           });
         }
@@ -69,7 +69,7 @@ export default function Thread({ thread, deleteThread, refreshTask }: Props) {
           content: editedContent,
         });
       } catch (error) {
-        console.error('Failed to update title', error);
+        console.error('Failed to update thread', error);
         setEditedTitle(thread.title);
         setEditedContent(thread.content ?? '');
       }
@@ -114,7 +114,7 @@ export default function Thread({ thread, deleteThread, refreshTask }: Props) {
 
       if (!res.ok) {
         const errorText = await res.text();
-        throw new Error("Can't create thread at the moment", {
+        throw new Error("Can't create comment at the moment", {
           cause: errorText,
         });
       }

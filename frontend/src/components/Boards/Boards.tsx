@@ -428,7 +428,7 @@ export default function Boards({ boards }: Props) {
         },
       );
       const ogdata = await ogres.json();
-      const assigneeId: number = ogdata.task.assignee;
+      const assigneeId: number = await getUserIdFromEmail(assignee);
       const parentId = ogdata.task.parentId;
       const statusId = ogdata.task.statusId;
       await fetch(`http://localhost:3000/api/task/update/${currentTaskId}`, {
