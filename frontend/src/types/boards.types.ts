@@ -59,9 +59,9 @@ export interface ActivityDTO {
 export interface EdgeConstraint {
   id: String;
   boardId: String;
-  board: Board;
+  board?: Board;
   uId: String;
-  u: Workflow;
+  u?: Workflow;
   vId: String;
-  v: Workflow;
+  v?: Workflow;
 }

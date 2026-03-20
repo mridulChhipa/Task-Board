@@ -1,6 +1,6 @@
 import { useEffect, useState, type SubmitEvent } from 'react';
 import type { Task, Workflow } from '../../types/boards.types';
-import { IconDelete, IconPlus, IconSettings } from './boards.images';
+import { IconCopy, IconDelete, IconPlus, IconSettings } from './boards.images';
 import { TaskCard } from './TaskCard';
 import styles from './column.module.css';
 import type { TaskType, Priority } from './Boards';
@@ -200,7 +200,17 @@ export function KanbanColumn({
         </div>
       </div>
       <div className={styles.columnBody}>
-        {/* {workflow.id} */}
+        <p className={styles.workflowId}>
+          {workflow.id}
+          <span
+            className={styles.copyIcon}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigator.clipboard.writeText(workflow.id);}}
+          >
+            <IconCopy />
+          </span>
+        </p>
         {tasks.map((task) => (
           <TaskCard
             deleteTask={deleteTask}

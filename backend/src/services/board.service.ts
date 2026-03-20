@@ -3,8 +3,10 @@ import { db } from '../config/db';
 import type { BoardDTO, ColumnDTO, EdgeConstraintDTO } from '../types/board.types';
 
 export class BoardService {
-  async create(projectId: string, name: string): Promise<string> {
+  async create(projectId: string, name: string): Promise<BoardDTO> {
     try {
+      console.log('Creating board with name: ', name, ' for projectId: ', projectId);
+      
       const createdBoard = await db.board.create({
         data: {
           projectId,
@@ -22,8 +24,10 @@ export class BoardService {
         { name: 'Review', order: 2 },
         { name: 'Done', order: 3 },
       ];
+
+      const createdWorkflows = [];
       for (const defWorkflow of defaultWorkflows) {
-        await db.workflow.create({
+        const createdWorkflow = await db.workflow.create({
           data: {
             name: defWorkflow.name,
             orderIdx: defWorkflow.order,
@@ -31,9 +35,23 @@ export class BoardService {
             limit: defWorkflow.name === 'In Progress' ? 5 : -1,
           },
         });
+        createdWorkflows.push(createdWorkflow);
       }
 
-      return createdBoard.id;
+      const board: BoardDTO = {
+        id: createdBoard.id,
+        name: createdBoard.name,
+        projectId: createdBoard.projectId,
+        workflows: createdWorkflows.map((workflow) => ({
+          id: workflow.id,
+          name: workflow.name,
+          boardId: workflow.boardId,
+          limit: workflow.limit,
+          orderIdx: workflow.orderIdx,
+        })),
+        edgeConstraints: [],
+      };
+      return board;
     } catch (error) {
       throw new Error('Error creating Board: ', { cause: error });
     }
@@ -158,43 +176,30 @@ export class BoardService {
 
   async addEdge(boardId: string, sourceColId: string, targetColId: string): Promise<EdgeConstraintDTO> {
     try {
+      console.log('Adding edge with sourceColId: ', sourceColId, ' and targetColId: ', targetColId);
+      const existingBoard = await db.board.findFirst({
+        where: {
+          id: boardId,
+        },
+      });
+
+      if (!existingBoard) {
+        throw new Error('Trying to add edge to non-existent board');
+      }
+
       const newEdge = await db.edgeConstraint.create({
         data: {
           boardId,
           uId: sourceColId,
           vId: targetColId,
         },
-        include: {
-          board: true,
-          u: true,
-          v: true,
-        },
       });
+      
       const edge: EdgeConstraintDTO = {
         id: newEdge.id,
         boardId: newEdge.boardId,
         uId: newEdge.uId,
         vId: newEdge.vId,
-        board: {
-          id: newEdge.board.id,
-          name: newEdge.board.name,
-          projectId: newEdge.board.projectId,
-          workflows: [],
-        },
-        u: {
-          id: newEdge.u.id,
-          name: newEdge.u.name,
-          boardId: newEdge.u.boardId,
-          limit: newEdge.u.limit,
-          orderIdx: newEdge.u.orderIdx,
-        },
-        v: {
-          id: newEdge.v.id,
-          name: newEdge.v.name,
-          boardId: newEdge.v.boardId,
-          limit: newEdge.v.limit,
-          orderIdx: newEdge.v.orderIdx,
-        },
       };
 
       return edge;
@@ -239,6 +244,7 @@ export class BoardService {
               tasks: true,
             },
           },
+          edgeConstraints: true,
         },
       });
 
@@ -265,6 +271,12 @@ export class BoardService {
         projectId: board.projectId,
         name: board.name,
         workflows: allCols,
+        edgeConstraints: board.edgeConstraints.map((edge) => ({
+          id: edge.id,
+          boardId: edge.boardId,
+          uId: edge.uId,
+          vId: edge.vId,
+        })),
       };
 
       return bdto;

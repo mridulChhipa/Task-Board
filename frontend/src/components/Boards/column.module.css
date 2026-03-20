@@ -39,6 +39,13 @@
   border-color: #3a3f4a;
 }
 
+.workflowId {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  padding: 0 10px;
+}
+
 .columnHeader {
   display: flex;
   align-items: center;

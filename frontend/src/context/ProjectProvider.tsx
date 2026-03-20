@@ -27,9 +27,11 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
               boards: [],
             };
             for (const boardData of projData.boards) {
+              console.log('Processing board data: ', boardData);
               const board: Board = {
                 ...boardData,
                 workflows: [],
+                edges: boardData.edgeConstraints ?? [],
               };
 
               for (const workflowData of boardData.workflows) {

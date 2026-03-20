@@ -120,6 +120,8 @@ export default function Boards({ boards }: Props) {
     );
   }
 
+  console.log('Rendering boards with data: ', boards);
+
   const { user } = useContext(AuthContext);
   const { project } = useContext(ProjectContext);
   const canEditWorkflows = project?.role === 'PROJECT_ADMIN' || user?.role === 'GLOBAL_ADMIN';
@@ -132,6 +134,7 @@ export default function Boards({ boards }: Props) {
 
   useEffect(() => {
     setWorkflowState(activeBoard.workflows);
+    setEdges(activeBoard.edges ?? []);
   }, [activeIndex]);
 
   const { pid: projectId } = useParams();
@@ -150,6 +153,7 @@ export default function Boards({ boards }: Props) {
   const [showChild, setShowChild] = useState(false);
   const [showChildOf, setShowChildOf] = useState<Task[] | null>(null);
   const [showEdgeModal, setShowEdgeModal] = useState(false);
+  const [showViewEdgesModal, setShowViewEdgesModal] = useState(false);
   const [edges, setEdges] = useState<EdgeConstraint[]>([]);
 
   const [editModal, setEditModal] = useState(false);
@@ -498,6 +502,40 @@ export default function Boards({ boards }: Props) {
     }
   }
 
+  const [fromEdgeId, setFromEdgeId] = useState<string>('');
+  const [toEdgeId, setToEdgeId] = useState<string>('');
+
+  const handleAddEdge = async (e: SubmitEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`http://localhost:3000/api/project/${projectId}/board/${activeBoard.id}/create-edge`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sourceColId: fromEdgeId,
+          targetColId: toEdgeId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Error adding edge: ${errorData.message}`);
+      }
+
+      const res = await response.json();
+      const newEdge: EdgeConstraint = res.edge;
+      console.log('Edge created successfully: ', newEdge);
+      const updatedEdges = [...edges, newEdge];
+      setEdges(updatedEdges);
+      activeBoard.edges = updatedEdges;
+    } catch (err) {
+      console.error('Error adding edge: ', { cause: err });
+    }
+  };
+
   return (
     <>
       <>
@@ -754,10 +792,70 @@ export default function Boards({ boards }: Props) {
         {showEdgeModal && <Modal onclick={() => setShowEdgeModal(false)}>
           <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
             <h2>Manage Task Transitions</h2>
-            <Button onClick={() => {}}>Add Transition</Button>
+            <Form onSubmit={handleAddEdge}>
+              <InputArea>
+                <Label htmlFor="from">From Workflow ID</Label>
+                <FormControl
+                  type="text"
+                  value={fromEdgeId}
+                  onChange={(e) => { setFromEdgeId(e.target.value) }}
+                  placeholder="e.g. 123e4567-e89b-12d3-a456-426614174000"
+                  name="from"
+                  id="from"
+                />
+              </InputArea>
+              <InputArea>
+                <Label htmlFor="to">To Workflow ID</Label>
+                <FormControl
+                  value={toEdgeId}
+                  onChange={(e) => { setToEdgeId(e.target.value) }}
+                  type="text"
+                  placeholder="e.g. 123e4567-e89b-12d3-a456-426614174000"
+                  name="to"
+                  id="to"
+                />
+              </InputArea>
+              <Button type='submit' onClick={() => { }}>Add Transition</Button>
+            </Form>
           </div>
-          {/* {activeBoard.} */}
         </Modal>}
+        {showViewEdgesModal && (
+          <Modal onclick={() => setShowViewEdgesModal(false)}>
+            <div style={{ minWidth: '320px' }}>
+              <h2>Board Transitions</h2>
+              {edges.length === 0 ? (
+                <p>No transitions added for this board yet.</p>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {edges.map((edge) => {
+                    const from = workflowState.find((workflow) => workflow.id === edge.uId);
+                    const to = workflowState.find((workflow) => workflow.id === edge.vId);
+                    return (
+                      <div
+                        key={edge.id.toString()}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '0.25rem',
+                          padding: '0.75rem',
+                          border: '1px solid #e2e8f0',
+                          borderRadius: '8px',
+                        }}
+                      >
+                        <strong>
+                          {from?.name ?? edge.uId} -&gt; {to?.name ?? edge.vId}
+                        </strong>
+                        <span style={{ color: '#64748b', fontSize: '0.85rem' }}>
+                          {edge.uId} -&gt; {edge.vId}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </Modal>
+        )}
         {showChild && <Modal onclick={() => setShowChild(false)}>
           <ShowChildrenModal children={showChildOf} />
         </Modal>}
@@ -793,6 +891,9 @@ export default function Boards({ boards }: Props) {
               () => setShowEdgeModal(true)
             }>
             Transitions
+          </Button>
+          <Button onClick={() => setShowViewEdgesModal(true)}>
+            View edges
           </Button>
         </div>
         {activeBoard && (

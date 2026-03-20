@@ -6,6 +6,7 @@ export async function fetchBoard(
   projectId: string,
 ): Promise<Board> {
   try {
+    console.log('Fetching board with id: ', bid, ' for projectId: ', projectId);
     const response = await fetch(
       `http://localhost:3000/api/project/${projectId}/board/${bid}`,
       {
@@ -25,7 +26,7 @@ export async function fetchBoard(
 
     return board;
   } catch (err) {
-    throw new Error("Can't fetch project at the moment", { cause: err });
+    throw new Error("Can't fetch project at the moment[fetchboard]", { cause: err });
   }
 }
 
