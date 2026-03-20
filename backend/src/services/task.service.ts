@@ -226,7 +226,11 @@ export class TaskService {
           },
           threads: {
             include: {
-              comments: true,
+              comments: {
+                where: {
+                  parentId: null,
+                },
+              },
             },
           },
         },
