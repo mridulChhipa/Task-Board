@@ -69,3 +69,6 @@ export interface EdgeConstraint {
 export interface ProjectMember {
  userId: number;
 }
+
+export type TaskType = 'STORY' | 'TASK' | 'BUG';
+export type Priority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';

@@ -40,10 +40,6 @@ async function tryRefreshToken(): Promise<Record<string, unknown> | null> {
     throw new Error('Failed to refresh token');
   }
 
-  // const userId: number = await refreshPromise.then((data) => data?.userId);
-  // new NotificationWebSocket(userId, (senderId, notification) => {
-  //   console.log(`Notification from user ${senderId}: ${notification}`);
-  // });
   return refreshPromise;
 }
 
@@ -54,15 +50,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const restoreUser = async () => {
       try {
-        // const refreshRes = await fetch('http://localhost:3000/api/auth/refresh', {
-        //   method: 'PATCH',
-        //   credentials: 'include',
-        // });
-
-        // if (!refreshRes.ok) {
-        //   return;
-        // }
-
         void isLoading;
         const refreshed = await tryRefreshToken();
         if (!refreshed) {
@@ -70,14 +57,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
 
-        // const { accessToken } = await refreshRes.json();
-        // const { accessToken } = refreshed;
         await fetch('http://localhost:3000/api/auth/me', {
           credentials: 'include',
         })
-          .then((res) => res.json()) // Return the promise here
+          .then((res) => res.json())
           .then((user) => {
-            // This 'user' is now the actual object
             console.log('Restored user:', user);
             dispatch({
               type: 'LOGIN',

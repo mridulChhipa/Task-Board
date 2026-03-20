@@ -8,7 +8,7 @@ import Form, {
   FormControl,
   InputArea,
   Label,
-} from '../../components/Forms/Form';
+} from '../../components/Form/Form';
 import { NotificationWebSocket } from '../../utils/Websockets.utils';
 import { handleError, handleNotification } from '../../App';
 

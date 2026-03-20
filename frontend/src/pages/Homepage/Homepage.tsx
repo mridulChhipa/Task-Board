@@ -130,7 +130,7 @@ function About() {
         <p>
           The source code is available on
           <a
-            href="https://github.com/mridulchippa/Task-Board"
+            href="https://github.com/mridulChhipa/Task-Board"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.aboutLink}
@@ -142,7 +142,7 @@ function About() {
         </p>
 
         <p className={styles.aboutEntryNumbers}>
-          Entry Numbers: 2024CS1XXXX, 2024CS1XXXX
+          Entry Numbers: 2024CS10411, 2024CS1595
         </p>
 
         <p className={styles.aboutCopyright}>
@@ -158,7 +158,6 @@ function HomePage() {
     <>
       <LandingHero />
       <div style={{ height: '30px' }}></div>
-
       <div id="features">
         <Features imgSrc={Feature1} imgLoc="right">
           <Collaboration />
@@ -170,7 +169,6 @@ function HomePage() {
           <Notifications />
         </Features>
       </div>
-
       <div id="about">
         <About />
       </div>

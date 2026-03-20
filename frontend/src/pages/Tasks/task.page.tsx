@@ -3,15 +3,11 @@ import { useContext, useEffect, useState, type SubmitEvent } from 'react';
 import styles from './task.page.module.css';
 // import { CommentTest } from "../tests/CommentTest";
 import type { Task } from '../../types/boards.types';
-import Button from '../../components/Button/Button';
 import { AuthContext } from '../../context/AuthContext';
 import type { CommentDTO, ThreadDTO } from '../../types/comment.types';
 import Thread from '../../components/Thread/Thread';
-import Form, {
-  InputArea,
-} from '../../components/Forms/Form';
 import { TaskTimelineSidebar } from '../../components/Activity/TaskTimelineSidebar';
-import InlineRichTextEditor from '../../components/TextEditor/InlineRichTextEditor';
+import AddThreadForm from '../../components/Thread/AddThreadForm';
 
 export default function TaskPage() {
   const { tid } = useParams<{ tid: string }>();
@@ -26,7 +22,6 @@ export default function TaskPage() {
   const authContext = useContext(AuthContext);
 
   const [threads, setThreads] = useState<ThreadDTO[]>([]);
-  // const [isOpen, setIsOpen] = useState(true);
 
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -43,10 +38,6 @@ export default function TaskPage() {
 
         const data = await res.json();
 
-        // const task: Task = data.task;
-        // console.log(task);
-        // setTask(task);
-
         const rawTask = data.task;
 
         const formattedTask: Task = {
@@ -57,7 +48,6 @@ export default function TaskPage() {
           })),
         };
 
-        // console.log(formattedTask);
         setTask(formattedTask);
       } catch (err) {
         setError((err as Error).message);
@@ -152,36 +142,25 @@ export default function TaskPage() {
         {task.threads &&
           task.threads.map((thread, idx) => {
             return (
-              <Thread refreshTask={() => { setRefreshKey(refreshKey + 1) }} deleteThread={deleteThread} key={idx} thread={thread} />
+              <Thread 
+                refreshTask={() => {
+                  setRefreshKey(refreshKey + 1) 
+                }} 
+                deleteThread={deleteThread} 
+                key={idx} 
+                thread={thread} 
+              />
             );
           })}
         <hr />
         <h1>Have some ideas ? Start a new Thread</h1>
-        <Form onSubmit={handleThreadSubmit}>
-          <InputArea>
-            <InlineRichTextEditor
-              required={true}
-              name="title"
-              id="title"
-              placeholder="Title"
-              value={threadTitle}
-              rows={1}
-              onChange={(e) => setThreadTitle(e.target.value)}
-            />
-          </InputArea>
-          <InputArea>
-            <InlineRichTextEditor
-              required={true}
-              name="desc"
-              id="desc"
-              placeholder="Description"
-              value={threadContent}
-              onChange={(e) => setThreadContent(e.target.value)}
-            />
-          </InputArea>
-
-          <Button type="submit">Start New Thread</Button>
-        </Form>
+        <AddThreadForm 
+          handleThreadSubmit={handleThreadSubmit}
+          threadTitle={threadTitle}
+          setThreadTitle={setThreadTitle}
+          threadContent={threadContent}
+          setThreadContent={setThreadContent}
+        />
       </div>
       <TaskTimelineSidebar activities={task.activities} />
     </div>

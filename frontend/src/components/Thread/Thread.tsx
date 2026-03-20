@@ -7,7 +7,7 @@ import {
 import type { ThreadDTO } from '../../types/comment.types';
 import { IconDelete } from '../Boards/boards.images';
 import Button from '../Button/Button';
-import Form, { InputArea } from '../Forms/Form';
+import Form, { InputArea } from '../Form/Form';
 import { Comment } from './Comment';
 import styles from './thread.module.css';
 import { useParams } from 'react-router-dom';

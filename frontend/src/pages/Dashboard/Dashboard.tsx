@@ -22,7 +22,7 @@ import {
   IconSettings,
 } from '../../components/Boards/boards.images';
 import type { NotificationDTO, NotifType } from '../../types/Notification.types';
-import Form, { FormControl, InputArea, Label } from '../../components/Forms/Form';
+import Form, { FormControl, InputArea, Label } from '../../components/Form/Form';
 import { handleError } from '../../App';
   
 function typeToString(notif: NotifDisplay): string {
