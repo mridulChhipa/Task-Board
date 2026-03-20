@@ -2,16 +2,16 @@ import { useParams } from 'react-router-dom';
 import { useContext, useEffect, useState, type SubmitEvent } from 'react';
 import styles from './task.page.module.css';
 // import { CommentTest } from "../tests/CommentTest";
-import type { Task } from '../types/boards.types';
-import Button from '../components/Button/Button';
-import { AuthContext } from '../context/AuthContext';
-import type { CommentDTO, ThreadDTO } from '../types/comment.types';
-import Thread from '../components/Thread/Thread';
+import type { Task } from '../../types/boards.types';
+import Button from '../../components/Button/Button';
+import { AuthContext } from '../../context/AuthContext';
+import type { CommentDTO, ThreadDTO } from '../../types/comment.types';
+import Thread from '../../components/Thread/Thread';
 import Form, {
   InputArea,
-} from '../components/Forms/Form';
-import { TaskTimelineSidebar } from '../components/Activity/TaskTimelineSidebar';
-import InlineRichTextEditor from '../components/TextEditor/InlineRichTextEditor';
+} from '../../components/Forms/Form';
+import { TaskTimelineSidebar } from '../../components/Activity/TaskTimelineSidebar';
+import InlineRichTextEditor from '../../components/TextEditor/InlineRichTextEditor';
 
 export default function TaskPage() {
   const { tid } = useParams<{ tid: string }>();

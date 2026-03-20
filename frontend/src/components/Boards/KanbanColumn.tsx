@@ -4,6 +4,7 @@ import { IconDelete, IconPlus, IconSettings } from './boards.images';
 import { TaskCard } from './TaskCard';
 import styles from './column.module.css';
 import type { TaskType, Priority } from './Boards';
+import { handleError } from '../../App';
 
 interface Props {
   id: string;
@@ -68,6 +69,7 @@ export function KanbanColumn({
 
       setTasks(tasks.filter((task) => task.id !== taskId));
     } catch (err) {
+      handleError('Error deleting task');
       throw new Error('Error deleting task', { cause: err });
     }
   }

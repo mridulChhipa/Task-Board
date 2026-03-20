@@ -4,12 +4,13 @@ import styles from './PopupProvider.module.css';
 type Popup = {
     senderName: string;
     message: string;
+    error: boolean;
 }
 
-let popupFunction: ((senderName: string, message: string) => void) | null = null;
+let popupFunction: ((senderName: string, message: string, error: boolean) => void) | null = null;
 
 export const PopupContext = createContext<
-  ((senderName: string, message: string) => void) | null
+  ((senderName: string, message: string, error: boolean) => void) | null
 >(null);
 
 export function PopupProvider({ children }: { children: React.ReactNode }) {
@@ -19,9 +20,9 @@ export function PopupProvider({ children }: { children: React.ReactNode }) {
         registerPopupFunction(showPopup);
     }, []);
 
-    function showPopup(senderName: string, message: string){
+    function showPopup(senderName: string, message: string, error: boolean = false) {
         const timeout = 3000;
-        setPopup({senderName, message});
+        setPopup({senderName, message, error});
         setTimeout(() => {
             setPopup(null);
         }, timeout);
@@ -30,7 +31,7 @@ export function PopupProvider({ children }: { children: React.ReactNode }) {
       <PopupContext.Provider value={showPopup}>
         {children}
         {popup && (
-            <div className={styles.popup}>
+            <div className={popup.error ? styles.error : styles.popup}>
                 <strong>{popup.senderName}</strong>: {popup.message}
             </div>
         )}
@@ -42,9 +43,9 @@ export function registerPopupFunction(fun: typeof popupFunction) {
   popupFunction = fun;
 }
 
-export function triggerPopup(senderName: string, message: string) {
+export function triggerPopup(senderName: string, message: string, error: boolean = false) {
   if (popupFunction) {
-    popupFunction(senderName, message);
+    popupFunction(senderName, message, error);
   }
 }
 

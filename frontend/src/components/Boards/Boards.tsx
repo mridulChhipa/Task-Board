@@ -14,6 +14,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { ProjectContext } from '../../context/ProjectContext';
 import Form, { FormControl, InputArea, Label } from '../Forms/Form';
 import { TaskCard } from './TaskCard';
+import { handleError } from '../../App';
 
 interface Props {
   boards: Board[];
@@ -35,6 +36,7 @@ async function sortWorkflows(workflows: Workflow[]): Promise<Workflow[]> {
         priority: resJson.task.priority,
       };
     } catch (err) {
+      handleError('Could not fetch task details for sorting');
       throw new Error('Error fetching task details: ', { cause: err });
     }
   }
@@ -206,7 +208,10 @@ export default function Boards({ boards }: Props) {
         const ogCol = event.dataTransfer.getData('ogCol');
         const currCol = workflows[Number(event.currentTarget.id)].id;
         const foundEdge = edges.find((edge) => edge.uId === ogCol && edge.vId === currCol);
-        if (!foundEdge) throw new Error ('Task transfer not allowed due to edge constraints');
+        if (!foundEdge) {
+          handleError('Task transfer not allowed due to edge constraints');
+          throw new Error ('Task transfer not allowed due to edge constraints');
+        }
         const ogColIdx = workflows.find(
           (workflow) => workflow.id === ogCol,
         )?.orderIdx;
@@ -215,7 +220,10 @@ export default function Boards({ boards }: Props) {
         const limit = workflows[currColIdx].limit;
         const taskCount = workflows[currColIdx].tasks.length;
         console.log(currColIdx);
-        if (limit != -1 && taskCount >= limit) throw new Error('Task transfer not allowed due to WIP limit');
+        if (limit != -1 && taskCount >= limit) {
+          handleError('Task transfer not allowed due to WIP limit');
+          throw new Error('Task transfer not allowed due to WIP limit');
+        }
       }
       event.preventDefault();
     }
@@ -244,6 +252,7 @@ export default function Boards({ boards }: Props) {
         setDragHighlight(sortedWF.map(() => false));
         boards[activeIndex].workflows = sortedWF;
       } catch (err) {
+        handleError('Column update failed with');
         throw new Error('Column update failed with error: ', { cause: err });
       }
     }
@@ -341,6 +350,7 @@ export default function Boards({ boards }: Props) {
       const resJson = await res.json();
       return resJson.data.personalData.userId;
     } catch (err) {
+      handleError('Could not fetch user id from email');
       throw new Error('Error fetching user id from email: ', { cause: err });
     }
   }
@@ -364,6 +374,7 @@ export default function Boards({ boards }: Props) {
       const projectData = await res1.json();
       const members = projectData.data.members.map((member: ProjectMember) => member.userId);
       if(!members.includes(assigneeId)) {
+        handleError('Assignee is not a member of the project, failed to add task');
         throw new Error('Assignee is not a member of the project, failed to add task');
       }
       const res = await fetch(`http://localhost:3000/api/task/create`, {
@@ -400,6 +411,7 @@ export default function Boards({ boards }: Props) {
       boards[activeIndex].workflows = sortedWF;
     } catch (err) {
       console.error('Error creating task:', { cause: err });
+      handleError('Failed to create task');
     } finally {
       setShowAddTaskModal(false);
       setTaskName('');
@@ -450,6 +462,7 @@ export default function Boards({ boards }: Props) {
       boards[activeIndex].workflows = sortedWF;
     } catch (err) {
       console.error('Error editing task: ', { cause: err });
+      handleError('Failed to edit task');
     } finally {
       setEditModal(false);
       setTaskName('');
@@ -480,6 +493,7 @@ export default function Boards({ boards }: Props) {
       setDragHighlight(sortedWF.map(() => false));
 
     } catch (err) {
+      handleError('Failed to delete column');
       throw new Error('Error deleting column: ', { cause: err });
     }
   }
@@ -518,6 +532,7 @@ export default function Boards({ boards }: Props) {
       setDragHighlight(updated.map(() => false));
       boards[activeIndex].workflows = updated;
     } catch (err) {
+      handleError('Failed to rename column');
       throw new Error('Error renaming column: ', { cause: err });
     }
   }
@@ -533,6 +548,7 @@ export default function Boards({ boards }: Props) {
       let toEdgeId = '';
       setIsAddingEdge(false);
       if(fromEdgeName.toLowerCase() == toEdgeName.toLowerCase()){
+         handleError('Cannot create edge between the same columns');
         throw new Error('Cannot create edge between the same columns');
       }
       // console.log(workflowState);
@@ -542,6 +558,7 @@ export default function Boards({ boards }: Props) {
         if(workflow.name === toEdgeName.toLowerCase().trim()) toEdgeId = workflow.id;
       }
       if(fromEdgeId === '' || toEdgeId === '') {
+        handleError('Invalid workflow names entered for edge creation');
         throw new Error('Invalid workflow names entered for edge creation');
       }
       const response = await fetch(`http://localhost:3000/api/project/${projectId}/board/${activeBoard.id}/create-edge`, {
@@ -558,6 +575,7 @@ export default function Boards({ boards }: Props) {
 
       if (!response.ok) {
         const errorData = await response.json();
+        handleError(`Failed to add edge: ${errorData.message}`);
         throw new Error(`Error adding edge: ${errorData.message}`);
       }
 

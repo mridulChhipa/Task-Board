@@ -23,6 +23,7 @@ import {
 } from '../../components/Boards/boards.images';
 import type { NotificationDTO, NotifType } from '../../types/Notification.types';
 import Form, { FormControl, InputArea, Label } from '../../components/Forms/Form';
+import { handleError } from '../../App';
   
 function typeToString(notif: NotifDisplay): string {
   switch (notif.type) {
@@ -173,6 +174,7 @@ function DashBoard() {
           }
         })
         .catch((err) => {
+          handleError('Could not create project');
           throw new Error('Error creating project', { cause: err });
         })
         .finally(() => {
@@ -249,6 +251,7 @@ function DashBoard() {
 
       return project;
     } catch (err) {
+      handleError('Could not update project');
       console.error('Error updating project:', err);
       throw err instanceof Error
         ? err
@@ -377,9 +380,9 @@ function DashBoard() {
           globalRole: 'GLOBAL_ADMIN',
         }),
       });
-      console.log('Global admin added successfully');
     }
     catch (err) {
+      handleError('Error adding global admin');
       throw new Error('Error adding global admin', { cause: err });
     }
   }
@@ -395,6 +398,7 @@ function DashBoard() {
         console.log(userData);
         return userData.data.personalData.email;
       } catch (err) {
+        handleError('Could not find email of user');
         throw new Error('Error finding email of user', { cause: err });
       }
     }
@@ -420,6 +424,7 @@ function DashBoard() {
       console.log(projectMembers);
       return projectMembers;
     } catch (err) {
+      handleError('Error fetching project members');
       throw new Error('Error fetching project members', { cause: err });
     }
   }

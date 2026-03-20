@@ -10,7 +10,7 @@ import Form, {
   Label,
 } from '../../components/Forms/Form';
 import { NotificationWebSocket } from '../../utils/Websockets.utils';
-import { handleNotification } from '../../App';
+import { handleError, handleNotification } from '../../App';
 
 export default function LogInPage() {
   const navigate = useNavigate();
@@ -54,6 +54,7 @@ export default function LogInPage() {
       console.log('Hello World!');
 
       if (!userRes.ok) {
+        handleError('Login Failed');
         throw new Error('Failed to fetch user data');
       }
 

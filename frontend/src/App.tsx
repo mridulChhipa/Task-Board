@@ -6,7 +6,7 @@ import { AuthProvider } from './context/AuthProvider.tsx';
 import Loader from './components/ui/Loader.tsx';
 import ProjectPage from './pages/Projects/project.page.tsx';
 import { ProjectProvider } from './context/ProjectProvider.tsx';
-import TaskPage from './pages/task.page.tsx';
+import TaskPage from './pages/Tasks/task.page.tsx';
 import LogInPage from './pages/Auth/Loginpage.tsx';
 import SignupPage from './pages/Auth/SignUpPage.tsx';
 import Account from './pages/Account/Account.tsx';
@@ -59,7 +59,11 @@ export async function handleNotification(senderId: number, notification: string)
   });
   const user = await res.json();
   const sender = user.data.personalData.name;
-  triggerPopup(sender, notification);
+  triggerPopup(sender, notification, false);
+}
+
+export async function handleError(message: string){
+  triggerPopup("ERROR", message, true);
 }
 
 export default App;
