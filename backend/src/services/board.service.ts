@@ -1,4 +1,3 @@
-import { EdgeConstraint } from '../../generated/prisma/client';
 import { db } from '../config/db';
 import type { BoardDTO, ColumnDTO, EdgeConstraintDTO } from '../types/board.types';
 

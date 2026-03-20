@@ -4,7 +4,7 @@ import formStyles from '../Projects/CreateProject.module.css';
 import type { Board } from '../../types/project.types';
 import { KanbanColumn } from './KanbanColumn';
 import type { EdgeConstraint, ProjectMember, Task, Workflow } from '../../types/boards.types';
-import { addWorkflow } from '../../utils/board.utils';
+import { addWorkflow, fetchBoard } from '../../utils/board.utils';
 import { useParams } from 'react-router-dom';
 import { IconDelete, IconPlus } from './boards.images';
 import Button from '../Button/Button';
@@ -155,6 +155,7 @@ export default function Boards({ boards }: Props) {
   const [showChildOf, setShowChildOf] = useState<Task[] | null>(null);
   const [showViewEdgesModal, setShowViewEdgesModal] = useState(false);
   const [edges, setEdges] = useState<EdgeConstraint[]>([]);
+  const [boardRefreshKey, setBoardRefreshKey] = useState(0);
 
   const [editModal, setEditModal] = useState(false);
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
@@ -200,6 +201,17 @@ export default function Boards({ boards }: Props) {
     event: React.DragEvent<HTMLDivElement>,
     workflows: Workflow[],
   ) {
+    async function refreshActiveBoard() {
+      if (!projectId) return;
+      const freshBoard = await fetchBoard(activeBoard.id, projectId);
+      const nextEdges = (freshBoard as Board & { edgeConstraints?: EdgeConstraint[] }).edgeConstraints ?? freshBoard.edges ?? [];
+      setWorkflowState(freshBoard.workflows);
+      setDragHighlight(freshBoard.workflows.map(() => false));
+      setEdges(nextEdges);
+      boards[activeIndex].workflows = freshBoard.workflows;
+      boards[activeIndex].edges = nextEdges;
+      setBoardRefreshKey((prev) => prev + 1);
+    }
     setDragHighlight(dragHighlight.map(() => false));
     if (event.currentTarget.dataset.column === 'true') {
       const type = event.dataTransfer.getData('type');
@@ -314,24 +326,7 @@ export default function Boards({ boards }: Props) {
         console.log('Error transferring task: ', { cause: err });
         return;
       }
-      const newWF = workflows.map((workflow) => {
-        if (workflow.id === colId) {
-          return {
-            ...workflow,
-            tasks: [...workflow.tasks, taskId],
-          };
-        } else if (workflow.id === ogCol) {
-          return {
-            ...workflow,
-            tasks: workflow.tasks.filter((id) => id !== taskId),
-          };
-        }
-        return workflow;
-      });
-      const sortedWF = await sortWorkflows(newWF);
-      setWorkflowState(sortedWF);
-      setDragHighlight(sortedWF.map(() => false));
-      boards[activeIndex].workflows = sortedWF;
+      await refreshActiveBoard();
     }
   }
 
@@ -854,48 +849,16 @@ export default function Boards({ boards }: Props) {
                   Add Transition
                 </Button>
               </div>
-              {edges.length === 0 ? (
+              {edges.length === 0 && (
                 <p>No transitions added for this board yet.</p>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  {edges.map((edge) => {
-                    const from = workflowState.find((workflow) => workflow.id === edge.uId);
-                    const to = workflowState.find((workflow) => workflow.id === edge.vId);
-                    return (
-                      <div
-                        key={edge.id.toString()}
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                          gap: '0.25rem',
-                          padding: '0.75rem',
-                          border: '1px solid #e2e8f0',
-                          borderRadius: '8px',
-                        }}
-                      >
-                        <strong>
-                          {from?.name.toUpperCase() ?? edge.uId} -&gt; {to?.name.toUpperCase() ?? edge.vId}
-                        </strong>
-                        <span onClick={async () => {
-                          const res = await fetch(`http://localhost:3000/api/project/${projectId}/board/${activeBoard.id}/remove-edge/${edge.id}`, {
-                            method: 'DELETE',
-                            credentials: 'include',
-                          });
-                          const data = await res.json();
-                          console.log('delete response: ', data);
-                          const updatedEdges = edges.filter(e => e.id !== edge.id);
-                          setEdges(updatedEdges);
-                          activeBoard.edges = updatedEdges;
-                        }}>
-                          <IconDelete size={20}/>
-                        </span>
-                      </div>
-                    );
-                  })}
-                  {isAddingEdge && (
+              )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {edges.map((edge) => {
+                  const from = workflowState.find((workflow) => workflow.id === edge.uId);
+                  const to = workflowState.find((workflow) => workflow.id === edge.vId);
+                  return (
                     <div
-                      key='add-edge'
+                      key={edge.id.toString()}
                       style={{
                         display: 'flex',
                         flexDirection: 'row',
@@ -906,36 +869,67 @@ export default function Boards({ boards }: Props) {
                         borderRadius: '8px',
                       }}
                     >
-                      <form onSubmit={handleAddEdge} style={{ display: 'flex', flexDirection: 'row', gap: '0.5rem'}}>
-                        <div>
-                          <InputArea>
-                            <Label htmlFor="from">From:</Label>
-                            <FormControl 
-                              type='text'
-                              value={fromEdgeName}
-                              onChange={(e) => { setFromEdgeName(e.target.value) }}
-                              placeholder="e.g. To Do"
-                            />
-                          </InputArea>
-                        </div>
-                        <div>
-                          <InputArea>
-                            <Label htmlFor="to">To:</Label>
-                            <FormControl
-                              type='text'
-                              value={toEdgeName}
-                              onChange={(e) => { setToEdgeName(e.target.value) }}
-                              placeholder="e.g. In Progress"
-                            />
-                          </InputArea>
-                        </div>
-                        <Button type="submit">Add</Button>
-                      </form>
+                      <strong>
+                        {from?.name.toUpperCase() ?? edge.uId} -&gt; {to?.name.toUpperCase() ?? edge.vId}
+                      </strong>
+                      <span onClick={async () => {
+                        const res = await fetch(`http://localhost:3000/api/project/${projectId}/board/${activeBoard.id}/remove-edge/${edge.id}`, {
+                          method: 'DELETE',
+                          credentials: 'include',
+                        });
+                        const data = await res.json();
+                        console.log('delete response: ', data);
+                        const updatedEdges = edges.filter(e => e.id !== edge.id);
+                        setEdges(updatedEdges);
+                        activeBoard.edges = updatedEdges;
+                      }}>
+                        <IconDelete size={20}/>
+                      </span>
                     </div>
+                  );
+                })}
+                {isAddingEdge && (
+                  <div
+                    key='add-edge'
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      gap: '0.25rem',
+                      padding: '0.75rem',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '8px',
+                    }}
+                  >
+                    <form onSubmit={handleAddEdge} style={{ display: 'flex', flexDirection: 'row', gap: '0.5rem'}}>
+                      <div>
+                        <InputArea>
+                          <Label htmlFor="from">From:</Label>
+                          <FormControl 
+                            type='text'
+                            value={fromEdgeName}
+                            onChange={(e) => { setFromEdgeName(e.target.value) }}
+                            placeholder="e.g. To Do"
+                          />
+                        </InputArea>
+                      </div>
+                      <div>
+                        <InputArea>
+                          <Label htmlFor="to">To:</Label>
+                          <FormControl
+                            type='text'
+                            value={toEdgeName}
+                            onChange={(e) => { setToEdgeName(e.target.value) }}
+                            placeholder="e.g. In Progress"
+                          />
+                        </InputArea>
+                      </div>
+                      <Button type="submit">Add</Button>
+                    </form>
+                  </div>
 
-                  )}
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </Modal>
         )}
@@ -986,7 +980,7 @@ export default function Boards({ boards }: Props) {
                 .map((workflow, index) => {
                   return (
                     <KanbanColumn
-                      key={`${activeBoard.id}-${workflow.id}`}
+                      key={`${activeBoard.id}-${workflow.id}-${boardRefreshKey}`}
                       id={workflow.orderIdx.toString()}
                       workflow={workflow}
                       highlight={dragHighlight[index]}

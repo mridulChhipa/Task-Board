@@ -36,7 +36,7 @@ export class TaskController {
 
       next();
     } catch (error) {
-      console.log('Task create control err: ', error);
+      console.log('Task update control err: ', error);
       next(error);
     }
   }
@@ -57,7 +57,7 @@ export class TaskController {
 
       next();
     } catch (error) {
-      console.log('Task create control err: ', error);
+      console.log('Task delete control err: ', error);
       next(error);
     }
   }

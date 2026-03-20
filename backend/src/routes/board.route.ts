@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { boardController } from '../controllers/board.controller';
-import { authorizeBoardRole } from '../middlewares/guards/board.guard';
+import {
+  authorizeBoardIdRole,
+  authorizeColumnIdRole,
+} from '../middlewares/guards/board.guard';
 import { ProjectRole } from '../types/project.types';
 import { authorizeProjectRole } from '../middlewares/guards/project.guard';
 
@@ -18,7 +21,7 @@ boardRouter.post(
 
 boardRouter.post(
   '/:boardId/create-edge',
-  authorizeBoardRole([ProjectRole.PROJECT_ADMIN, ProjectRole.PROJECT_MEMBER]),
+  authorizeBoardIdRole([ProjectRole.PROJECT_ADMIN, ProjectRole.PROJECT_MEMBER]),
   (req, res, next) => {
     boardController.addEdge(req, res, next);
   },
@@ -26,7 +29,7 @@ boardRouter.post(
 
 boardRouter.delete(
   '/:boardId/remove-edge/:edgeId',
-  authorizeBoardRole([ProjectRole.PROJECT_ADMIN, ProjectRole.PROJECT_MEMBER]),
+  authorizeBoardIdRole([ProjectRole.PROJECT_ADMIN, ProjectRole.PROJECT_MEMBER]),
   (req, res, next) => {
     boardController.deleteEdge(req, res, next);
   },
@@ -34,7 +37,7 @@ boardRouter.delete(
 
 boardRouter.patch(
   '/update/:boardId',
-  authorizeBoardRole([ProjectRole.PROJECT_ADMIN]),
+  authorizeBoardIdRole([ProjectRole.PROJECT_ADMIN]),
   (req, res, next) => {
     boardController.updateBoard(req, res, next);
   },
@@ -42,7 +45,7 @@ boardRouter.patch(
 
 boardRouter.delete(
   '/delete/:boardId',
-  authorizeBoardRole([ProjectRole.PROJECT_ADMIN]),
+  authorizeBoardIdRole([ProjectRole.PROJECT_ADMIN]),
   (req, res, next) => {
     boardController.deleteBoard(req, res, next);
   },
@@ -50,7 +53,7 @@ boardRouter.delete(
 
 boardRouter.post(
   '/add-column/:boardId',
-  authorizeBoardRole([ProjectRole.PROJECT_ADMIN, ProjectRole.PROJECT_MEMBER]),
+  authorizeBoardIdRole([ProjectRole.PROJECT_ADMIN, ProjectRole.PROJECT_MEMBER]),
   (req, res, next) => {
     boardController.addColumn(req, res, next);
   },
@@ -58,7 +61,7 @@ boardRouter.post(
 
 boardRouter.delete(
   '/:boardId/remove-column/:columnId',
-  authorizeBoardRole([ProjectRole.PROJECT_ADMIN, ProjectRole.PROJECT_MEMBER]),
+  authorizeBoardIdRole([ProjectRole.PROJECT_ADMIN, ProjectRole.PROJECT_MEMBER]),
   (req, res, next) => {
     boardController.deleteColumn(req, res, next);
   },
@@ -66,7 +69,7 @@ boardRouter.delete(
 
 boardRouter.put(
   '/:boardId/update-column/:columnId',
-  authorizeBoardRole([ProjectRole.PROJECT_ADMIN, ProjectRole.PROJECT_MEMBER]),
+  authorizeBoardIdRole([ProjectRole.PROJECT_ADMIN, ProjectRole.PROJECT_MEMBER]),
   (req, res, next) => {
     boardController.updateColumn(req, res, next);
   },
@@ -74,7 +77,7 @@ boardRouter.put(
 
 boardRouter.get(
   '/:boardId',
-  authorizeBoardRole([
+  authorizeBoardIdRole([
     ProjectRole.PROJECT_ADMIN,
     ProjectRole.PROJECT_MEMBER,
     ProjectRole.PROJECT_VIEWER,
@@ -86,7 +89,7 @@ boardRouter.get(
 
 boardRouter.get(
   '/:colId',
-  authorizeBoardRole([
+  authorizeColumnIdRole([
     ProjectRole.PROJECT_ADMIN,
     ProjectRole.PROJECT_MEMBER,
     ProjectRole.PROJECT_VIEWER,

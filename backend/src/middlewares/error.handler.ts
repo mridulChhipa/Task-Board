@@ -30,6 +30,4 @@ export const errorHandler = (
     status: 'error',
     msg,
   });
-
-  next();
 };

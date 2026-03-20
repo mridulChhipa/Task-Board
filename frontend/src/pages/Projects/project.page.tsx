@@ -4,7 +4,6 @@ import styles from './project.page.module.css';
 import Button from '../../components/Button/Button';
 import Modal from '../../components/Modal/Modal';
 import AddBoard from '../../components/Projects/AddBoard';
-import { fetchBoard } from '../../utils/board.utils';
 import type { SubmitEvent } from 'react';
 import {
   ProjectContext,
@@ -49,7 +48,15 @@ export default function ProjectPage() {
       // const { bid } = resJson;
 
       // const board = await fetchBoard(bid, project.id);
-      const board: Board = resJson.board;
+      const rawBoard = resJson.board;
+      const board: Board = {
+        ...rawBoard,
+        workflows: (rawBoard.workflows ?? []).map((workflow: Board['workflows'][number]) => ({
+          ...workflow,
+          tasks: workflow.tasks ?? [],
+        })),
+        edges: rawBoard.edgeConstraints ?? rawBoard.edges ?? [],
+      };
       console.log(board);
       const updatedBoards: Board[] = project.boards;
       updatedBoards.push(board);

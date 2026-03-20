@@ -84,6 +84,15 @@ export class TaskService {
         parentId = null;
       }
 
+      const childCount = await db.task.count({
+        where: {
+          parentId: taskId,
+        },
+      });
+
+      const isStoryUpdate = type === 'STORY' && existingTask.type === 'STORY';
+      const nextStatusId = isStoryUpdate && childCount > 0 ? existingTask.statusId : statusId;
+
       await db.task.update({
         data: {
           title,
@@ -92,7 +101,7 @@ export class TaskService {
           priority: priority as Priority,
           assignee,
           dueDate: dueDate,
-          statusId,
+          statusId: nextStatusId,
           parentId,
         },
         where: {
@@ -116,14 +125,14 @@ export class TaskService {
         await syncStatusWithChildren(existingTask.parentId);
       }
 
-      if (existingTask.statusId && statusId) {
-        if (existingTask.statusId !== statusId) {
+      if (existingTask.statusId && nextStatusId) {
+        if (existingTask.statusId !== nextStatusId) {
           await db.activity.create({
             data: {
               type: 'TASK_STATUS_UPDATED',
               taskId,
               oldStatusId: existingTask.statusId,
-              newStatusId: statusId,
+              newStatusId: nextStatusId,
               userId: reporter,
             },
           });

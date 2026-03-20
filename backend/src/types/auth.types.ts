@@ -13,7 +13,7 @@ export enum TokenType {
 }
 
 export interface JWTPayload {
-  sub: number;
+  sub: number; // userId
   iss: string; // Issuer
   jti: string; // Refresh_token -> id
   type: TokenType;

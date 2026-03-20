@@ -20,8 +20,6 @@ export class BoardController {
         status: 'success',
         board,
       });
-
-      next();
     } catch (err) {
       next(err);
     }
@@ -45,8 +43,6 @@ export class BoardController {
         status: 'success',
         msg: 'Board updated Successfully',
       });
-
-      next();
     } catch (error) {
       next(error);
     }
@@ -74,8 +70,6 @@ export class BoardController {
         status: 'success',
         column,
       });
-
-      next();
     } catch (error) {
       next(error);
     }
@@ -87,12 +81,13 @@ export class BoardController {
     next: NextFunction,
   ): Promise<void> {
     try {
+      console.log('Updating column with id: ', req.params.columnId, ' in board: ', req.params.boardId);
       const columnId = req.params.columnId;
       const boardId = req.params.boardId;
 
       // if (typeof columnId !== 'string') {
       if (typeof columnId !== 'string' || typeof boardId !== 'string') {
-        throw new Error('Invalid type for projectId');
+        throw new Error('Invalid type for columnId or boardId');
       }
 
       await boardService.updateColumn(
@@ -106,8 +101,6 @@ export class BoardController {
         status: 'success',
         msg: 'Column updated Successfully',
       });
-
-      next();
     } catch (error) {
       next(error);
     }
@@ -124,7 +117,7 @@ export class BoardController {
 
       // if (typeof columnId !== 'string') {
       if (typeof columnId !== 'string' || typeof boardId !== 'string') {
-        throw new Error('Invalid type for projectId');
+        throw new Error('Invalid type for columnId or boardId');
       }
 
       await boardService.deleteColumn(columnId, boardId);
@@ -132,8 +125,6 @@ export class BoardController {
         status: 'success',
         msg: 'Column deleted Successfully',
       });
-
-      next();
     } catch (error) {
       next(error);
     }
@@ -200,7 +191,7 @@ export class BoardController {
     try {
       const boardId = req.params.boardId;
       if (typeof boardId !== 'string') {
-        throw new Error('Invalid type for boardid');
+        throw new Error('Invalid type for boardId');
       }
 
       await boardService.deleteBoard(boardId);
@@ -208,8 +199,6 @@ export class BoardController {
         status: 'success',
         msg: 'Board deleted Successfully',
       });
-
-      next();
     } catch (error) {
       next(error);
     }
@@ -221,9 +210,10 @@ export class BoardController {
     next: NextFunction,
   ): Promise<void> {
     try {
+      console.log('Fetching board with id: ', req.params.boardId);
       const boardId = req.params.boardId;
       if (typeof boardId !== 'string') {
-        throw new Error('Invalid type for boardid');
+        throw new Error('Invalid type for boardId');
       }
 
       const board = await boardService.fetchBoard(boardId);
@@ -231,8 +221,6 @@ export class BoardController {
         status: 'success',
         board,
       });
-
-      next();
     } catch (error) {
       next(error);
     }
@@ -246,7 +234,7 @@ export class BoardController {
     try {
       const colId = req.params.colId;
       if (typeof colId !== 'string') {
-        throw new Error('Invalid type for boardid');
+        throw new Error('Invalid type for colId');
       }
 
       const fcol = await boardService.fetchBoard(colId);
@@ -254,8 +242,6 @@ export class BoardController {
         status: 'success',
         fcol,
       });
-
-      next();
     } catch (error) {
       next(error);
     }
