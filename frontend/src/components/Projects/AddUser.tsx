@@ -2,7 +2,8 @@ import { type SubmitEventHandler } from 'react';
 import Button from '../Button/Button';
 import styles from './CreateProject.module.css';
 import tableStyles from '../../pages/Dashboard/Dashboard.module.css';
-import type { Operation, ProjectMember } from '../../pages/Dashboard/Dashboard';
+import type { Operation } from '../../pages/Dashboard/Dashboard';
+import type { ProjectMember } from '../../utils/users.handler';
 import Form, { FormControl, InputArea, Label } from '../Form/Form';
 
 interface Props {
@@ -15,6 +16,7 @@ interface Props {
   handleAdd: SubmitEventHandler;
   setAddUser: React.Dispatch<React.SetStateAction<boolean>>;
   projectMembers: ProjectMember[];
+  canManageUsers: boolean;
 }
 
 export default function AddUser({
@@ -27,6 +29,7 @@ export default function AddUser({
   handleAdd,
   setAddUser,
   projectMembers,
+  canManageUsers,
 }: Props) {
   return (
     <>
@@ -35,9 +38,9 @@ export default function AddUser({
         onChange={(e) => setOperation(e.target.value as Operation)}
       >
         <option value="View">View Users</option>
-        <option value="Add">Add User</option>
-        <option value="Edit">Edit User Role</option>
-        <option value="Remove">Remove User</option>
+        <option value="Add" disabled={!canManageUsers}>Add User</option>
+        <option value="Edit" disabled={!canManageUsers}>Edit User Role</option>
+        <option value="Remove" disabled={!canManageUsers}>Remove User</option>
       </select>
       <h2
         style={{
@@ -61,6 +64,7 @@ export default function AddUser({
               placeholder="e.g. john_doe@taskboard.com"
               value={userToAdd}
               onChange={(e) => setUserToAdd(e.target.value)}
+              disabled={!canManageUsers}
               required
             />
           </InputArea>
@@ -71,6 +75,7 @@ export default function AddUser({
               <select
                 value={newRole}
                 onChange={(e) => setNewRole(e.target.value)}
+                disabled={!canManageUsers}
               >
                 <option value="PROJECT_ADMIN">Admin</option>
                 <option value="PROJECT_MEMBER">Member</option>
@@ -87,7 +92,7 @@ export default function AddUser({
             >
               Cancel
             </Button>
-            <Button priority="first" type="submit">
+            <Button priority="first" type="submit" disabled={!canManageUsers}>
               {operation === 'Add' && 'Add User'}
               {operation === 'Edit' && 'Edit User Role'}
               {operation === 'Remove' && 'Remove User'}

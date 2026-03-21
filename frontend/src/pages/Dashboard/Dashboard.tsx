@@ -156,6 +156,10 @@ function DashBoard() {
             })}
             setAddUser={setAddUser}
             projectMembers={projectMembers}
+            canManageUsers={
+              user?.role === 'GLOBAL_ADMIN' ||
+              projects.find((p) => p.id === currProject)?.role === 'PROJECT_ADMIN'
+            }
           />
         </Modal>
       )}
@@ -288,8 +292,14 @@ function DashBoard() {
                   <td style={{ position: 'relative' }}>
                     <Button
                       onClick={() => {
+                        const canManageUsers =
+                          user?.role === 'GLOBAL_ADMIN' ||
+                          project.role === 'PROJECT_ADMIN';
                         setAddUser(true);
                         setCurrProject(project.id);
+                        if (!canManageUsers) {
+                          setOperation('View');
+                        }
                         void getMembers({
                           operation,
                           setOperation,
