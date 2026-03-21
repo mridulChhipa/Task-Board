@@ -40,7 +40,7 @@ export async function handleCreate(
       }),
     })
       .then((res) => res.json())
-      .then((resJson) => {
+      .then(async (resJson) => {
         const project: Project = resJson.data;
 
         const newProj: Project = {
@@ -65,6 +65,18 @@ export async function handleCreate(
               user: updatedUser,
               isLoading: false,
             },
+          });
+
+          await fetch(`http://localhost:3000/api/project/assign-user/${project.id}`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userMail: props.user.email,
+              role: 'PROJECT_ADMIN',
+            }),
           });
         }
       })

@@ -80,6 +80,7 @@ export async function sortWorkflows(
   workflows: Workflow[],
   onError: (msg: string) => void = () => {},
 ): Promise<Workflow[]> {
+  console.log('Sorting workflows');
   async function getTaskMeta(taskId: string) {
     try {
       const res = await fetch(`http://localhost:3000/api/task/${taskId}`, {
@@ -95,7 +96,7 @@ export async function sortWorkflows(
       throw new Error('Error fetching task details', { cause: err });
     }
   }
-
+  console.log(workflows)
   const workflowTasks = await Promise.all(
     workflows.map(async (workflow) =>
       Promise.all(

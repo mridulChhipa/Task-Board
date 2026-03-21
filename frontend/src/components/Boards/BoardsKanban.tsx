@@ -15,14 +15,11 @@ export default function BoardsKanban({
   setWorkflowState,
   dragHighlight,
   setDragHighlight,
-  setEdges,
   boardRefreshKey,
-  setBoardRefreshKey,
   setShowAddTaskModal,
   setActiveColumnId,
   role,
   projectId,
-  user,
   edges,
   isAdding,
   setIsAdding,
@@ -62,7 +59,7 @@ export default function BoardsKanban({
           })}
         </div>
         <Button 
-          onClick={() => setShowViewEdgesModal(true)}>
+          onClick={() => {setShowViewEdgesModal(true); console.log(role);}}>
           Transitions
         </Button>
       </div>
@@ -104,19 +101,15 @@ export default function BoardsKanban({
                     dropHandler={(e) => dropHandler(
                       e,
                       workflowState,
-                      projectId,
                       activeBoard,
                       boards,
                       activeIndex,
                       setWorkflowState,
                       setDragHighlight,
-                      setEdges,
-                      setBoardRefreshKey,
                       handleError,
                       edges,
                       dragHighlight,
                       workflowState,
-                      user
                     )}
                     dragoverHandler={dragoverHandler}
                     taskDragstartHandler={(e) => taskDragstartHandler(

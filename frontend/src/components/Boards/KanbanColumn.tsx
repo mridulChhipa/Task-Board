@@ -174,7 +174,7 @@ export function KanbanColumn({
         </div>
 
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          {role === 'PROJECT_ADMIN' || role === 'PROJECT_MEMBER' && (
+          {(role === 'PROJECT_ADMIN' || role === 'PROJECT_MEMBER') && (
             <button
               className={styles.columnAddBtn}
               onClick={onAddTask}

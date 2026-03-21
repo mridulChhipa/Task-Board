@@ -371,12 +371,12 @@ function DashBoard() {
               </div>
             )}
           </div>
-          <div className={styles.notifications} style={{ textAlign: 'center' }}>
+          <div className={styles.notifSidebar} style={{ textAlign: 'center' }}>
             <h2>Your Notifications</h2>
-            <ul>
+            <ul style={{ marginLeft: '0px', paddingLeft: '0px', listStyleType: 'none' }}>
               {(notifs === undefined || notifs.length === 0) && <li>No notifications</li>}
               {notifs?.filter((n) => !n.read).map((notification, index) => {
-                if (index < 5) return <li key={index}>{typeToString(notification)}</li>;
+                if (index < 5) return <li key={index} className={styles.notifPreview}>{typeToString(notification)}</li>;
               })}
             </ul>
             <Button onClick={async () => {

@@ -200,6 +200,8 @@ export class AuthService {
         })),
       );
 
+      const projectMap = new Map<string, string>();
+
       for (const { membership, currProj } of membershipProjects) {
         if (!currProj) {
           throw new Error('Project not found');
@@ -218,17 +220,19 @@ export class AuthService {
           members: allMembers,
           isArchived: currProj.isArchived,
         });
+        projectMap.set(currProj.id, membership.role);
       }
 
       if (rawUserData.globalRole === 'GLOBAL_ADMIN') {
         const globalProjects = await projectService.fetchGlobalAdminProjects();
-        allProjs.splice(0, allProjs.length);
+        // allProjs.splice(0, allProjs.length);
         for (const currProj of globalProjects) {
+          if (projectMap.has(currProj.id)) continue; 
           allProjs.push({
             id: currProj.id,
             name: currProj.name,
             description: currProj.description ?? '',
-            role: ProjectRole.PROJECT_ADMIN,
+            role: ProjectRole.PROJECT_VIEWER,
             members: currProj.members,
             isArchived: currProj.isArchived,
           });

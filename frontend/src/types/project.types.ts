@@ -6,8 +6,15 @@ export interface Project {
   description: string;
   role: string;
   isArchived: boolean;
-  members: number[];
+  members: Member[];
   boards: Board[];
+}
+
+export interface Member {
+  id: string;
+  projectId: string;
+  role: string;
+  userId: number;
 }
 
 export interface Board {

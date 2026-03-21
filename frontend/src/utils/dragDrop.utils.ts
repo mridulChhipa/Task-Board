@@ -1,21 +1,28 @@
 import type { EdgeConstraint, Workflow } from '../types/boards.types';
 import type { Board } from '../types/project.types';
-import { fetchBoard } from './board.utils';
-import type { User } from '../context/AuthContext';
 import { sortWorkflows } from './board.utils';
+
+const dragData = {
+  itemType: 'text/x-taskboard-item-type',
+  columnOrderId: 'text/x-taskboard-column-order-id',
+  taskId: 'text/x-taskboard-task-id',
+  originColumnId: 'text/x-taskboard-origin-column-id',
+} as const;
 
 export function dragstartHandler(event: React.DragEvent<HTMLDivElement>) {
   event.stopPropagation();
-  event.dataTransfer.setData('type', 'column');
-  event.dataTransfer.setData('columnOrderId', event.currentTarget.id);
+  console.log('column drag start');
+  event.dataTransfer.setData(dragData.itemType, 'column');
+  event.dataTransfer.setData(dragData.columnOrderId, event.currentTarget.id);
 }
 
 export function taskDragstartHandler(event: React.DragEvent<HTMLDivElement>, workflowState: Workflow[], edges: EdgeConstraint[], setDragHighlight: React.Dispatch<React.SetStateAction<boolean[]>>) {
+  console.log('task drag start');
   event.stopPropagation();
-  event.dataTransfer.setData('type', 'task');
-  event.dataTransfer.setData('taskId', event.currentTarget.dataset.id ?? '');
+  event.dataTransfer.setData(dragData.itemType, 'task');
+  event.dataTransfer.setData(dragData.taskId, event.currentTarget.dataset.id ?? '');
   event.dataTransfer.setData(
-    'ogCol',
+    dragData.originColumnId,
     event.currentTarget.dataset.parent ?? '',
   );
   let allowed: boolean[] = workflowState.map(() => true);
@@ -29,45 +36,34 @@ export function taskDragstartHandler(event: React.DragEvent<HTMLDivElement>, wor
 export async function dropHandler(
   event: React.DragEvent<HTMLDivElement>,
   workflows: Workflow[],
-  projectId: string | undefined,
   activeBoard: Board,
   boards: Board[],
   activeIndex: number,
   setWorkflowState: React.Dispatch<React.SetStateAction<Workflow[]>>,
   setDragHighlight: React.Dispatch<React.SetStateAction<boolean[]>>,
-  setEdges: React.Dispatch<React.SetStateAction<EdgeConstraint[]>>,
-  setBoardRefreshKey: React.Dispatch<React.SetStateAction<number>>,
   handleError: (message: string) => void,
   edges: EdgeConstraint[],
   dragHighlight: boolean[],
   workflowState: Workflow[],
-  user: User | null,
 ) {
-  async function refreshActiveBoard() {
-    if (!projectId) return;
-    const freshBoard = await fetchBoard(activeBoard.id, projectId);
-    const nextEdges = (freshBoard as Board & { edgeConstraints?: EdgeConstraint[] }).edgeConstraints ?? freshBoard.edges ?? [];
-    setWorkflowState(freshBoard.workflows);
-    setDragHighlight(freshBoard.workflows.map(() => false));
-    setEdges(nextEdges);
-    boards[activeIndex].workflows = freshBoard.workflows;
-    boards[activeIndex].edges = nextEdges;
-    setBoardRefreshKey((prev) => prev + 1);
-  }
+  event.stopPropagation();
+  event.preventDefault();
+  const dragItemType = event.dataTransfer.getData(dragData.itemType);
+  const draggedColumnOrderId = event.dataTransfer.getData(dragData.columnOrderId);
+  const draggedTaskId = event.dataTransfer.getData(dragData.taskId);
+  const draggedOriginColumnId = event.dataTransfer.getData(dragData.originColumnId);
   setDragHighlight(dragHighlight.map(() => false));
   if (event.currentTarget.dataset.column === 'true') {
-    const type = event.dataTransfer.getData('type');
-    if (type === 'task') {
+    if (dragItemType === 'task') {
       // check for wip limit, adjacent column, same columns
-      const ogCol = event.dataTransfer.getData('ogCol');
       const currCol = workflows[Number(event.currentTarget.id)].id;
-      const foundEdge = edges.find((edge) => edge.uId === ogCol && edge.vId === currCol);
+      const foundEdge = edges.find((edge) => edge.uId === draggedOriginColumnId && edge.vId === currCol);
       if (!foundEdge) {
         handleError('Task transfer not allowed due to edge constraints');
         throw new Error ('Task transfer not allowed due to edge constraints');
       }
       const ogColIdx = workflows.find(
-        (workflow) => workflow.id === ogCol,
+        (workflow) => workflow.id === draggedOriginColumnId,
       )?.orderIdx;
       const currColIdx = Number(event.currentTarget.id);
       if (ogColIdx === undefined) return;
@@ -79,9 +75,7 @@ export async function dropHandler(
         throw new Error('Task transfer not allowed due to WIP limit');
       }
     }
-    event.preventDefault();
   }
-  event.stopPropagation();
   async function changeOrder(workflow: Workflow, newOrderIdx: number) {
     try {
       await fetch(
@@ -110,8 +104,8 @@ export async function dropHandler(
       throw new Error('Column update failed with error: ', { cause: err });
     }
   }
-  if (event.dataTransfer.getData('type') === 'column') {
-    const startIdx = Number(event.dataTransfer.getData('columnOrderId'));
+  if (dragItemType === 'column') {
+    const startIdx = Number(draggedColumnOrderId);
     const endIdx = Number(event.currentTarget.id);
     workflows.forEach((workflow) => {
       if (
@@ -132,16 +126,34 @@ export async function dropHandler(
         changeOrder(workflow, endIdx);
       }
     });
-  } else if (event.dataTransfer.getData('type') === 'task') {
+  } else if (dragItemType === 'task') {
     const currCol = Number(event.currentTarget.id);
     const colId = workflows[currCol].id;
-    // const ogCol = event.dataTransfer.getData('ogCol');
-    const taskId = event.dataTransfer.getData('taskId');
+    const taskId = draggedTaskId;
+    let parentTaskId: string = '';
+    let ogParentId = '';
+    let subtaskIds: string[] = [];
     try {
       const res1 = await fetch(`http://localhost:3000/api/task/${taskId}`, {
         credentials: 'include',
       });
       const data = await res1.json();
+      if(data.task.type === 'STORY' && data.task.subtasks && data.task.subtasks.length > 0){
+        handleError('Cannot move a story with existing subtasks. Please move the subtasks first.');
+        throw new Error('Cannot move a story with existing subtasks. Please move the subtasks first.');
+      }
+      parentTaskId = data.task.parentId;
+      const res2 = await fetch(
+          `http://localhost:3000/api/task/${parentTaskId}`,
+          {
+            credentials: 'include',
+          },
+        );
+        const data_parent = await res2.json();
+        ogParentId = data_parent.task.statusId;
+        console.log('Old parent column: ', ogParentId);
+        subtaskIds = data_parent.task.children ?? [];
+
       const res = await fetch(
         `http://localhost:3000/api/task/update/${taskId}`,
         {
@@ -156,7 +168,7 @@ export async function dropHandler(
             type: data.task.type,
             priority: data.task.priority,
             assignee: data.task.assignee,
-            reporter: user?.userId ?? -1,
+            reporter: data.task.reporter ?? -1,
             dueDate: data.task.dueDate,
             statusId: colId,
           }),
@@ -168,7 +180,74 @@ export async function dropHandler(
       console.log('Error transferring task: ', { cause: err });
       return;
     }
-    await refreshActiveBoard();
+    // update frontend state:
+    //remove task from ogCol and add it to new column
+    // sort the new column, update the workflow staate, and the board as well.
+    // await refreshActiveBoard();
+    // console.log('old col:   ', draggedOriginColumnId);
+    // console.log('item type: ', dragItemType);
+    const newWFState = workflowState.map((workflow) => {
+      if(workflow.id === draggedOriginColumnId){
+        return {
+          ...workflow,
+          tasks: workflow.tasks.filter((id) => id !== taskId),
+        }
+      } else if(workflow.id === colId){
+        return {
+          ...workflow,
+          tasks: [...workflow.tasks, taskId],
+        }
+      }
+      else return workflow;
+    });
+    console.log(newWFState);
+    let targetParentId = '';
+    if(parentTaskId && parentTaskId !== ''){
+      try {
+        
+        const subtasksColIds = await Promise.all(
+          subtaskIds.map(async (subtaskId) => {
+            const res = await fetch(`http://localhost:3000/api/task/${subtaskId}`, {
+              credentials: 'include',
+            });
+            const data = await res.json();
+            return data.task.statusId;
+          }),
+        );
+        for(const workflow of newWFState){
+          console.log('Checking workflow ', workflow.orderIdx);
+          if(subtasksColIds.some((id) => id === workflow.id)){
+            console.log('Found new parent column: ', workflow.id);
+            targetParentId = workflow.id;
+            break;
+          }
+        }
+      } catch (err) {
+        console.log('Error fetching parent task details: ', { cause: err });
+        return;
+      }
+    }
+    const newWFState2 = (parentTaskId && parentTaskId.length > 0) ? newWFState.map((workflow) => {
+      if (workflow.id === ogParentId) {
+        return {
+          ...workflow,
+          tasks: workflow.tasks.filter((id) => id !== parentTaskId),
+        }
+      }
+      else if(workflow.id === targetParentId){
+        return {
+          ...workflow,
+          tasks: [...workflow.tasks, parentTaskId],
+        }
+      }
+      return workflow;
+    }) : newWFState;
+
+    console.log(newWFState2);
+    const sortedWF = await sortWorkflows(newWFState2);
+    setWorkflowState(sortedWF);
+    setDragHighlight(sortedWF.map(() => false));
+    boards[activeIndex].workflows = sortedWF;
   }
 }
 

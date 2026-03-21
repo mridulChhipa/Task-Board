@@ -75,7 +75,6 @@ export function TaskCard({
   const navigate = useNavigate();
 
   return (
-    <>
       <div
         className={styles.taskCard}
         draggable={draggable}
@@ -172,6 +171,5 @@ export function TaskCard({
           </div>
         </div>
       </div>
-    </>
   );
 }

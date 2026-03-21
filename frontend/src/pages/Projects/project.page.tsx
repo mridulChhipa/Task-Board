@@ -20,6 +20,7 @@ export default function ProjectPage() {
 
   const dispatch = useContext(ProjectDispatchContext);
   const { project } = useContext(ProjectContext);
+  const role = project?.members.find((member) => member.userId === user?.userId)?.role;
 
   async function handleAdd(e: SubmitEvent) {
     e.preventDefault();
@@ -82,7 +83,7 @@ export default function ProjectPage() {
   if (!project) {
     return <div>Loading</div>;
   }
-
+  // console.log(project);
   return (
     <>
       {showAddModal && (
@@ -110,7 +111,7 @@ export default function ProjectPage() {
           )}
         </div>
         <hr />
-        <Boards boards={project.boards ?? []} />
+        <Boards boards={project.boards ?? []} role={role} />
       </div>
     </>
   );

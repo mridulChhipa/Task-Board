@@ -4,15 +4,16 @@ import type { EdgeConstraint, Task, TaskType, Priority } from '../../types/board
 import { createBoardHandlers } from '../../utils/board.utils';
 import { useParams } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { ProjectContext } from '../../context/ProjectContext';
+// import { ProjectContext } from '../../context/ProjectContext';
 import { handleError } from '../../App';
 import BoardsView from './BoardsView';
 
 interface Props {
   boards: Board[];
+  role: string | undefined;
 }
 
-export default function Boards({ boards }: Props) {
+export default function Boards({ boards, role }: Props) {
   if (boards.length === 0) {
     return (
       <>
@@ -23,7 +24,7 @@ export default function Boards({ boards }: Props) {
   }
 
   const { user } = useContext(AuthContext);
-  const { project } = useContext(ProjectContext);
+  // const { project } = useContext(ProjectContext);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeBoard = boards[activeIndex];
   const [workflowState, setWorkflowState] = useState(activeBoard.workflows);
@@ -122,7 +123,7 @@ export default function Boards({ boards }: Props) {
       setEdges,
     },
   });
-
+  // console.log(role);
   return (
     <BoardsView
       boards={boards}
@@ -177,7 +178,7 @@ export default function Boards({ boards }: Props) {
       setBoardRefreshKey={setBoardRefreshKey}
       setState={setState}
       boardHandlers={boardHandlers}
-      role={project?.role}
+      role={role}
       projectId={projectId}
       user={user}
     />
