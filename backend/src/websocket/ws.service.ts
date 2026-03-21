@@ -9,10 +9,11 @@ type WSMessage =
     recieverId: number;
     notification: string;
   };
-let wsServer: WebsocketService;
+  
+let wsServer: WebSocketService;
 
 export function initWSServer(httpServer: HttpServer) {
-  wsServer = new WebsocketService(httpServer);
+  wsServer = new WebSocketService(httpServer);
   return wsServer;
 }
 
@@ -28,7 +29,7 @@ export function sendNotif(
   wsServer.sendNotification(senderId, recieverId, notification);
 }
 
-export class WebsocketService {
+export class WebSocketService {
   private wss: WebSocketServer | null = null;
   private userSockets = new Map<number, WebSocket>();
 

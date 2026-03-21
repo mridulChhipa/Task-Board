@@ -10,7 +10,7 @@ import type {
 import { NotifType } from '../types/notifcation.types';
 import { extractEmailMentions, toCommentDTO, toThreadDTO } from '../utils/comment.utils';
 import { notificationService } from './notification.service';
-import { sendNotif } from '../websocket/WebsocketsService';
+import { sendNotif } from '../websocket/ws.service';
 
 export class CommentService {
   async createThread({
