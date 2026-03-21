@@ -119,7 +119,6 @@ export const TaskTimelineSidebar = ({
       <div className={styles.sidebar}>
         <div className={styles.header}>
           <h2 className={styles.title}>Activity</h2>
-          <button className={styles.closeButton}>✕</button>
         </div>
 
         <div className={styles.content}>

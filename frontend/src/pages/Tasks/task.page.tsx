@@ -143,6 +143,7 @@ export default function TaskPage() {
     <div
       style={{
         display: 'flex',
+        justifyContent: 'space-between',
       }}
     >
       <div className={styles.taskContainer}>
