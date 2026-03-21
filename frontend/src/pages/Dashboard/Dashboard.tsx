@@ -256,7 +256,10 @@ function DashBoard() {
         <div className={styles.dashboard}>
           <div className={styles.projectHeader}>
             <h2>Projects</h2>
-            <Button onClick={() => setShowCreateModal(true)}>
+            <Button 
+              onClick={() => setShowCreateModal(true)}
+              disabled={user?.role !== 'GLOBAL_ADMIN'}  
+            >
               Create Project
             </Button>
           </div>
@@ -329,6 +332,11 @@ function DashBoard() {
                     <button
                       type="button"
                       onClick={() => {
+                        if(project.role !== 'PROJECT_ADMIN' && user?.role !== 'GLOBAL_ADMIN'){
+                          handleError("You don't have permission to edit this project");
+                          console.log("error raised");
+                          return;
+                        }
                         setCurrProject(project.id);
                         setUpdatedDesc(project.description);
                         setUpdatedName(project.name);
@@ -336,15 +344,7 @@ function DashBoard() {
                         setShowUpdateModal(true);
                       }}
                       aria-label={`Settings for ${project.name}`}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        padding: 0,
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
+                      className={styles.settingsButton}
                     >
                       <IconSettings size={25} />
                     </button>
