@@ -58,6 +58,8 @@ export class CommentService {
           type: NotifType.THREAD_STARTED,
         });
 
+        sendNotif(authorId, task.assignee, `New thread started on task: ${task.title}`);
+
       }
 
       return createdThread as ThreadDTO;

@@ -156,9 +156,26 @@ export function createTaskHandlers(
         credentials: 'include',
       });
       const ogData = await ogRes.json();
-      const assigneeId: number = ogData.task.assignee;
       const parentId = ogData.task.parentId;
       const statusId = ogData.task.statusId;
+
+      const assigneeId: number = await getUserIdFromEmail(assignee, onError);
+
+      if (projectId) {
+        const projectRes = await fetch(`http://localhost:3000/api/project/${projectId}`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const projectData = await projectRes.json();
+        const members = projectData.data.members.map(
+          (member: ProjectMember) => member.userId,
+        );
+
+        if (!members.includes(assigneeId)) {
+          onError('Assignee is not a member of the project, failed to edit task');
+          throw new Error('Assignee is not a member of the project');
+        }
+      }
 
       await fetch(`http://localhost:3000/api/task/update/${currentTaskId}`, {
         credentials: 'include',
