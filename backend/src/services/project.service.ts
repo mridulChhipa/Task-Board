@@ -10,7 +10,7 @@ import {
   type UpdateBody,
   type UpdateRoleBody,
 } from '../types/project.types';
-import { sendNotif } from '../websocket/WebsocketsService';
+import { sendNotif } from '../websocket/ws.service';
 
 export class ProjectService {
   async create({ name, description }: CreateBody): Promise<Project> {

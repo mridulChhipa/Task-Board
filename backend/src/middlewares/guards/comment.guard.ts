@@ -238,7 +238,7 @@ export function authoriseCommentAuthor(): RequestHandler {
       const authReq = req as unknown as AuthenticatedRequest;
       const id = authReq.user.sub;
 
-      let commentId = authReq.params.commentId;
+      let commentId = authReq.params.commentId ?? authReq.params.cid;
       if (commentId === undefined) {
         console.log('Undefined id');
         commentId = authReq.body.commentId;

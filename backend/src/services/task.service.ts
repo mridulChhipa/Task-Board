@@ -4,7 +4,7 @@ import type { Priority, TaskType } from '../../generated/prisma/enums';
 import type { CreateTaskBody, TaskDTO } from '../types/task.types';
 import { notificationService } from './notification.service';
 import { NotifType } from '../types/notifcation.types';
-import { sendNotif } from '../websocket/WebsocketsService';
+import { sendNotif } from '../websocket/ws.service';
 import { send } from 'node:process';
 
 export class TaskService {

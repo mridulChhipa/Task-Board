@@ -16,10 +16,16 @@ import { generateAuthTokens, verifyToken } from '../utils/jwt';
 import { GlobalRole } from '../../generated/prisma/enums';
 import { ProjectDetails, ProjectRole } from '../types/project.types';
 import { projectService } from './project.service';
-import { wsServer } from '../index';
 import { NotifType } from '../types/notifcation.types';
+import { WebSocketService } from '../websocket/ws.service';
+import { getWSServer } from '../websocket/ws';
 
 export class AuthService {
+  private wsServer: WebSocketService | null = null;
+  constructor() {
+    this.wsServer = getWSServer();
+  }
+  
   async register(body: RegisterBody): Promise<AuthToken> {
     try {
       const existingUser = await db.user.findUnique({
@@ -102,7 +108,7 @@ export class AuthService {
         },
       });
 
-      wsServer.removeUser(payload.sub);
+      this.wsServer?.removeUser(payload.sub);
     } catch (error) {
       throw new Error('Error Logging out user: ', { cause: error });
     }

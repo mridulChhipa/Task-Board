@@ -115,7 +115,6 @@ export class AuthController {
   ): Promise<void> {
     try {
       const userId = Number(req.params.userId);
-      console.log('Params console: ', req.params.userId);
 
       const fetchedUser = await authService.userDetails(userId);
       res.status(200).json({
@@ -140,8 +139,6 @@ export class AuthController {
       if (typeof userMail !== 'string') {
         throw new Error('Invalid type for userMail');
       }
-
-      console.log('Params console: ', req.params.userMail);
 
       const fetchedUser = await authService.userDetailsByMail(userMail);
       res.status(200).json({
