@@ -57,6 +57,7 @@ export default function BoardsModalStack({
   workflowState,
   projectId,
   activeBoard,
+  role,
   setEdges,
   isAddingEdge,
   setIsAddingEdge,
@@ -120,6 +121,7 @@ export default function BoardsModalStack({
         projectId={projectId}
         activeBoard={activeBoard}
         setEdges={setEdges}
+        role={role}
         isAddingEdge={isAddingEdge}
         setIsAddingEdge={setIsAddingEdge}
         fromEdgeName={fromEdgeName}

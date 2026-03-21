@@ -12,7 +12,7 @@ interface Props {
   onAddTask: () => void;
   deleteColumn: () => void;
   renameColumn: (name: string) => Promise<void>;
-  canEditWorkflow: boolean;
+  role: string | undefined;
   highlight: boolean;
   draggable?: boolean;
   dragstartHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
@@ -40,7 +40,7 @@ export function KanbanColumn({
   onAddTask,
   deleteColumn,
   renameColumn,
-  canEditWorkflow,
+  role,
   draggable,
   dragstartHandler,
   dropHandler,
@@ -102,10 +102,10 @@ export function KanbanColumn({
   }, [workflow.name]);
 
   useEffect(() => {
-    if (!canEditWorkflow && isEditingName) {
+    if (role !== 'PROJECT_ADMIN' && isEditingName) {
       setIsEditingName(false);
     }
-  }, [canEditWorkflow, isEditingName]);
+  }, [role, isEditingName]);
 
   async function handleRenameSubmit(
     event?: SubmitEvent,
@@ -133,7 +133,7 @@ export function KanbanColumn({
     >
       <div className={styles.columnHeader}>
         <div className={styles.columnHeaderLeft}>
-          {isEditingName && canEditWorkflow ? (
+          {isEditingName && role === 'PROJECT_ADMIN' ? (
             <form
               className={styles.columnEditForm}
               onSubmit={handleRenameSubmit}
@@ -174,15 +174,17 @@ export function KanbanColumn({
         </div>
 
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button
-            className={styles.columnAddBtn}
-            onClick={onAddTask}
-            title="Add task"
-          >
-            <IconPlus />
-          </button>
+          {role === 'PROJECT_ADMIN' || role === 'PROJECT_MEMBER' && (
+            <button
+              className={styles.columnAddBtn}
+              onClick={onAddTask}
+              title="Add task"
+            >
+              <IconPlus />
+            </button>
+          )}
 
-          {canEditWorkflow && (
+          {role === 'PROJECT_ADMIN' && (
             <>
               <button
                 className={styles.columnAddBtn}
@@ -209,8 +211,8 @@ export function KanbanColumn({
             deleteTask={deleteTask}
             key={task.id}
             task={task}
-            showDelete={true}
-            showSettings={true}
+            showDelete={role === 'PROJECT_ADMIN' || role === 'PROJECT_MEMBER'}
+            showSettings={role === 'PROJECT_ADMIN' || role === 'PROJECT_MEMBER'}
             dragstartHandler={taskDragstartHandler}
             draggable={true}
             setState={setState}

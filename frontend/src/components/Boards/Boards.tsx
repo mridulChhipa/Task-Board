@@ -24,7 +24,6 @@ export default function Boards({ boards }: Props) {
 
   const { user } = useContext(AuthContext);
   const { project } = useContext(ProjectContext);
-  const canEditWorkflows = project?.role === 'PROJECT_ADMIN' || user?.role === 'GLOBAL_ADMIN';
   const [activeIndex, setActiveIndex] = useState(0);
   const activeBoard = boards[activeIndex];
   const [workflowState, setWorkflowState] = useState(activeBoard.workflows);
@@ -178,7 +177,7 @@ export default function Boards({ boards }: Props) {
       setBoardRefreshKey={setBoardRefreshKey}
       setState={setState}
       boardHandlers={boardHandlers}
-      canEditWorkflows={canEditWorkflows}
+      role={project?.role}
       projectId={projectId}
       user={user}
     />

@@ -26,7 +26,7 @@ async function getUserIdFromEmail(
     const resJson = await res.json();
     return resJson.data.personalData.userId;
   } catch (err) {
-    onError('Could not fetch user id from email');
+    onError('User does not exist');
     throw new Error('Error fetching user id from email', { cause: err });
   }
 }

@@ -1,4 +1,3 @@
-// import { useParams } from 'react-router-dom';
 import { useContext, useState } from 'react';
 import styles from './project.page.module.css';
 import Button from '../../components/Button/Button';
@@ -11,10 +10,13 @@ import {
 } from '../../context/ProjectContext';
 import type { Board, Project } from '../../types/project.types';
 import Boards from '../../components/Boards/Boards';
+import { AuthContext } from '../../context/AuthContext';
 
 export default function ProjectPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [boardName, setBoardName] = useState('');
+
+  const {user} = useContext(AuthContext);
 
   const dispatch = useContext(ProjectDispatchContext);
   const { project } = useContext(ProjectContext);
@@ -45,9 +47,6 @@ export default function ProjectPage() {
       const resJson = await res.json();
       console.log(resJson);
 
-      // const { bid } = resJson;
-
-      // const board = await fetchBoard(bid, project.id);
       const rawBoard = resJson.board;
       const board: Board = {
         ...rawBoard,
@@ -102,7 +101,13 @@ export default function ProjectPage() {
             <h1 className={styles.desc}>{project.name}</h1>
             <p className={styles.desc}>{project.description}</p>
           </div>
-          <Button onClick={() => setShowAddModal(true)}>Add Board</Button>
+          {(project.role === 'PROJECT_ADMIN' || user?.role === 'GLOBAL_ADMIN' ) && (
+            <Button onClick={() => {
+              setShowAddModal(true);
+            }}>
+              Add Board
+            </Button>
+          )}
         </div>
         <hr />
         <Boards boards={project.boards ?? []} />

@@ -9,7 +9,7 @@ import {
   IconWarning,
   IconCopy,
 } from './boards.images';
-import { type Priority, type TaskType } from './Boards';
+import { type Priority, type TaskType } from '../../types/boards.types';
 import { useNavigate } from 'react-router-dom';
 
 interface Props {
@@ -94,7 +94,7 @@ export function TaskCard({
           </span>
           <span className={styles.taskId}>{task.id}</span>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
+            <div style={{ display: 'flex', flexDirection: 'row', gap: '5px', justifyContent: 'flex-end' }}>
               {task.type === 'STORY' &&
                 <span 
                   className={styles.copyIcon}

@@ -20,7 +20,7 @@ export default function BoardsKanban({
   setBoardRefreshKey,
   setShowAddTaskModal,
   setActiveColumnId,
-  canEditWorkflows,
+  role,
   projectId,
   user,
   edges,
@@ -61,7 +61,8 @@ export default function BoardsKanban({
             );
           })}
         </div>
-        <Button onClick={() => setShowViewEdgesModal(true)}>
+        <Button 
+          onClick={() => setShowViewEdgesModal(true)}>
           Transitions
         </Button>
       </div>
@@ -95,10 +96,10 @@ export default function BoardsKanban({
                     renameColumn={async (name) =>
                       await boardHandlers.renameColumn(workflow.id, name)
                     }
-                    canEditWorkflow={canEditWorkflows}
-                    draggable={canEditWorkflows}
+                    role={role}
+                    draggable={role === 'PROJECT_ADMIN'}
                     dragstartHandler={
-                      canEditWorkflows ? dragstartHandler : undefined
+                      role === 'PROJECT_ADMIN' ? dragstartHandler : undefined
                     }
                     dropHandler={(e) => dropHandler(
                       e,
@@ -129,7 +130,7 @@ export default function BoardsKanban({
                 );
               })}
 
-            {activeBoard && canEditWorkflows && (
+            {activeBoard && role === 'PROJECT_ADMIN' && (
               <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
                 <EditWorkflowButton
                   isAdding={isAdding}

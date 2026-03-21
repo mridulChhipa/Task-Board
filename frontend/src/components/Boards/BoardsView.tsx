@@ -55,7 +55,7 @@ export default function BoardsView({
   setBoardRefreshKey,
   setState,
   boardHandlers,
-  canEditWorkflows,
+  role,
   projectId,
   user,
 }: BoardsViewProps) {
@@ -74,6 +74,7 @@ export default function BoardsView({
         showChildOf={showChildOf}
         taskName={taskName}
         setTaskName={setTaskName}
+        role={role}
         taskDescription={taskDescription}
         setTaskDescription={setTaskDescription}
         taskType={taskType}
@@ -114,7 +115,7 @@ export default function BoardsView({
         setBoardRefreshKey={setBoardRefreshKey}
         setShowAddTaskModal={setShowAddTaskModal}
         setActiveColumnId={setActiveColumnId}
-        canEditWorkflows={canEditWorkflows}
+        role={role}
         projectId={projectId}
         user={user}
         edges={edges}

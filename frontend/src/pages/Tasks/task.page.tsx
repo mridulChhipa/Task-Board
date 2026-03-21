@@ -1,7 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useContext, useEffect, useState, type SubmitEvent } from 'react';
 import styles from './task.page.module.css';
-// import { CommentTest } from "../tests/CommentTest";
 import type { Task } from '../../types/boards.types';
 import { AuthContext } from '../../context/AuthContext';
 import type { CommentDTO, ThreadDTO } from '../../types/comment.types';

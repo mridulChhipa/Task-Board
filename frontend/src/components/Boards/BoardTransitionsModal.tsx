@@ -20,6 +20,7 @@ interface Props {
   fromEdgeName: string;
   setFromEdgeName: Dispatch<SetStateAction<string>>;
   toEdgeName: string;
+  role: string | undefined;
   setToEdgeName: Dispatch<SetStateAction<string>>;
 }
 
@@ -36,6 +37,7 @@ export default function BoardTransitionsModal({
   setIsAddingEdge,
   fromEdgeName,
   setFromEdgeName,
+  role,
   toEdgeName,
   setToEdgeName,
 }: Props) {
@@ -48,11 +50,13 @@ export default function BoardTransitionsModal({
       <div style={{ minWidth: '320px' }}>
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <h2>Board Transitions</h2>
-          <Button onClick={() => {
-            setIsAddingEdge(true);
-          }}>
-            Add Transition
-          </Button>
+          {role === 'PROJECT_ADMIN' && (
+            <Button onClick={() => {
+              setIsAddingEdge(true);
+            }}>
+              Add Transition
+            </Button>
+          )}
         </div>
         {edges.length === 0 && (
           <p>No transitions added for this board yet.</p>
@@ -77,7 +81,7 @@ export default function BoardTransitionsModal({
                 <strong>
                   {from?.name.toUpperCase() ?? edge.uId} -&gt; {to?.name.toUpperCase() ?? edge.vId}
                 </strong>
-                <span onClick={async () => {
+                {role === 'PROJECT_ADMIN' && <span onClick={async () => {
                   const res = await fetch(`http://localhost:3000/api/project/${projectId}/board/${activeBoard.id}/remove-edge/${edge.id}`, {
                     method: 'DELETE',
                     credentials: 'include',
@@ -89,7 +93,7 @@ export default function BoardTransitionsModal({
                   activeBoard.edges = updatedEdges;
                 }}>
                   <IconDelete size={20}/>
-                </span>
+                </span>}
               </div>
             );
           })}

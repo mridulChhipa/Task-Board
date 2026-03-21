@@ -77,7 +77,7 @@ export interface BoardsViewProps {
   setBoardRefreshKey: Dispatch<SetStateAction<number>>;
   setState: TaskCardSetState;
   boardHandlers: BoardHandlers;
-  canEditWorkflows: boolean;
+  role: string | undefined;
   projectId: string | undefined;
   user: User | null;
 }
@@ -98,6 +98,7 @@ export interface BoardsModalStackProps {
   taskDescription: string;
   setTaskDescription: Dispatch<SetStateAction<string>>;
   taskType: TaskType;
+  role: string | undefined;
   setTaskType: Dispatch<SetStateAction<TaskType>>;
   priority: Priority;
   setPriority: Dispatch<SetStateAction<Priority>>;
@@ -136,7 +137,7 @@ export interface BoardsKanbanProps {
   setBoardRefreshKey: Dispatch<SetStateAction<number>>;
   setShowAddTaskModal: Dispatch<SetStateAction<boolean>>;
   setActiveColumnId: Dispatch<SetStateAction<string | null>>;
-  canEditWorkflows: boolean;
+  role: string | undefined;
   projectId: string | undefined;
   user: User | null;
   edges: EdgeConstraint[];

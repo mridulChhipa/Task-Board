@@ -24,7 +24,24 @@ export class BoardService {
         { name: 'done', order: 3 },
       ];
 
+      const defaultEdges = [
+        { source: 'to do', target: 'in progress' },
+        { source: 'in progress', target: 'review' },
+        { source: 'review', target: 'done' },
+      ];
+
       const createdWorkflows = [];
+      // const createdWorkflow = Promise.all(defaultWorkflows.map(async (defWorkflow) => {
+      //   const createdWorkflow = await db.workflow.create({
+      //     data: {
+      //       name: defWorkflow.name,
+      //       orderIdx: defWorkflow.order,
+      //       boardId: createdBoard.id,
+      //       limit: defWorkflow.name === 'in progress' ? 5 : -1,
+      //     },
+      //   });
+      //   createdWorkflows.push(createdWorkflow);
+      // }));
       for (const defWorkflow of defaultWorkflows) {
         const createdWorkflow = await db.workflow.create({
           data: {
