@@ -49,6 +49,6 @@ export async function setNotifications(notifications: NotificationDTO[], setNoti
         read: notif.read,
         sender: senderName,
       } as NotifDisplay;
-    })
+    }).reverse()
   ));
 }

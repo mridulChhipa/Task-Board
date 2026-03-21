@@ -11,7 +11,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "dummy": "tsx dummy/script.ts",
+    "dummy": "tsx tests/test-script.ts",
     "test": "tsx tests/script.ts"
   },
   "keywords": [],

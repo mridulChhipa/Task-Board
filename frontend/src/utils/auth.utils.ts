@@ -98,7 +98,7 @@ export function useFetchUser() {
 
         const data = await globalRes.json();
         allProjects = await data.allProjects;
-        // console.log('All Projects', allProjects);
+        console.log('All Projects', allProjects);
         userData.data.personalData.projectData = allProjects;
       }
 

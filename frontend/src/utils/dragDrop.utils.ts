@@ -19,13 +19,11 @@ export function taskDragstartHandler(event: React.DragEvent<HTMLDivElement>, wor
     event.currentTarget.dataset.parent ?? '',
   );
   let allowed: boolean[] = workflowState.map(() => true);
-  for(const edge of edges){
+    for(const edge of edges){
     const idx = workflowState.findIndex((workflow) => workflow.id === edge.vId);
     if(edge.uId === event.currentTarget.dataset.parent) allowed[idx] = false;
-    else allowed[idx] = true;
   }
   setDragHighlight(allowed);
-  console.log(allowed);
 }
 
 export async function dropHandler(

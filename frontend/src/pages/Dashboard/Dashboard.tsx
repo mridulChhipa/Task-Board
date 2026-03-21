@@ -59,6 +59,7 @@ function DashBoard() {
 
   useEffect(() => {
     if (userId) {
+      console.log('fetching user');
       fetchUser();
     }
   }, [fetchUser]);

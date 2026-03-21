@@ -180,16 +180,21 @@ export class AuthService {
 
       const allProjs: ProjectDetails[] = [];
 
-      for (const membership of rawUserData.projects) {
-        const currProj = await db.project.findUnique({
-          where: {
-            id: membership.projectId,
-          },
-          include: {
-            members: true,
-          },
-        });
+      const membershipProjects = await Promise.all(
+        rawUserData.projects.map(async (membership) => ({
+          membership,
+          currProj: await db.project.findUnique({
+            where: {
+              id: membership.projectId,
+            },
+            include: {
+              members: true,
+            },
+          }),
+        })),
+      );
 
+      for (const { membership, currProj } of membershipProjects) {
         if (!currProj) {
           throw new Error('Project not found');
         }
@@ -211,6 +216,7 @@ export class AuthService {
 
       if (rawUserData.globalRole === 'GLOBAL_ADMIN') {
         const globalProjects = await projectService.fetchGlobalAdminProjects();
+        allProjs.splice(0, allProjs.length);
         for (const currProj of globalProjects) {
           allProjs.push({
             id: currProj.id,
