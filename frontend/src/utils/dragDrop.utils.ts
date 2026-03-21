@@ -143,17 +143,18 @@ export async function dropHandler(
         throw new Error('Cannot move a story with existing subtasks. Please move the subtasks first.');
       }
       parentTaskId = data.task.parentId;
-      const res2 = await fetch(
-          `http://localhost:3000/api/task/${parentTaskId}`,
-          {
-            credentials: 'include',
-          },
-        );
-        const data_parent = await res2.json();
-        ogParentId = data_parent.task.statusId;
-        console.log('Old parent column: ', ogParentId);
-        subtaskIds = data_parent.task.children ?? [];
-
+      if(parentTaskId && parentTaskId !== ''){
+        const res2 = await fetch(
+            `http://localhost:3000/api/task/${parentTaskId}`,
+            {
+              credentials: 'include',
+            },
+          );
+          const data_parent = await res2.json();
+          ogParentId = data_parent.task.statusId;
+          console.log('Old parent column: ', ogParentId);
+          subtaskIds = data_parent.task.children ?? [];
+      }
       const res = await fetch(
         `http://localhost:3000/api/task/update/${taskId}`,
         {
@@ -180,12 +181,6 @@ export async function dropHandler(
       console.log('Error transferring task: ', { cause: err });
       return;
     }
-    // update frontend state:
-    //remove task from ogCol and add it to new column
-    // sort the new column, update the workflow staate, and the board as well.
-    // await refreshActiveBoard();
-    // console.log('old col:   ', draggedOriginColumnId);
-    // console.log('item type: ', dragItemType);
     const newWFState = workflowState.map((workflow) => {
       if(workflow.id === draggedOriginColumnId){
         return {
@@ -204,7 +199,6 @@ export async function dropHandler(
     let targetParentId = '';
     if(parentTaskId && parentTaskId !== ''){
       try {
-        
         const subtasksColIds = await Promise.all(
           subtaskIds.map(async (subtaskId) => {
             const res = await fetch(`http://localhost:3000/api/task/${subtaskId}`, {

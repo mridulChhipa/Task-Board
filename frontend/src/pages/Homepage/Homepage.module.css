@@ -134,3 +134,12 @@
   transform: translateY(0);
   opacity: 0.9;
 }
+
+@media (max-width: 900px) {
+  .featureContainer{
+    flex-direction: column;
+  }
+  .aboutContainer{
+    flex-direction: column;
+  }
+}
