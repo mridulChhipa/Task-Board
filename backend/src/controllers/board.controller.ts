@@ -237,7 +237,7 @@ export class BoardController {
         throw new Error('Invalid type for colId');
       }
 
-      const fcol = await boardService.fetchBoard(colId);
+      const fcol = await boardService.fetchCol(colId);
       res.status(200).json({
         status: 'success',
         fcol,

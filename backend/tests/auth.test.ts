@@ -48,8 +48,8 @@ describe('Auth API Endpoints', () => {
 
         return {
           id: 1,
-          name: args.where?.email ? 'Test Native' : 'Test Native',
-          email: args.where?.email ?? 'native@node.test',
+          name: args.where.email ? 'Test Native' : 'Test Native',
+          email: args.where.email ?? 'native@node.test',
           password: hashedPassword,
           globalRole: 'USER',
           notifications: [],
@@ -88,7 +88,7 @@ describe('Auth API Endpoints', () => {
         }
 
         return {
-          id: args.where?.id ?? refreshSessionId,
+          id: args.where.id ?? refreshSessionId,
           token: refreshTokenValue,
           expiresAt: new Date(Date.now() + 60 * 60 * 1000),
           user: {
@@ -128,8 +128,6 @@ describe('Auth API Endpoints', () => {
 
     assert.equal(response.status, 201);
     const data = (await response.json()) as AuthToken;
-
-    console.log('Register Response Data:', data);
 
     assert.ok(data.accessToken, 'Response should contain an access token');
     assert.equal(data.userId, 1);
@@ -176,7 +174,7 @@ describe('Auth API Endpoints', () => {
     });
 
     assert.equal(response.status, 200);
-    const data = (await response.json()) as { message?: string };
+    const data = (await response.json()) as { message: string };
     assert.equal(data.message, 'User Logout Successfull');
   });
 
@@ -225,9 +223,9 @@ describe('Auth API Endpoints', () => {
 
     assert.equal(response.status, 200);
     const data = (await response.json()) as {
-      email?: string;
-      role?: string | null;
-      notifications?: unknown[];
+      email: string;
+      role: string | null;
+      notifications: unknown[];
     };
     assert.equal(data.email, 'native@node.test');
     assert.equal(data.role, 'USER');
@@ -241,7 +239,7 @@ describe('Auth API Endpoints', () => {
       'native@node.test',
       sessionId,
     );
-    
+
     const response = await fetch(`${baseUrl}/api/auth/1`, {
       method: 'GET',
       headers: {
@@ -282,7 +280,7 @@ describe('Auth API Endpoints', () => {
     });
 
     assert.equal(response.status, 200);
-    const data = (await response.json()) as { status?: string };
+    const data = (await response.json()) as { status: string };
     assert.equal(data.status, 'success');
   });
 });

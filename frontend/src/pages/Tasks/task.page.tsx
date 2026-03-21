@@ -41,7 +41,7 @@ export default function TaskPage() {
 
         const formattedTask: Task = {
           ...rawTask,
-          threads: rawTask.threads.map((thread: any) => ({
+          threads: rawTask.threads.map((thread: { comments: CommentDTO[] }) => ({
             ...thread,
             comments: thread.comments.map((x: CommentDTO) => x.id),
           })),
@@ -151,19 +151,19 @@ export default function TaskPage() {
         {threads &&
           threads.map((thread, idx) => {
             return (
-              <Thread 
+              <Thread
                 refreshTask={() => {
-                  setRefreshKey(refreshKey + 1) 
-                }} 
-                deleteThread={deleteThread} 
-                key={idx} 
-                thread={thread} 
+                  setRefreshKey(refreshKey + 1)
+                }}
+                deleteThread={deleteThread}
+                key={idx}
+                thread={thread}
               />
             );
           })}
         <hr />
         <h1>Have some ideas ? Start a new Thread</h1>
-        <AddThreadForm 
+        <AddThreadForm
           handleThreadSubmit={handleThreadSubmit}
           threadTitle={threadTitle}
           setThreadTitle={setThreadTitle}

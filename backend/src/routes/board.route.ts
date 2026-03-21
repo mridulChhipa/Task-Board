@@ -88,7 +88,7 @@ boardRouter.get(
 );
 
 boardRouter.get(
-  '/:colId',
+  '/column/:colId',
   authorizeColumnIdRole([
     ProjectRole.PROJECT_ADMIN,
     ProjectRole.PROJECT_MEMBER,

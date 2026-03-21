@@ -27,7 +27,7 @@ for (const file of files) {
       cwd: join(__dirname, '..')
     });
     console.log(`\x1b[32m✔ ${file} passed.\x1b[0m\n`);
-  } catch (error: any) {
+  } catch (error) {
     console.error(`\x1b[31m✖ ${file} failed.\x1b[0m\n`);
     hasFailures = true;
   }
