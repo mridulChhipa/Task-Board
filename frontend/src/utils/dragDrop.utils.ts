@@ -230,7 +230,7 @@ export async function dropHandler(
       );
       workflow.orderIdx = newOrderIdx;
       const newWorkflowState = [...workflowState];
-      const sortedWF = await sortWorkflows(newWorkflowState);
+      const sortedWF = await sortWorkflows(newWorkflowState, () => {}, taskCache);
       const syncedWF = syncStoriesWithChildrenOrder(sortedWF, taskCache);
       setWorkflowState(syncedWF);
       setDragHighlight(syncedWF.map(() => false));
@@ -420,7 +420,7 @@ export async function dropHandler(
     }
 
     console.log(newWFState2);
-    const sortedWF = await sortWorkflows(newWFState2);
+    const sortedWF = await sortWorkflows(newWFState2, () => {}, taskCache);
     setWorkflowState(sortedWF);
     setDragHighlight(sortedWF.map(() => false));
     boards[activeIndex].workflows = sortedWF;

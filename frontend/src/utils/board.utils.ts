@@ -1,4 +1,4 @@
-import type { Priority, Workflow } from '../types/boards.types';
+import type { Priority, Task, Workflow } from '../types/boards.types';
 import type { Board } from '../types/project.types';
 
 const priorityRank: Record<Priority, number> = {
@@ -79,9 +79,17 @@ export async function addWorkflow(
 export async function sortWorkflows(
   workflows: Workflow[],
   onError: (msg: string) => void = () => {},
+  taskCache: Record<string, Task> = {},
 ): Promise<Workflow[]> {
   console.log('Sorting workflows');
   async function getTaskMeta(taskId: string) {
+    const cached = taskCache[taskId];
+    if (cached) {
+      return {
+        date: cached.dueDate ? new Date(cached.dueDate) : null,
+        priority: cached.priority as Priority,
+      };
+    }
     try {
       const res = await fetch(`http://localhost:3000/api/task/${taskId}`, {
         credentials: 'include',

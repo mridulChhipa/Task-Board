@@ -173,7 +173,11 @@ export function createTaskHandlers(
           : workflow,
       );
 
-      const sortedWF = await sortWorkflows(updatedWorkflowState, onError);
+      const sortedWF = await sortWorkflows(
+        updatedWorkflowState,
+        onError,
+        taskCache,
+      );
       const now = new Date();
       const nextCache: Record<string, Task> = {
         ...taskCache,
@@ -317,7 +321,11 @@ export function createTaskHandlers(
         }),
       });
 
-      const sortedWF = await sortWorkflows([...workflowState], onError);
+      const sortedWF = await sortWorkflows(
+        [...workflowState],
+        onError,
+        taskCache,
+      );
       const nextCache: Record<string, Task> = {
         ...taskCache,
         [currentTaskId]: {

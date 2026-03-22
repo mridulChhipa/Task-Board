@@ -79,6 +79,7 @@ export default function Boards({ boards, role }: Props) {
     setWorkflowState(nextBoard.workflows);
     setDragHighlight(nextBoard.workflows.map(() => false));
     setEdges(nextBoard.edges ?? []);
+    setTaskCache({});
   };
 
   const boardHandlers = createBoardHandlers({
