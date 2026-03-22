@@ -175,7 +175,7 @@ function DashBoard() {
             canManageUsers={
               user?.role === 'GLOBAL_ADMIN' ||
               projects.find((p) => p.id === currProject)?.role ===
-              'PROJECT_ADMIN'
+                'PROJECT_ADMIN'
             }
           />
         </Modal>

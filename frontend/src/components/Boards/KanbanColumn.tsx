@@ -137,7 +137,7 @@ export function KanbanColumn({
     }
 
     fetchTasks();
-  }, [workflow.tasks]);
+  }, [workflow.tasks, setTaskCache]);
 
   useEffect(() => {
     setDraftName(workflow.name);

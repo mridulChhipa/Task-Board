@@ -91,6 +91,28 @@ export function createTaskHandlers(
     const dateObject = dueDate !== '' ? new Date(dueDate) : null;
 
     try {
+      if (taskType === 'STORY' && setParent) {
+        onError('Story cannot have a parent story');
+        return;
+      }
+
+      if (setParent) {
+        const parentTask = taskCache[taskId];
+        const workflowIds = new Set(workflowState.map((wf) => wf.id));
+        if (!parentTask) {
+          onError('Parent task is not available in the board cache');
+          return;
+        }
+        if (parentTask.type !== 'STORY') {
+          onError('Parent task must be a story');
+          return;
+        }
+        if (!workflowIds.has(parentTask.statusId)) {
+          onError('Parent task must be on the same board');
+          return;
+        }
+      }
+
       const res1 = await fetch(
         `http://localhost:3000/api/project/${projectId}`,
         {
@@ -123,7 +145,7 @@ export function createTaskHandlers(
           reporter: reporterId,
           dueDate: dateObject,
           statusId: activeColumnId,
-          parentId: setParent ? taskId : null,
+          parentId: taskType === 'STORY' ? null : setParent ? taskId : null,
         }),
       });
 
@@ -163,7 +185,7 @@ export function createTaskHandlers(
         },
       };
 
-      if (setParent && taskId && nextCache[taskId]) {
+      if (setParent && taskType !== 'STORY' && taskId && nextCache[taskId]) {
         const parent = nextCache[taskId];
         nextCache[taskId] = {
           ...parent,
@@ -209,9 +231,31 @@ export function createTaskHandlers(
           ? undefined
           : setParent
             ? taskId
-            : parentId ?? undefined;
+            : (parentId ?? undefined);
 
       const assigneeId: number = await getUserIdFromEmail(assignee, onError);
+
+      if (taskType === 'STORY' && setParent) {
+        onError('Story cannot have a parent story');
+        return;
+      }
+
+      if (setParent) {
+        const parentTask = taskCache[taskId];
+        const workflowIds = new Set(workflowState.map((wf) => wf.id));
+        if (!parentTask) {
+          onError('Parent task is not available in the board cache');
+          return;
+        }
+        if (parentTask.type !== 'STORY') {
+          onError('Parent task must be a story');
+          return;
+        }
+        if (!workflowIds.has(parentTask.statusId)) {
+          onError('Parent task must be on the same board');
+          return;
+        }
+      }
 
       if (projectId) {
         const projectRes = await fetch(
@@ -247,7 +291,7 @@ export function createTaskHandlers(
           priority: priority as Priority,
           reporter: user?.userId,
           assignee: assigneeId,
-          parentId: newParentId ?? null,
+          parentId: taskType === 'STORY' ? null : (newParentId ?? null),
           statusId,
           dueDate: dueDate !== '' ? new Date(dueDate) : null,
         }),
@@ -280,7 +324,7 @@ export function createTaskHandlers(
         };
       }
 
-      if (newParentId && nextCache[newParentId]) {
+      if (newParentId && taskType !== 'STORY' && nextCache[newParentId]) {
         const newParent = nextCache[newParentId];
         nextCache[newParentId] = {
           ...newParent,

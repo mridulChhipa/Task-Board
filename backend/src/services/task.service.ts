@@ -19,6 +19,35 @@ export class TaskService {
     parentId,
   }: CreateTaskBody): Promise<string> {
     try {
+      if (type === 'STORY') {
+        parentId = null;
+      }
+
+      if (parentId) {
+        const [parentTask, childStatus] = await Promise.all([
+          db.task.findUnique({
+            where: { id: parentId },
+            include: { status: true },
+          }),
+          db.workflow.findUnique({
+            where: { id: statusId },
+            select: { boardId: true },
+          }),
+        ]);
+
+        if (!parentTask || !parentTask.status) {
+          throw new Error('Parent task does not exist');
+        }
+
+        if (parentTask.type !== 'STORY') {
+          throw new Error('Parent task must be a story');
+        }
+
+        if (!childStatus || parentTask.status.boardId !== childStatus.boardId) {
+          throw new Error('Parent task must be on the same board');
+        }
+      }
+
       const createdTask = await db.task.create({
         data: {
           title,
@@ -85,6 +114,31 @@ export class TaskService {
 
       if (type === 'STORY') {
         parentId = null;
+      }
+
+      if (parentId) {
+        const [parentTask, childStatus] = await Promise.all([
+          db.task.findUnique({
+            where: { id: parentId },
+            include: { status: true },
+          }),
+          db.workflow.findUnique({
+            where: { id: statusId },
+            select: { boardId: true },
+          }),
+        ]);
+
+        if (!parentTask || !parentTask.status) {
+          throw new Error('Parent task does not exist');
+        }
+
+        if (parentTask.type !== 'STORY') {
+          throw new Error('Parent task must be a story');
+        }
+
+        if (!childStatus || parentTask.status.boardId !== childStatus.boardId) {
+          throw new Error('Parent task must be on the same board');
+        }
       }
 
       const childCount = await db.task.count({

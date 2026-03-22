@@ -49,7 +49,10 @@ export function taskDragstartHandler(
     const originIdx = workflowState.findIndex(
       (workflow) => workflow.id === originId,
     );
-    const allowed = workflowState.map((_, idx) => idx === originIdx);
+    const allowed = workflowState.map((workflow, idx) => {
+      void workflow;
+      return idx === originIdx;
+    });
     setDragHighlight(allowed);
     return;
   }
@@ -79,7 +82,9 @@ export function syncStoriesWithChildrenOrder(
   const nextWorkflows = workflows.map((workflow, index) => {
     workflowIndexById.set(workflow.id, index);
     workflowOrderById.set(workflow.id, workflow.orderIdx);
-    workflow.tasks.forEach((taskId) => taskToWorkflowId.set(taskId, workflow.id));
+    workflow.tasks.forEach((taskId) =>
+      taskToWorkflowId.set(taskId, workflow.id),
+    );
     return {
       ...workflow,
       tasks: [...workflow.tasks],
@@ -382,22 +387,22 @@ export async function dropHandler(
       targetParentId !== ogParentId;
     const newWFState2 = shouldMoveParent
       ? newWFState.map((workflow) => {
-        if (workflow.id === ogParentId) {
-          return {
-            ...workflow,
-            tasks: workflow.tasks.filter((id) => id !== parentTaskId),
-          };
-        }
-        if (workflow.id === targetParentId) {
-          return {
-            ...workflow,
-            tasks: workflow.tasks.includes(parentTaskId)
-              ? workflow.tasks
-              : [...workflow.tasks, parentTaskId],
-          };
-        }
-        return workflow;
-      })
+          if (workflow.id === ogParentId) {
+            return {
+              ...workflow,
+              tasks: workflow.tasks.filter((id) => id !== parentTaskId),
+            };
+          }
+          if (workflow.id === targetParentId) {
+            return {
+              ...workflow,
+              tasks: workflow.tasks.includes(parentTaskId)
+                ? workflow.tasks
+                : [...workflow.tasks, parentTaskId],
+            };
+          }
+          return workflow;
+        })
       : newWFState;
 
     if (parentTaskId && parentTaskId.length > 0 && targetParentId) {
