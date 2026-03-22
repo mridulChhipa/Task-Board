@@ -4,6 +4,7 @@ import assert from 'node:assert';
 import { BoardService } from '../../src/services/board.service';
 import { prisma } from '../../lib/prisma';
 import type { PrismaClient } from '@prisma/client/extension';
+import type { BoardCreateArgs, WorkflowCreateArgs, WorkflowUpdateArgs, WorkflowDeleteArgs, EdgeConstraintCreateArgs, EdgeConstraintDeleteArgs } from '../test.types';
 
 describe('BoardService', () => {
   let service: BoardService;
@@ -16,7 +17,7 @@ describe('BoardService', () => {
   test('create returns board with default workflows', async () => {
     let workflowCreateCount = 0;
     db.board = {
-      create: async (args: any) => ({
+      create: async (args: BoardCreateArgs) => ({
         id: 'board-1',
         name: args.data.name,
         projectId: args.data.projectId,
@@ -24,7 +25,7 @@ describe('BoardService', () => {
     };
 
     db.workflow = {
-      create: async (args: any) => {
+      create: async (args: WorkflowCreateArgs) => {
         workflowCreateCount += 1;
         return {
           id: `workflow-${workflowCreateCount}`,
@@ -104,10 +105,10 @@ describe('BoardService', () => {
   });
 
   test('update writes board name', async () => {
-    let updateArgs: any = null;
+    let updateArgs: WorkflowUpdateArgs | null = null;
     db.board = {
       findFirst: async () => ({ id: 'board-1', projectId: 'project-1' }),
-      update: async (args: any) => {
+      update: async (args: WorkflowUpdateArgs) => {
         updateArgs = args;
         return {
           id: args.where.id,
@@ -125,7 +126,7 @@ describe('BoardService', () => {
 
   test('addColumn returns created column', async () => {
     db.workflow = {
-      create: async (args: any) => ({
+      create: async (args: WorkflowCreateArgs) => ({
         id: 'column-1',
         name: args.data.name,
         boardId: args.data.boardId,
@@ -155,10 +156,10 @@ describe('BoardService', () => {
   });
 
   test('updateColumn updates and skips sync when no stories', async () => {
-    let updateArgs: any = null;
+    let updateArgs: WorkflowUpdateArgs | null = null;
     db.workflow = {
       findFirst: async () => ({ id: 'column-1', boardId: 'board-1' }),
-      update: async (args: any) => {
+      update: async (args: WorkflowUpdateArgs) => {
         updateArgs = args;
         return {
           id: args.where.id,
@@ -233,10 +234,10 @@ describe('BoardService', () => {
   });
 
   test('deleteColumn removes column', async () => {
-    let deleteArgs: any = null;
+    let deleteArgs: WorkflowDeleteArgs | null = null;
     db.workflow = {
       findFirst: async () => ({ id: 'column-1', boardId: 'board-1' }),
-      delete: async (args: any) => {
+      delete: async (args: WorkflowDeleteArgs) => {
         deleteArgs = args;
         return { id: args.where.id };
       },
@@ -288,7 +289,7 @@ describe('BoardService', () => {
       findFirst: async () => ({ id: 'board-1' }),
     };
     db.edgeConstraint = {
-      create: async (args: any) => ({
+      create: async (args: EdgeConstraintCreateArgs) => ({
         id: 'edge-1',
         boardId: args.data.boardId,
         uId: args.data.uId,
@@ -331,9 +332,9 @@ describe('BoardService', () => {
   });
 
   test('deleteEdge removes edge', async () => {
-    let deleteArgs: any = null;
+    let deleteArgs: EdgeConstraintDeleteArgs | null = null;
     db.edgeConstraint = {
-      delete: async (args: any) => {
+      delete: async (args: EdgeConstraintDeleteArgs) => {
         deleteArgs = args;
         return { id: args.where.id };
       },
@@ -358,9 +359,9 @@ describe('BoardService', () => {
   });
 
   test('deleteBoard removes board', async () => {
-    let deleteArgs: any = null;
+    let deleteArgs: { where: { id: string } } | null = null;
     db.board = {
-      delete: async (args: any) => {
+      delete: async (args: { where: { id: string } }) => {
         deleteArgs = args;
         return { id: args.where.id };
       },

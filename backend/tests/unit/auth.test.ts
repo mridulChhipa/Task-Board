@@ -8,6 +8,14 @@ import { GlobalRole } from '../../generated/prisma/enums';
 import { prisma } from '../../lib/prisma';
 import { PrismaClient } from '@prisma/client/extension';
 import { projectService } from '../../src/services/project.service';
+import type {
+  UserCreateArgs,
+  SessionCreateArgs,
+  UserUpdateArgs,
+  SessionDeleteArgs,
+  SessionUpdateArgs,
+} from '../test.types';
+import { ProjectRole } from '../../src/types/project.types';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -30,10 +38,10 @@ describe('AuthService', () => {
       password: 'superSecretPassword1!',
     };
 
-    let createdUserArgs: any = null;
+    let createdUserArgs: UserCreateArgs | null = null;
     db.user = {
       findUnique: async () => null,
-      create: async (args: any) => {
+      create: async (args: UserCreateArgs) => {
         createdUserArgs = args;
         return {
           id: 1,
@@ -54,10 +62,12 @@ describe('AuthService', () => {
 
     assert.ok(loginCalled);
     assert.equal(result.userId, 1);
-    assert.equal(createdUserArgs?.data.email, body.email);
-    assert.equal(createdUserArgs?.data.name, body.name);
-    assert.equal(createdUserArgs?.data.globalRole, GlobalRole.USER);
-    assert.notEqual(createdUserArgs?.data.password, body.password);
+    assert.ok(createdUserArgs);
+    const userArgs = createdUserArgs as UserCreateArgs;
+    assert.equal(userArgs.data.email, body.email);
+    assert.equal(userArgs.data.name, body.name);
+    assert.equal(userArgs.data.globalRole, GlobalRole.USER);
+    assert.notEqual(userArgs.data.password, body.password);
   });
 
   test('register rejects existing user', async () => {
@@ -99,7 +109,7 @@ describe('AuthService', () => {
     const password = 'superSecretPassword1!';
     const hashedPassword = await hash(password);
 
-    let sessionArgs: any = null;
+    let sessionArgs: SessionCreateArgs | null = null;
     db.user = {
       findUnique: async () => ({
         id: 1,
@@ -113,7 +123,7 @@ describe('AuthService', () => {
       }),
     };
     db.session = {
-      create: async (args: any) => {
+      create: async (args: SessionCreateArgs) => {
         sessionArgs = args;
         return {
           id: args.data.id,
@@ -132,8 +142,10 @@ describe('AuthService', () => {
     assert.ok(result.accessToken);
     assert.ok(result.refreshToken);
     assert.equal(result.userId, 1);
-    assert.equal(sessionArgs?.data.userId, 1);
-    assert.equal(sessionArgs?.data.token, result.refreshToken);
+    assert.ok(sessionArgs);
+    const sArgs = sessionArgs as SessionCreateArgs;
+    assert.equal(sArgs.data.userId, 1);
+    assert.equal(sArgs.data.token, result.refreshToken);
   });
 
   test('login rejects missing user', async () => {
@@ -186,7 +198,7 @@ describe('AuthService', () => {
 
     let deletedSessionId: string | null = null;
     db.session = {
-      delete: async (args: any) => {
+      delete: async (args: SessionDeleteArgs) => {
         deletedSessionId = args.where.id;
         return {
           id: args.where.id,
@@ -213,10 +225,7 @@ describe('AuthService', () => {
       },
     };
 
-    await assert.rejects(
-      () => service.logout(refreshToken),
-      /delete failed/,
-    );
+    await assert.rejects(() => service.logout(refreshToken), /delete failed/);
   });
 
   test('logout rejects non-refresh tokens', async () => {
@@ -242,8 +251,8 @@ describe('AuthService', () => {
           email: 'native@node.test',
         },
       }),
-      update: async (args: any) => {
-        updatedToken = args.data.token;
+      update: async (args: SessionUpdateArgs) => {
+        updatedToken = args.data.token ?? null;
         return {
           id: args.where.id,
           token: args.data.token,
@@ -327,7 +336,7 @@ describe('AuthService', () => {
   });
 
   test('updateUser updates profile fields', async () => {
-    let updateArgs: any = null;
+    let updateArgs: UserUpdateArgs | null = null;
     db.user = {
       findUnique: async () => ({
         id: 1,
@@ -339,7 +348,7 @@ describe('AuthService', () => {
         avatar: null,
         projects: [],
       }),
-      update: async (args: any) => {
+      update: async (args: UserUpdateArgs) => {
         updateArgs = args;
         return {
           id: 1,
@@ -359,8 +368,10 @@ describe('AuthService', () => {
       globalRole: 'USER',
     });
 
-    assert.equal(updateArgs?.data.name, 'Updated Name');
-    assert.equal(updateArgs?.data.globalRole, GlobalRole.USER);
+    assert.ok(updateArgs);
+    const uArgs = updateArgs as UserUpdateArgs;
+    assert.equal(uArgs.data.name, 'Updated Name');
+    assert.equal(uArgs.data.globalRole, GlobalRole.USER);
   });
 
   test('updateUser rejects missing user', async () => {
@@ -436,11 +447,20 @@ describe('AuthService', () => {
         id: 'project-2',
         name: 'Global Project',
         description: null,
-        role: 'PROJECT_VIEWER' as any,
+        role: ProjectRole.PROJECT_VIEWER,
         members: [1],
         isArchived: false,
       },
-    ]) as any;
+    ]) as unknown as () => Promise<
+      Array<{
+        id: string;
+        name: string;
+        description: string | null;
+        role: ProjectRole;
+        members: number[];
+        isArchived: boolean;
+      }>
+    >;
 
     const result = await service.userDetails(1);
 

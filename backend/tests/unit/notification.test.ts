@@ -5,6 +5,7 @@ import { NotificationService } from '../../src/services/notification.service';
 import { prisma } from '../../lib/prisma';
 import type { PrismaClient } from '@prisma/client/extension';
 import { NotifType } from '../../src/types/notifcation.types';
+import type { NotificationCreateArgs, NotificationDeleteArgs, NotificationUpdateArgs } from '../test.types';
 
 describe('NotificationService', () => {
   let service: NotificationService;
@@ -16,7 +17,7 @@ describe('NotificationService', () => {
 
   test('createNotification returns dto', async () => {
     db.notification = {
-      create: async (args: any) => ({
+      create: async (args: NotificationCreateArgs) => ({
         id: 'notification-1',
         senderId: args.data.senderId,
         recipientId: args.data.recipientId,
@@ -111,9 +112,9 @@ describe('NotificationService', () => {
   });
 
   test('deleteNotification removes notification', async () => {
-    let deleteArgs: any = null;
+    let deleteArgs: NotificationDeleteArgs | null = null;
     db.notification = {
-      delete: async (args: any) => {
+      delete: async (args: NotificationDeleteArgs) => {
         deleteArgs = args;
         return { id: args.where.id };
       },
@@ -138,9 +139,9 @@ describe('NotificationService', () => {
   });
 
   test('readNotification updates read status', async () => {
-    let updateArgs: any = null;
+    let updateArgs: NotificationUpdateArgs | null = null;
     db.notification = {
-      update: async (args: any) => {
+      update: async (args: NotificationUpdateArgs) => {
         updateArgs = args;
         return { id: args.where.id, read: args.data.read };
       },

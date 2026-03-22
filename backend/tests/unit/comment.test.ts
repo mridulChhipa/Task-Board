@@ -8,6 +8,7 @@ import type { PrismaClient } from '@prisma/client/extension';
 import { notificationService } from '../../src/services/notification.service';
 import { initWSServer, shutdownWSServer } from '../../src/websocket/ws.service';
 import { NotifType } from '../../src/types/notifcation.types';
+import type { ThreadCreateArgs, ThreadUpdateArgs, CommentCreateArgs, CommentUpdateArgs, ActivityCreateArgs, CreateNotificationPayload, NotificationDTO } from '../test.types';
 
 // Ensure sendNotif has a ws server instance to call.
 let wsServer: ReturnType<typeof initWSServer> | null = null;
@@ -33,12 +34,12 @@ describe('CommentService', () => {
     notificationService.createNotification = (async () => ({
       id: 'notif-1',
       type: NotifType.COMMENT_ADDED,
-    })) as any;
+    } as NotificationDTO)) as (payload: CreateNotificationPayload) => Promise<NotificationDTO>;
   });
 
   test('createThread returns created thread', async () => {
     db.thread = {
-      create: async (args: any) => ({
+      create: async (args: ThreadCreateArgs) => ({
         id: 'thread-1',
         title: args.data.title,
         content: args.data.content ?? null,
@@ -121,7 +122,7 @@ describe('CommentService', () => {
     };
     notificationService.createNotification = (async () => {
       throw new Error('notification failed');
-    }) as any;
+    }) as (payload: CreateNotificationPayload) => Promise<NotificationDTO>;
 
     await assert.rejects(
       () =>
@@ -137,10 +138,10 @@ describe('CommentService', () => {
   });
 
   test('updateThread updates thread fields', async () => {
-    let updateArgs: any = null;
+    let updateArgs: ThreadUpdateArgs | null = null;
     db.thread = {
       findUnique: async () => ({ id: 'thread-1' }),
-      update: async (args: any) => {
+      update: async (args: ThreadUpdateArgs) => {
         updateArgs = args;
         return {
           id: args.where.id,
@@ -200,10 +201,10 @@ describe('CommentService', () => {
   });
 
   test('deleteThread marks thread deleted', async () => {
-    let updateArgs: any = null;
+    let updateArgs: ThreadUpdateArgs | null = null;
     db.thread = {
       findUnique: async () => ({ id: 'thread-1', taskId: 'task-1' }),
-      update: async (args: any) => {
+      update: async (args: ThreadUpdateArgs) => {
         updateArgs = args;
         return { id: args.where.id, isDeleted: args.data.isDeleted };
       },
@@ -244,7 +245,7 @@ describe('CommentService', () => {
 
   test('createComment returns created comment', async () => {
     db.comment = {
-      create: async (args: any) => ({
+      create: async (args: CommentCreateArgs) => ({
         id: 'comment-1',
         content: args.data.content,
         threadId: args.data.threadId,
@@ -316,10 +317,10 @@ describe('CommentService', () => {
 
   test('createComment handles mention notification', async () => {
     const notifications: string[] = [];
-    notificationService.createNotification = (async (payload: any) => {
+    notificationService.createNotification = (async (payload: CreateNotificationPayload) => {
       notifications.push(payload.type);
-      return { id: 'notif-1' } as any;
-    }) as any;
+      return { id: 'notif-1' } as NotificationDTO;
+    }) as (payload: CreateNotificationPayload) => Promise<NotificationDTO>;
 
     db.comment = {
       create: async () => ({
@@ -389,7 +390,7 @@ describe('CommentService', () => {
     };
     notificationService.createNotification = (async () => {
       throw new Error('notification failed');
-    }) as any;
+    }) as (payload: CreateNotificationPayload) => Promise<NotificationDTO>;
 
     await assert.rejects(
       () =>
@@ -406,10 +407,10 @@ describe('CommentService', () => {
   });
 
   test('updateComment updates comment', async () => {
-    let updateArgs: any = null;
+    let updateArgs: CommentUpdateArgs | null = null;
     db.comment = {
       findUnique: async () => ({ id: 'comment-1' }),
-      update: async (args: any) => {
+      update: async (args: CommentUpdateArgs) => {
         updateArgs = args;
         return {
           id: args.where.id,
@@ -468,10 +469,10 @@ describe('CommentService', () => {
   });
 
   test('deleteComment marks comment deleted', async () => {
-    let updateArgs: any = null;
+    let updateArgs: CommentUpdateArgs | null = null;
     db.comment = {
       findUnique: async () => ({ id: 'comment-1' }),
-      update: async (args: any) => {
+      update: async (args: CommentUpdateArgs) => {
         updateArgs = args;
         return { id: args.where.id, isDeleted: args.data.isDeleted };
       },

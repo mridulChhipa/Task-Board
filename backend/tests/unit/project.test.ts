@@ -5,6 +5,7 @@ import { ProjectService } from '../../src/services/project.service';
 import { prisma } from '../../lib/prisma';
 import type { PrismaClient } from '@prisma/client/extension';
 import { ProjectRole } from '../../src/types/project.types';
+import type { ProjectCreateArgs, ProjectUpdateArgs, ProjectMemberCreateArgs, ProjectMemberDeleteArgs, ProjectMemberUpdateArgs } from '../test.types';
 
 describe('ProjectService', () => {
   let service: ProjectService;
@@ -15,9 +16,9 @@ describe('ProjectService', () => {
   });
 
   test('create returns new project', async () => {
-    let createArgs: any = null;
+    let createArgs: ProjectCreateArgs | null = null;
     db.project = {
-      create: async (args: any) => {
+      create: async (args: ProjectCreateArgs) => {
         createArgs = args;
         return {
           id: 'project-1',
@@ -55,9 +56,9 @@ describe('ProjectService', () => {
   });
 
   test('update returns project details with members', async () => {
-    let updateArgs: any = null;
+    let updateArgs: ProjectUpdateArgs | null = null;
     db.project = {
-      update: async (args: any) => {
+      update: async (args: ProjectUpdateArgs) => {
         updateArgs = args;
         return {
           id: args.where.id,
@@ -115,9 +116,9 @@ describe('ProjectService', () => {
   });
 
   test('setArchiveStatus updates archive flag', async () => {
-    let updateArgs: any = null;
+    let updateArgs: ProjectUpdateArgs | null = null;
     db.project = {
-      update: async (args: any) => {
+      update: async (args: ProjectUpdateArgs) => {
         updateArgs = args;
         return { id: args.where.id };
       },
@@ -142,13 +143,13 @@ describe('ProjectService', () => {
   });
 
   test('assignUser creates membership', async () => {
-    let createdMembership: any = null;
+    let createdMembership: ProjectMemberCreateArgs | null = null;
     db.user = {
       findUnique: async () => ({ id: 7, email: 'member@node.test' }),
     };
     db.projectMember = {
       findUnique: async () => null,
-      create: async (args: any) => {
+      create: async (args: ProjectMemberCreateArgs) => {
         createdMembership = args;
         return {
           projectId: args.data.projectId,
@@ -221,13 +222,13 @@ describe('ProjectService', () => {
   });
 
   test('removeUser deletes membership', async () => {
-    let deleteArgs: any = null;
+    let deleteArgs: ProjectMemberDeleteArgs | null = null;
     db.user = {
       findUnique: async () => ({ id: 5, email: 'member@node.test' }),
     };
     db.projectMember = {
       findUnique: async () => ({ projectId: 'project-1', userId: 5 }),
-      delete: async (args: any) => {
+      delete: async (args: ProjectMemberDeleteArgs) => {
         deleteArgs = args;
         return { projectId: 'project-1', userId: 5 };
       },
@@ -281,13 +282,13 @@ describe('ProjectService', () => {
   });
 
   test('updateUserRole updates membership role', async () => {
-    let updateArgs: any = null;
+    let updateArgs: ProjectMemberUpdateArgs | null = null;
     db.user = {
       findUnique: async () => ({ id: 5, email: 'member@node.test' }),
     };
     db.projectMember = {
       findUnique: async () => ({ projectId: 'project-1', userId: 5 }),
-      update: async (args: any) => {
+      update: async (args: ProjectMemberUpdateArgs) => {
         updateArgs = args;
         return { projectId: 'project-1', userId: 5, role: args.data.role };
       },
@@ -381,7 +382,7 @@ describe('ProjectService', () => {
     const project = await service.getProject('project-1');
 
     assert.equal(project.id, 'project-1');
-    assert.equal((project as any).members[0]?.userId, 1);
+    assert.equal((project as unknown as {members: Array<{userId: number}>}).members[0]?.userId, 1);
   });
 
   test('getProject rejects missing project', async () => {
@@ -409,10 +410,10 @@ describe('ProjectService', () => {
   });
 
   test('deleteProject removes project', async () => {
-    let deleteArgs: any = null;
+    let deleteArgs: { where: { id: string } } | null = null;
     db.project = {
       findUnique: async () => ({ id: 'project-1' }),
-      delete: async (args: any) => {
+      delete: async (args: { where: { id: string } }) => {
         deleteArgs = args;
         return { id: args.where.id };
       },

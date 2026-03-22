@@ -8,6 +8,7 @@ import type { PrismaClient } from '@prisma/client/extension';
 import { PriorityType, TaskType } from '../../src/types/task.types';
 import { notificationService } from '../../src/services/notification.service';
 import { initWSServer, shutdownWSServer } from '../../src/websocket/ws.service';
+import type { TaskCreateArgs, TaskUpdateArgs, TaskFindUniqueArgs, ActivityCreateArgs, CreateNotificationPayload, NotificationDTO } from '../test.types';
 
 // Ensure sendNotif has a ws server instance to call.
 let wsServer: ReturnType<typeof initWSServer> | null = null;
@@ -28,13 +29,13 @@ describe('TaskService', () => {
     service = new TaskService();
     notificationService.createNotification = (async () => ({
       id: 'notif-1',
-    })) as any;
+    } as NotificationDTO)) as (payload: CreateNotificationPayload) => Promise<NotificationDTO>;
   });
 
   test('create returns task id', async () => {
-    let createArgs: any = null;
+    let createArgs: TaskCreateArgs | null = null;
     db.task = {
-      create: async (args: any) => {
+      create: async (args: TaskCreateArgs) => {
         createArgs = args;
         return {
           id: 'task-1',
@@ -62,9 +63,9 @@ describe('TaskService', () => {
   });
 
   test('create clears parentId for story', async () => {
-    let createArgs: any = null;
+    let createArgs: TaskCreateArgs | null = null;
     db.task = {
-      create: async (args: any) => {
+      create: async (args: TaskCreateArgs) => {
         createArgs = args;
         return {
           id: 'task-1',
@@ -185,7 +186,7 @@ describe('TaskService', () => {
     };
     notificationService.createNotification = (async () => {
       throw new Error('notification failed');
-    }) as any;
+    }) as (payload: CreateNotificationPayload) => Promise<NotificationDTO>;
 
     await assert.rejects(
       () =>
@@ -227,7 +228,7 @@ describe('TaskService', () => {
   });
 
   test('update writes task fields', async () => {
-    let updateArgs: any = null;
+    let updateArgs: TaskUpdateArgs | null = null;
     db.task = {
       findUnique: async () => ({
         id: 'task-1',
@@ -240,7 +241,7 @@ describe('TaskService', () => {
         parentId: null,
       }),
       count: async () => 0,
-      update: async (args: any) => {
+      update: async (args: TaskUpdateArgs) => {
         updateArgs = args;
         return {
           id: args.where.id,
@@ -330,7 +331,7 @@ describe('TaskService', () => {
 
   test('update rejects missing parent task', async () => {
     db.task = {
-      findUnique: async (args: any) => {
+      findUnique: async (args: TaskFindUniqueArgs) => {
         if (args.where.id === 'task-1') {
           return {
             id: 'task-1',
@@ -372,7 +373,7 @@ describe('TaskService', () => {
 
   test('update rejects parent not story', async () => {
     db.task = {
-      findUnique: async (args: any) => {
+      findUnique: async (args: TaskFindUniqueArgs) => {
         if (args.where.id === 'task-1') {
           return {
             id: 'task-1',
@@ -418,7 +419,7 @@ describe('TaskService', () => {
 
   test('update rejects parent on different board', async () => {
     db.task = {
-      findUnique: async (args: any) => {
+      findUnique: async (args: TaskFindUniqueArgs) => {
         if (args.where.id === 'task-1') {
           return {
             id: 'task-1',
@@ -464,10 +465,10 @@ describe('TaskService', () => {
 
   test('update triggers status and assignee notifications', async () => {
     const notifications: string[] = [];
-    notificationService.createNotification = (async (payload: any) => {
+    notificationService.createNotification = (async (payload: CreateNotificationPayload) => {
       notifications.push(payload.type);
-      return { id: 'notif-1' } as any;
-    }) as any;
+      return { id: 'notif-1' } as NotificationDTO;
+    }) as (payload: CreateNotificationPayload) => Promise<NotificationDTO>;
 
     let activityCalls = 0;
     db.task = {
@@ -510,7 +511,7 @@ describe('TaskService', () => {
   });
 
   test('update keeps status for story with children', async () => {
-    let updateArgs: any = null;
+    let updateArgs: TaskUpdateArgs | null = null;
     db.task = {
       findUnique: async () => ({
         id: 'task-1',
@@ -523,7 +524,7 @@ describe('TaskService', () => {
         parentId: null,
       }),
       count: async () => 2,
-      update: async (args: any) => {
+      update: async (args: TaskUpdateArgs) => {
         updateArgs = args;
         return {
           id: args.where.id,
@@ -590,10 +591,10 @@ describe('TaskService', () => {
   });
 
   test('delete removes task', async () => {
-    let deleteArgs: any = null;
+    let deleteArgs: { where: { id: string } } | null = null;
     db.task = {
       findUnique: async () => ({ id: 'task-1', parentId: null }),
-      delete: async (args: any) => {
+      delete: async (args: { where: { id: string } }) => {
         deleteArgs = args;
         return { id: args.where.id };
       },
