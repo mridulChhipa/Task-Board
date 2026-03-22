@@ -100,6 +100,14 @@ export class CommentService {
           id,
         },
       });
+      
+      await db.activity.create({
+        data: {
+          type: 'THREAD_EDITED',
+          threadId: id,
+          taskId: existingThread.taskId,
+        },
+      });
     } catch (error) {
       throw error;
     }
@@ -264,6 +272,14 @@ export class CommentService {
           id,
         },
       });
+
+      await db.activity.create({
+        data: {
+          type: 'COMMENT_EDITED',
+          commentId: id,
+          taskId: existingComment.threadId,
+        },
+      });
     } catch (error) {
       throw error;
     }
@@ -288,6 +304,14 @@ export class CommentService {
         },
         where: {
           id,
+        },
+      });
+
+      await db.activity.create({
+        data: {
+          type: 'COMMENT_DELETED',
+          commentId: id,
+          taskId: existingComment.threadId,
         },
       });
     } catch (error) {
