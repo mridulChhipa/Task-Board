@@ -97,7 +97,17 @@ export function useFetchUser() {
         // console.log('Done fetching');
 
         const data = await globalRes.json();
-        allProjects = await data.allProjects;
+        const projectRoles = new Map<string, string>(
+          (userData.data.projectData as Project[]).map((project) => [
+            project.id,
+            project.role,
+          ]),
+        );
+
+        allProjects = (data.allProjects as Project[]).map((project) => ({
+          ...project,
+          role: projectRoles.get(project.id) ?? 'PROJECT_VIEWER',
+        }));
         console.log('All Projects', allProjects);
         userData.data.personalData.projectData = allProjects;
       }

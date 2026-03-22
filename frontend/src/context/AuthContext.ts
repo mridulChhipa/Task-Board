@@ -25,7 +25,7 @@ export const defaultAuth: AuthContextType = {
 export const AuthContext = createContext(defaultAuth);
 
 export interface DispatchType {
-  type: 'LOGIN' | 'REFRESH_FAILURE' | 'SET_NOTIFICATIONS';
+  type: 'LOGIN' | 'REFRESH_FAILURE' | 'SET_NOTIFICATIONS'| 'LOADING' | 'LOGOUT' | 'LOGOUT_FAILURE' | 'PROJECT_CREATED';
   payload: AuthContextType | NotificationDTO[];
 }
 
