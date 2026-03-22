@@ -204,6 +204,12 @@ export function createTaskHandlers(
       const ogData = await ogRes.json();
       const parentId = ogData.task.parentId;
       const statusId = ogData.task.statusId;
+      const newParentId =
+        taskType === 'STORY'
+          ? undefined
+          : setParent
+            ? taskId
+            : parentId ?? undefined;
 
       const assigneeId: number = await getUserIdFromEmail(assignee, onError);
 
@@ -241,16 +247,54 @@ export function createTaskHandlers(
           priority: priority as Priority,
           reporter: user?.userId,
           assignee: assigneeId,
-          parentId: setParent ? taskId : parentId,
+          parentId: newParentId ?? null,
           statusId,
           dueDate: dueDate !== '' ? new Date(dueDate) : null,
         }),
       });
 
       const sortedWF = await sortWorkflows([...workflowState], onError);
-      setWorkflowState(sortedWF);
-      setDragHighlight(sortedWF.map(() => false));
-      boards[activeIndex].workflows = sortedWF;
+      const nextCache: Record<string, Task> = {
+        ...taskCache,
+        [currentTaskId]: {
+          ...taskCache[currentTaskId],
+          id: currentTaskId,
+          title: taskName,
+          description: taskDescription,
+          type: taskType,
+          priority,
+          assignee: assigneeId,
+          reporter: user?.userId ?? taskCache[currentTaskId]?.reporter ?? -1,
+          dueDate: dueDate !== '' ? new Date(dueDate) : undefined,
+          statusId,
+          parentId: newParentId,
+          updatedAt: new Date(),
+        },
+      };
+
+      if (parentId && nextCache[parentId]) {
+        const oldParent = nextCache[parentId];
+        nextCache[parentId] = {
+          ...oldParent,
+          children: oldParent.children.filter((id) => id !== currentTaskId),
+        };
+      }
+
+      if (newParentId && nextCache[newParentId]) {
+        const newParent = nextCache[newParentId];
+        nextCache[newParentId] = {
+          ...newParent,
+          children: newParent.children.includes(currentTaskId)
+            ? newParent.children
+            : [...newParent.children, currentTaskId],
+        };
+      }
+
+      const syncedWF = syncStoriesWithChildrenOrder(sortedWF, nextCache);
+      setTaskCache(nextCache);
+      setWorkflowState(syncedWF);
+      setDragHighlight(syncedWF.map(() => false));
+      boards[activeIndex].workflows = syncedWF;
     } catch (err) {
       console.error('Error editing task:', { cause: err });
       onError('Failed to edit task');
