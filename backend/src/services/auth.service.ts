@@ -52,7 +52,7 @@ export class AuthService {
         password: body.password,
       });
     } catch (error) {
-      throw new Error('Error registering user:', { cause: error });
+      throw error;
     }
   }
 
@@ -88,7 +88,7 @@ export class AuthService {
       tokens.userId = user.id;
       return tokens;
     } catch (error) {
-      throw new Error('Error logging in user:', { cause: error });
+      throw error;
     }
   }
 
@@ -110,7 +110,7 @@ export class AuthService {
 
       this.wsServer?.removeUser(payload.sub);
     } catch (error) {
-      throw new Error('Error Logging out user: ', { cause: error });
+      throw error;
     }
   }
 
@@ -266,7 +266,7 @@ export class AuthService {
 
       return userData;
     } catch (error) {
-      throw new Error('User Details Catch: ', { cause: error });
+      throw error;
     }
   }
 
@@ -347,7 +347,7 @@ export class AuthService {
 
       return userData;
     } catch (error) {
-      throw new Error('User Details Catch: ', { cause: error });
+      throw error;
     }
   }
 
@@ -374,7 +374,7 @@ export class AuthService {
         },
       });
     } catch (error) {
-      throw new Error('Error updating user:', { cause: error });
+      throw error;
     }
   }
 }

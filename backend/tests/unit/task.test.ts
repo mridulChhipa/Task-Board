@@ -61,6 +61,151 @@ describe('TaskService', () => {
     assert.equal(createArgs?.data.title, 'Task Title');
   });
 
+  test('create clears parentId for story', async () => {
+    let createArgs: any = null;
+    db.task = {
+      create: async (args: any) => {
+        createArgs = args;
+        return {
+          id: 'task-1',
+          ...args.data,
+        };
+      },
+    };
+
+    await service.create({
+      title: 'Story',
+      description: 'Story Desc',
+      type: TaskType.STORY,
+      priority: PriorityType.MEDIUM,
+      assignee: 2,
+      reporter: 1,
+      dueDate: new Date(),
+      statusId: 'status-1',
+      parentId: 'parent-1',
+      resolvedAt: null,
+      closedAt: null,
+    });
+
+    assert.equal(createArgs?.data.parentId, null);
+  });
+
+  test('create rejects missing parent task', async () => {
+    db.task = {
+      findUnique: async () => null,
+    };
+    db.workflow = {
+      findUnique: async () => ({ boardId: 'board-1' }),
+    };
+
+    await assert.rejects(
+      () =>
+        service.create({
+          title: 'Task Title',
+          description: 'Task Desc',
+          type: TaskType.TASK,
+          priority: PriorityType.MEDIUM,
+          assignee: 2,
+          reporter: 1,
+          dueDate: new Date(),
+          statusId: 'status-1',
+          parentId: 'parent-1',
+          resolvedAt: null,
+          closedAt: null,
+        }),
+      /Parent task does not exist/,
+    );
+  });
+
+  test('create rejects non-story parent', async () => {
+    db.task = {
+      findUnique: async () => ({
+        id: 'parent-1',
+        type: TaskType.TASK,
+        status: { boardId: 'board-1' },
+      }),
+    };
+    db.workflow = {
+      findUnique: async () => ({ boardId: 'board-1' }),
+    };
+
+    await assert.rejects(
+      () =>
+        service.create({
+          title: 'Task Title',
+          description: 'Task Desc',
+          type: TaskType.TASK,
+          priority: PriorityType.MEDIUM,
+          assignee: 2,
+          reporter: 1,
+          dueDate: new Date(),
+          statusId: 'status-1',
+          parentId: 'parent-1',
+          resolvedAt: null,
+          closedAt: null,
+        }),
+      /Parent task must be a story/,
+    );
+  });
+
+  test('create rejects parent on different board', async () => {
+    db.task = {
+      findUnique: async () => ({
+        id: 'parent-1',
+        type: TaskType.STORY,
+        status: { boardId: 'board-1' },
+      }),
+    };
+    db.workflow = {
+      findUnique: async () => ({ boardId: 'board-2' }),
+    };
+
+    await assert.rejects(
+      () =>
+        service.create({
+          title: 'Task Title',
+          description: 'Task Desc',
+          type: TaskType.TASK,
+          priority: PriorityType.MEDIUM,
+          assignee: 2,
+          reporter: 1,
+          dueDate: new Date(),
+          statusId: 'status-1',
+          parentId: 'parent-1',
+          resolvedAt: null,
+          closedAt: null,
+        }),
+      /Parent task must be on the same board/,
+    );
+  });
+
+  test('create rejects notification failure', async () => {
+    db.task = {
+      create: async () => ({ id: 'task-1' }),
+    };
+    notificationService.createNotification = (async () => {
+      throw new Error('notification failed');
+    }) as any;
+
+    await assert.rejects(
+      () =>
+        service.create({
+          title: 'Task Title',
+          description: 'Task Desc',
+          type: TaskType.TASK,
+          priority: PriorityType.MEDIUM,
+          assignee: 2,
+          reporter: 1,
+          dueDate: new Date(),
+          statusId: 'status-1',
+          parentId: null,
+          resolvedAt: null,
+          closedAt: null,
+        }),
+      /notification failed/,
+    );
+  });
+
   test('create rejects closed without resolved', async () => {
     await assert.rejects(
       () =>
@@ -126,6 +271,244 @@ describe('TaskService', () => {
     assert.equal(updateArgs?.data.statusId, 'status-2');
   });
 
+  test('update rejects missing task', async () => {
+    db.task = {
+      findUnique: async () => null,
+    };
+
+    await assert.rejects(
+      () =>
+        service.update('task-1', {
+          title: 'Updated Title',
+          description: 'Updated Desc',
+          type: TaskType.TASK,
+          priority: PriorityType.MEDIUM,
+          assignee: 2,
+          reporter: 1,
+          dueDate: new Date(),
+          statusId: 'status-2',
+          parentId: null,
+          resolvedAt: null,
+          closedAt: null,
+        }),
+      /Task with the given taskId does not exist/,
+    );
+  });
+
+  test('update rejects closed without resolved', async () => {
+    db.task = {
+      findUnique: async () => ({
+        id: 'task-1',
+        title: 'Task',
+        type: TaskType.TASK,
+        priority: PriorityType.MEDIUM,
+        assignee: 1,
+        reporter: 1,
+        statusId: 'status-1',
+        parentId: null,
+      }),
+    };
+
+    await assert.rejects(
+      () =>
+        service.update('task-1', {
+          title: 'Updated Title',
+          description: 'Updated Desc',
+          type: TaskType.TASK,
+          priority: PriorityType.MEDIUM,
+          assignee: 2,
+          reporter: 1,
+          dueDate: new Date(),
+          statusId: 'status-2',
+          parentId: null,
+          resolvedAt: null,
+          closedAt: new Date(),
+        }),
+      /Closed task must be resolved first/,
+    );
+  });
+
+  test('update rejects missing parent task', async () => {
+    db.task = {
+      findUnique: async (args: any) => {
+        if (args.where.id === 'task-1') {
+          return {
+            id: 'task-1',
+            title: 'Task',
+            type: TaskType.TASK,
+            priority: PriorityType.MEDIUM,
+            assignee: 1,
+            reporter: 1,
+            statusId: 'status-1',
+            parentId: null,
+          };
+        }
+
+        return null;
+      },
+    };
+    db.workflow = {
+      findUnique: async () => ({ boardId: 'board-1' }),
+    };
+
+    await assert.rejects(
+      () =>
+        service.update('task-1', {
+          title: 'Updated Title',
+          description: 'Updated Desc',
+          type: TaskType.TASK,
+          priority: PriorityType.MEDIUM,
+          assignee: 2,
+          reporter: 1,
+          dueDate: new Date(),
+          statusId: 'status-2',
+          parentId: 'parent-1',
+          resolvedAt: null,
+          closedAt: null,
+        }),
+      /Parent task does not exist/,
+    );
+  });
+
+  test('update rejects parent not story', async () => {
+    db.task = {
+      findUnique: async (args: any) => {
+        if (args.where.id === 'task-1') {
+          return {
+            id: 'task-1',
+            title: 'Task',
+            type: TaskType.TASK,
+            priority: PriorityType.MEDIUM,
+            assignee: 1,
+            reporter: 1,
+            statusId: 'status-1',
+            parentId: null,
+          };
+        }
+
+        return {
+          id: 'parent-1',
+          type: TaskType.TASK,
+          status: { boardId: 'board-1' },
+        };
+      },
+    };
+    db.workflow = {
+      findUnique: async () => ({ boardId: 'board-1' }),
+    };
+
+    await assert.rejects(
+      () =>
+        service.update('task-1', {
+          title: 'Updated Title',
+          description: 'Updated Desc',
+          type: TaskType.TASK,
+          priority: PriorityType.MEDIUM,
+          assignee: 2,
+          reporter: 1,
+          dueDate: new Date(),
+          statusId: 'status-2',
+          parentId: 'parent-1',
+          resolvedAt: null,
+          closedAt: null,
+        }),
+      /Parent task must be a story/,
+    );
+  });
+
+  test('update rejects parent on different board', async () => {
+    db.task = {
+      findUnique: async (args: any) => {
+        if (args.where.id === 'task-1') {
+          return {
+            id: 'task-1',
+            title: 'Task',
+            type: TaskType.TASK,
+            priority: PriorityType.MEDIUM,
+            assignee: 1,
+            reporter: 1,
+            statusId: 'status-1',
+            parentId: null,
+          };
+        }
+
+        return {
+          id: 'parent-1',
+          type: TaskType.STORY,
+          status: { boardId: 'board-1' },
+        };
+      },
+    };
+    db.workflow = {
+      findUnique: async () => ({ boardId: 'board-2' }),
+    };
+
+    await assert.rejects(
+      () =>
+        service.update('task-1', {
+          title: 'Updated Title',
+          description: 'Updated Desc',
+          type: TaskType.TASK,
+          priority: PriorityType.MEDIUM,
+          assignee: 2,
+          reporter: 1,
+          dueDate: new Date(),
+          statusId: 'status-2',
+          parentId: 'parent-1',
+          resolvedAt: null,
+          closedAt: null,
+        }),
+      /Parent task must be on the same board/,
+    );
+  });
+
+  test('update triggers status and assignee notifications', async () => {
+    const notifications: string[] = [];
+    notificationService.createNotification = (async (payload: any) => {
+      notifications.push(payload.type);
+      return { id: 'notif-1' } as any;
+    }) as any;
+
+    let activityCalls = 0;
+    db.task = {
+      findUnique: async () => ({
+        id: 'task-1',
+        title: 'Task',
+        type: TaskType.TASK,
+        priority: PriorityType.MEDIUM,
+        assignee: 1,
+        reporter: 1,
+        statusId: 'status-1',
+        parentId: null,
+      }),
+      count: async () => 0,
+      update: async () => ({ id: 'task-1' }),
+    };
+    db.activity = {
+      create: async () => {
+        activityCalls += 1;
+        return { id: `activity-${activityCalls}` };
+      },
+    };
+
+    await service.update('task-1', {
+      title: 'Updated Title',
+      description: 'Updated Desc',
+      type: TaskType.TASK,
+      priority: PriorityType.MEDIUM,
+      assignee: 2,
+      reporter: 1,
+      dueDate: new Date(),
+      statusId: 'status-2',
+      parentId: null,
+      resolvedAt: null,
+      closedAt: null,
+    });
+
+    assert.equal(activityCalls, 3);
+    assert.equal(notifications.length, 2);
+  });
+
   test('update keeps status for story with children', async () => {
     let updateArgs: any = null;
     db.task = {
@@ -169,6 +552,43 @@ describe('TaskService', () => {
     assert.equal(updateArgs?.data.statusId, 'status-1');
   });
 
+  test('update rejects update failure', async () => {
+    db.task = {
+      findUnique: async () => ({
+        id: 'task-1',
+        title: 'Task',
+        type: TaskType.TASK,
+        priority: PriorityType.MEDIUM,
+        assignee: 1,
+        reporter: 1,
+        statusId: 'status-1',
+        parentId: null,
+      }),
+      count: async () => 0,
+      update: async () => {
+        throw new Error('update failed');
+      },
+    };
+
+    await assert.rejects(
+      () =>
+        service.update('task-1', {
+          title: 'Updated Title',
+          description: 'Updated Desc',
+          type: TaskType.TASK,
+          priority: PriorityType.MEDIUM,
+          assignee: 2,
+          reporter: 1,
+          dueDate: new Date(),
+          statusId: 'status-2',
+          parentId: null,
+          resolvedAt: null,
+          closedAt: null,
+        }),
+      /update failed/,
+    );
+  });
+
   test('delete removes task', async () => {
     let deleteArgs: any = null;
     db.task = {
@@ -182,6 +602,25 @@ describe('TaskService', () => {
     await service.delete('task-1');
 
     assert.equal(deleteArgs?.where.id, 'task-1');
+  });
+
+  test('delete rejects missing task', async () => {
+    db.task = {
+      findUnique: async () => null,
+    };
+
+    await assert.rejects(() => service.delete('task-1'), /Task with the given taskId does not exis/);
+  });
+
+  test('delete rejects delete failure', async () => {
+    db.task = {
+      findUnique: async () => ({ id: 'task-1', parentId: null }),
+      delete: async () => {
+        throw new Error('delete failed');
+      },
+    };
+
+    await assert.rejects(() => service.delete('task-1'), /delete failed/);
   });
 
   test('getTask returns dto', async () => {
@@ -246,6 +685,16 @@ describe('TaskService', () => {
     };
 
     await assert.rejects(() => service.getTask('task-1'), /given taskId does not exist/);
+  });
+
+  test('getTask rejects fetch failure', async () => {
+    db.task = {
+      findUnique: async () => {
+        throw new Error('fetch failed');
+      },
+    };
+
+    await assert.rejects(() => service.getTask('task-1'), /fetch failed/);
   });
 });
 

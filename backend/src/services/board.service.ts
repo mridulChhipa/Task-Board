@@ -8,34 +8,28 @@ import type {
 
 export class BoardService {
   async create(projectId: string, name: string): Promise<BoardDTO> {
+    let createdBoard: { id: string; name: string; projectId: string };
     try {
-      console.log(
-        'Creating board with name: ',
-        name,
-        ' for projectId: ',
-        projectId,
-      );
-
-      const createdBoard = await db.board.create({
+      createdBoard = await db.board.create({
         data: {
           projectId,
           name,
         },
       });
+    } catch (error) {
+      throw new Error('Error creating board: ', { cause: error });
+    }
 
-      /*
-      Need to find a mechanism so that if creation of let
-      say second def-workflow fails then it removes the already created two 
-      */
-      const defaultWorkflows = [
-        { name: 'to do', order: 0 },
-        { name: 'in progress', order: 1 },
-        { name: 'review', order: 2 },
-        { name: 'done', order: 3 },
-      ];
+    const defaultWorkflows = [
+      { name: 'to do', order: 0 },
+      { name: 'in progress', order: 1 },
+      { name: 'review', order: 2 },
+      { name: 'done', order: 3 },
+    ];
 
-      const createdWorkflows = [];
+    const createdWorkflows = [];
 
+    try {
       for (const defWorkflow of defaultWorkflows) {
         const createdWorkflow = await db.workflow.create({
           data: {
@@ -47,28 +41,28 @@ export class BoardService {
         });
         createdWorkflows.push(createdWorkflow);
       }
-
-      const board: BoardDTO = {
-        id: createdBoard.id,
-        name: createdBoard.name,
-        projectId: createdBoard.projectId,
-        workflows: createdWorkflows.map((workflow) => ({
-          id: workflow.id,
-          name: workflow.name,
-          boardId: workflow.boardId,
-          limit: workflow.limit,
-          orderIdx: workflow.orderIdx,
-        })),
-        edgeConstraints: [],
-      };
-      return board;
     } catch (error) {
-      throw new Error('Error creating Board: ', { cause: error });
+      throw new Error('Error creating default workflows: ', { cause: error });
     }
+
+    const board: BoardDTO = {
+      id: createdBoard.id,
+      name: createdBoard.name,
+      projectId: createdBoard.projectId,
+      workflows: createdWorkflows.map((workflow) => ({
+        id: workflow.id,
+        name: workflow.name,
+        boardId: workflow.boardId,
+        limit: workflow.limit,
+        orderIdx: workflow.orderIdx,
+      })),
+      edgeConstraints: [],
+    };
+    return board;
   }
 
   async update(
-    boardId: string /*, projectId: string*/,
+    boardId: string,
     name: string,
   ): Promise<void> {
     try {
@@ -81,10 +75,6 @@ export class BoardService {
       if (!existingBoard) {
         throw new Error('Trying to update non-existent board');
       }
-
-      // if (existingBoard.projectId !== projectId) {
-      //   throw new Error('This board does not exists in this project');
-      // }
 
       await db.board.update({
         data: {

@@ -71,7 +71,7 @@ export class CommentService {
 
       return createdThread as ThreadDTO;
     } catch (error) {
-      throw new Error('Error creating thread: ', { cause: error });
+      throw error;
     }
   }
 
@@ -101,7 +101,7 @@ export class CommentService {
         },
       });
     } catch (error) {
-      throw new Error('Error creating thread: ', { cause: error });
+      throw error;
     }
   }
 
@@ -134,7 +134,7 @@ export class CommentService {
         },
       });
     } catch (error) {
-      throw new Error('Error deleting thread: ', { cause: error });
+      throw error;
     }
   }
 
@@ -236,7 +236,7 @@ export class CommentService {
 
       return createdComment as CommentDTO;
     } catch (error) {
-      throw new Error('Error creating comment: ', { cause: error });
+      throw error;
     }
   }
 
@@ -265,7 +265,7 @@ export class CommentService {
         },
       });
     } catch (error) {
-      throw new Error('Error updating comment: ', { cause: error });
+      throw error;
     }
   }
 
@@ -291,7 +291,7 @@ export class CommentService {
         },
       });
     } catch (error) {
-      throw new Error('Error deleting comment: ', { cause: error });
+      throw error;
     }
   }
 
@@ -308,12 +308,12 @@ export class CommentService {
       });
 
       if (!existingComment) {
-        throw new Error();
+        throw new Error("Comment DNE");
       }
 
       return toCommentDTO(existingComment);
     } catch (err) {
-      throw new Error("Can't fetch comment: ", { cause: err });
+      throw err;
     }
   }
 
@@ -334,11 +334,11 @@ export class CommentService {
       });
 
       if (!existingThread) {
-        throw new Error();
+        throw new Error("Thread DNE");
       }
       return toThreadDTO(existingThread);
     } catch (err) {
-      throw new Error("Can't fetch thread: ", { cause: err });
+      throw err;
     }
   }
 }

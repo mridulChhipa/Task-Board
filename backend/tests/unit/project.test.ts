@@ -37,6 +37,23 @@ describe('ProjectService', () => {
     assert.equal(createArgs?.data.name, 'New Project');
   });
 
+  test('create rejects create failure', async () => {
+    db.project = {
+      create: async () => {
+        throw new Error('create failed');
+      },
+    };
+
+    await assert.rejects(
+      () =>
+        service.create({
+          name: 'New Project',
+          description: 'Unit test project',
+        }),
+      /Error creating project/,
+    );
+  });
+
   test('update returns project details with members', async () => {
     let updateArgs: any = null;
     db.project = {
@@ -63,6 +80,40 @@ describe('ProjectService', () => {
     assert.equal(result.name, 'Updated Project');
   });
 
+  test('update rejects missing update result', async () => {
+    db.project = {
+      update: async () => null,
+    };
+
+    await assert.rejects(
+      () =>
+        service.update('project-1', {
+          name: 'Updated Project',
+          description: 'Updated',
+          isArchived: false,
+        }),
+      /Can't update/,
+    );
+  });
+
+  test('update rejects update failure', async () => {
+    db.project = {
+      update: async () => {
+        throw new Error('update failed');
+      },
+    };
+
+    await assert.rejects(
+      () =>
+        service.update('project-1', {
+          name: 'Updated Project',
+          description: 'Updated',
+          isArchived: false,
+        }),
+      /update failed/,
+    );
+  });
+
   test('setArchiveStatus updates archive flag', async () => {
     let updateArgs: any = null;
     db.project = {
@@ -75,6 +126,19 @@ describe('ProjectService', () => {
     await service.setArchiveStatus('project-1', { isArchived: true });
 
     assert.equal(updateArgs?.data.isArchived, true);
+  });
+
+  test('setArchiveStatus rejects update failure', async () => {
+    db.project = {
+      update: async () => {
+        throw new Error('archive failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.setArchiveStatus('project-1', { isArchived: true }),
+      /Error archiving project/,
+    );
   });
 
   test('assignUser creates membership', async () => {
@@ -100,6 +164,45 @@ describe('ProjectService', () => {
     });
 
     assert.equal(createdMembership?.data.userId, 7);
+  });
+
+  test('assignUser rejects existing membership', async () => {
+    db.user = {
+      findUnique: async () => ({ id: 7, email: 'member@node.test' }),
+    };
+    db.projectMember = {
+      findUnique: async () => ({ projectId: 'project-1', userId: 7 }),
+    };
+
+    await assert.rejects(
+      () =>
+        service.assignUser('project-1', {
+          userMail: 'member@node.test',
+          role: ProjectRole.PROJECT_MEMBER,
+        }),
+      /User already exists in the project/,
+    );
+  });
+
+  test('assignUser rejects create failure', async () => {
+    db.user = {
+      findUnique: async () => ({ id: 7, email: 'member@node.test' }),
+    };
+    db.projectMember = {
+      findUnique: async () => null,
+      create: async () => {
+        throw new Error('create failed');
+      },
+    };
+
+    await assert.rejects(
+      () =>
+        service.assignUser('project-1', {
+          userMail: 'member@node.test',
+          role: ProjectRole.PROJECT_MEMBER,
+        }),
+      /create failed/,
+    );
   });
 
   test('assignUser rejects unknown user', async () => {
@@ -135,6 +238,48 @@ describe('ProjectService', () => {
     assert.equal(deleteArgs?.where.uniqueUser.userId, 5);
   });
 
+  test('removeUser rejects missing user', async () => {
+    db.user = {
+      findUnique: async () => null,
+    };
+
+    await assert.rejects(
+      () => service.removeUser('project-1', { userMail: 'missing@node.test' }),
+      /Error removing user from project/,
+    );
+  });
+
+  test('removeUser rejects missing membership', async () => {
+    db.user = {
+      findUnique: async () => ({ id: 5, email: 'member@node.test' }),
+    };
+    db.projectMember = {
+      findUnique: async () => null,
+    };
+
+    await assert.rejects(
+      () => service.removeUser('project-1', { userMail: 'member@node.test' }),
+      /Error removing user from project/,
+    );
+  });
+
+  test('removeUser rejects delete failure', async () => {
+    db.user = {
+      findUnique: async () => ({ id: 5, email: 'member@node.test' }),
+    };
+    db.projectMember = {
+      findUnique: async () => ({ projectId: 'project-1', userId: 5 }),
+      delete: async () => {
+        throw new Error('delete failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.removeUser('project-1', { userMail: 'member@node.test' }),
+      /Error removing user from project/,
+    );
+  });
+
   test('updateUserRole updates membership role', async () => {
     let updateArgs: any = null;
     db.user = {
@@ -154,6 +299,60 @@ describe('ProjectService', () => {
     });
 
     assert.equal(updateArgs?.data.role, ProjectRole.PROJECT_ADMIN);
+  });
+
+  test('updateUserRole rejects missing user', async () => {
+    db.user = {
+      findUnique: async () => null,
+    };
+
+    await assert.rejects(
+      () =>
+        service.updateUserRole('project-1', {
+          userMail: 'missing@node.test',
+          role: ProjectRole.PROJECT_ADMIN,
+        }),
+      /Error updating user role/,
+    );
+  });
+
+  test('updateUserRole rejects missing membership', async () => {
+    db.user = {
+      findUnique: async () => ({ id: 5, email: 'member@node.test' }),
+    };
+    db.projectMember = {
+      findUnique: async () => null,
+    };
+
+    await assert.rejects(
+      () =>
+        service.updateUserRole('project-1', {
+          userMail: 'member@node.test',
+          role: ProjectRole.PROJECT_ADMIN,
+        }),
+      /Error updating user role/,
+    );
+  });
+
+  test('updateUserRole rejects update failure', async () => {
+    db.user = {
+      findUnique: async () => ({ id: 5, email: 'member@node.test' }),
+    };
+    db.projectMember = {
+      findUnique: async () => ({ projectId: 'project-1', userId: 5 }),
+      update: async () => {
+        throw new Error('update failed');
+      },
+    };
+
+    await assert.rejects(
+      () =>
+        service.updateUserRole('project-1', {
+          userMail: 'member@node.test',
+          role: ProjectRole.PROJECT_ADMIN,
+        }),
+      /Error updating user role/,
+    );
   });
 
   test('getProject returns project with members and boards', async () => {
@@ -185,6 +384,30 @@ describe('ProjectService', () => {
     assert.equal((project as any).members[0]?.userId, 1);
   });
 
+  test('getProject rejects missing project', async () => {
+    db.project = {
+      findUnique: async () => null,
+    };
+
+    await assert.rejects(
+      () => service.getProject('project-1'),
+      /Error fetching project/,
+    );
+  });
+
+  test('getProject rejects fetch failure', async () => {
+    db.project = {
+      findUnique: async () => {
+        throw new Error('fetch failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.getProject('project-1'),
+      /Error fetching project/,
+    );
+  });
+
   test('deleteProject removes project', async () => {
     let deleteArgs: any = null;
     db.project = {
@@ -198,6 +421,31 @@ describe('ProjectService', () => {
     await service.deleteProject('project-1');
 
     assert.equal(deleteArgs?.where.id, 'project-1');
+  });
+
+  test('deleteProject rejects missing project', async () => {
+    db.project = {
+      findUnique: async () => null,
+    };
+
+    await assert.rejects(
+      () => service.deleteProject('project-1'),
+      /Error deleting project/,
+    );
+  });
+
+  test('deleteProject rejects delete failure', async () => {
+    db.project = {
+      findUnique: async () => ({ id: 'project-1' }),
+      delete: async () => {
+        throw new Error('delete failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.deleteProject('project-1'),
+      /Error deleting project/,
+    );
   });
 
   test('fetchGlobalAdminProjects maps roles', async () => {
@@ -217,5 +465,28 @@ describe('ProjectService', () => {
 
     assert.equal(result[0]?.role, ProjectRole.PROJECT_ADMIN);
     assert.deepEqual(result[0]?.members, [1]);
+  });
+
+  test('fetchGlobalAdminProjects returns empty on no projects', async () => {
+    db.project = {
+      findMany: async () => [],
+    };
+
+    const result = await service.fetchGlobalAdminProjects();
+
+    assert.deepEqual(result, []);
+  });
+
+  test('fetchGlobalAdminProjects rejects fetch failure', async () => {
+    db.project = {
+      findMany: async () => {
+        throw new Error('fetch failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.fetchGlobalAdminProjects(),
+      /fetchglobaladmin/,
+    );
   });
 });

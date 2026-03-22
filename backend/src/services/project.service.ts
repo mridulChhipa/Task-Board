@@ -22,7 +22,7 @@ export class ProjectService {
       });
       return project;
     } catch (error) {
-      throw new Error('Error creating project: ', { cause: error });
+      throw Error('Error creating project: ', { cause: error });
     }
   }
 
@@ -61,7 +61,7 @@ export class ProjectService {
 
       return retProj;
     } catch (error) {
-      throw new Error('Error updating project details: ', { cause: error });
+      throw error;
     }
   }
 
@@ -83,7 +83,6 @@ export class ProjectService {
     }
   }
 
-  // Membership related services
   async assignUser(
     projectId: string,
     { userMail, role }: AssignUserBody,

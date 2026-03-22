@@ -43,6 +43,27 @@ describe('NotificationService', () => {
     assert.equal(notif.recipientName, 'Recipient');
   });
 
+  test('createNotification rejects create failure', async () => {
+    db.notification = {
+      create: async () => {
+        throw new Error('create failed');
+      },
+    };
+
+    await assert.rejects(
+      () =>
+        service.createNotification({
+          recipientId: 1,
+          senderId: 2,
+          taskId: 'task-1',
+          commentId: null,
+          threadId: null,
+          type: NotifType.TASK_ASSIGNED,
+        }),
+      /Can't create notification/,
+    );
+  });
+
   test('fetchNotification returns dto', async () => {
     db.notification = {
       findUnique: async () => ({
@@ -76,6 +97,19 @@ describe('NotificationService', () => {
     );
   });
 
+  test('fetchNotification rejects fetch failure', async () => {
+    db.notification = {
+      findUnique: async () => {
+        throw new Error('fetch failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.fetchNotification('notification-1'),
+      /fetch failed/,
+    );
+  });
+
   test('deleteNotification removes notification', async () => {
     let deleteArgs: any = null;
     db.notification = {
@@ -90,6 +124,19 @@ describe('NotificationService', () => {
     assert.equal(deleteArgs?.where.id, 'notification-1');
   });
 
+  test('deleteNotification rejects delete failure', async () => {
+    db.notification = {
+      delete: async () => {
+        throw new Error('delete failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.deleteNotification('notification-1'),
+      /Can't delete notification/,
+    );
+  });
+
   test('readNotification updates read status', async () => {
     let updateArgs: any = null;
     db.notification = {
@@ -102,5 +149,18 @@ describe('NotificationService', () => {
     await service.readNotification('notification-1', true);
 
     assert.equal(updateArgs?.data.read, true);
+  });
+
+  test('readNotification rejects update failure', async () => {
+    db.notification = {
+      update: async () => {
+        throw new Error('update failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.readNotification('notification-1', true),
+      /Can't read notification/,
+    );
   });
 });

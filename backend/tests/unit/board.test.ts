@@ -45,6 +45,39 @@ describe('BoardService', () => {
     assert.equal(result.workflows[0]?.name, 'to do');
   });
 
+  test('create rejects board create failure', async () => {
+    db.board = {
+      create: async () => {
+        throw new Error('create failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.create('project-1', 'Board One'),
+      /Error creating board/,
+    );
+  });
+
+  test('create rejects workflow create failure', async () => {
+    db.board = {
+      create: async () => ({
+        id: 'board-1',
+        name: 'Board One',
+        projectId: 'project-1',
+      }),
+    };
+    db.workflow = {
+      create: async () => {
+        throw new Error('error creating workflow');
+      },
+    };
+
+    await assert.rejects(
+      () => service.create('project-1', 'Board One'),
+      /Error creating default workflows/,
+    );
+  });
+
   test('update throws for missing board', async () => {
     db.board = {
       findFirst: async () => null,
@@ -53,6 +86,20 @@ describe('BoardService', () => {
     await assert.rejects(
       () => service.update('board-1', 'Updated Board'),
       /Trying to update non-existent board/,
+    );
+  });
+
+  test('update rejects update failure', async () => {
+    db.board = {
+      findFirst: async () => ({ id: 'board-1' }),
+      update: async () => {
+        throw new Error('update failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.update('board-1', 'Updated Board'),
+      /update failed/,
     );
   });
 
@@ -94,6 +141,19 @@ describe('BoardService', () => {
     assert.equal(column.name, 'New Column');
   });
 
+  test('addColumn rejects create failure', async () => {
+    db.workflow = {
+      create: async () => {
+        throw new Error('create failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.addColumn('board-1', 'New Column', 5, 2),
+      /Error adding workflow\/column/,
+    );
+  });
+
   test('updateColumn updates and skips sync when no stories', async () => {
     let updateArgs: any = null;
     db.workflow = {
@@ -119,6 +179,17 @@ describe('BoardService', () => {
     assert.equal(updateArgs?.data.name, 'Updated');
   });
 
+  test('updateColumn rejects missing column', async () => {
+    db.workflow = {
+      findFirst: async () => null,
+    };
+
+    await assert.rejects(
+      () => service.updateColumn('column-1', 'board-1', 'Updated', 4, 3),
+      /Non-existent column/,
+    );
+  });
+
   test('updateColumn rejects wrong board', async () => {
     db.workflow = {
       findFirst: async () => ({ id: 'column-1', boardId: 'other-board' }),
@@ -127,6 +198,37 @@ describe('BoardService', () => {
     await assert.rejects(
       () => service.updateColumn('column-1', 'board-1', 'Updated', 4, 3),
       /does not exists in this board/,
+    );
+  });
+
+  test('updateColumn rejects update failure', async () => {
+    db.workflow = {
+      findFirst: async () => ({ id: 'column-1', boardId: 'board-1' }),
+      update: async () => {
+        throw new Error('update failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.updateColumn('column-1', 'board-1', 'Updated', 4, 3),
+      /update failed/,
+    );
+  });
+
+  test('updateColumn rejects task lookup failure', async () => {
+    db.workflow = {
+      findFirst: async () => ({ id: 'column-1', boardId: 'board-1' }),
+      update: async () => ({ id: 'column-1' }),
+    };
+    db.task = {
+      findMany: async () => {
+        throw new Error('findMany failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.updateColumn('column-1', 'board-1', 'Updated', 4, 3),
+      /findMany failed/,
     );
   });
 
@@ -143,6 +245,42 @@ describe('BoardService', () => {
     await service.deleteColumn('column-1', 'board-1');
 
     assert.equal(deleteArgs?.where.id, 'column-1');
+  });
+
+  test('deleteColumn rejects missing column', async () => {
+    db.workflow = {
+      findFirst: async () => null,
+    };
+
+    await assert.rejects(
+      () => service.deleteColumn('column-1', 'board-1'),
+      /Column Deletion/,
+    );
+  });
+
+  test('deleteColumn rejects wrong board', async () => {
+    db.workflow = {
+      findFirst: async () => ({ id: 'column-1', boardId: 'other-board' }),
+    };
+
+    await assert.rejects(
+      () => service.deleteColumn('column-1', 'board-1'),
+      /Column Deletion/,
+    );
+  });
+
+  test('deleteColumn rejects delete failure', async () => {
+    db.workflow = {
+      findFirst: async () => ({ id: 'column-1', boardId: 'board-1' }),
+      delete: async () => {
+        throw new Error('delete failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.deleteColumn('column-1', 'board-1'),
+      /Column Deletion/,
+    );
   });
 
   test('addEdge creates edge for board', async () => {
@@ -176,6 +314,22 @@ describe('BoardService', () => {
     );
   });
 
+  test('addEdge rejects create failure', async () => {
+    db.board = {
+      findFirst: async () => ({ id: 'board-1' }),
+    };
+    db.edgeConstraint = {
+      create: async () => {
+        throw new Error('create failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.addEdge('board-1', 'col-1', 'col-2'),
+      /create failed/,
+    );
+  });
+
   test('deleteEdge removes edge', async () => {
     let deleteArgs: any = null;
     db.edgeConstraint = {
@@ -190,6 +344,19 @@ describe('BoardService', () => {
     assert.equal(deleteArgs?.where.id, 'edge-1');
   });
 
+  test('deleteEdge rejects delete failure', async () => {
+    db.edgeConstraint = {
+      delete: async () => {
+        throw new Error('delete failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.deleteEdge('board-1', 'edge-1'),
+      /Failed to delete edge/,
+    );
+  });
+
   test('deleteBoard removes board', async () => {
     let deleteArgs: any = null;
     db.board = {
@@ -202,6 +369,19 @@ describe('BoardService', () => {
     await service.deleteBoard('board-1');
 
     assert.equal(deleteArgs?.where.id, 'board-1');
+  });
+
+  test('deleteBoard rejects delete failure', async () => {
+    db.board = {
+      delete: async () => {
+        throw new Error('delete failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.deleteBoard('board-1'),
+      /Board Deletions/,
+    );
   });
 
   test('fetchBoard returns board dto', async () => {
@@ -246,6 +426,16 @@ describe('BoardService', () => {
     await assert.rejects(() => service.fetchBoard('board-1'), /fetching board/);
   });
 
+  test('fetchBoard rejects fetch failure', async () => {
+    db.board = {
+      findUnique: async () => {
+        throw new Error('fetch failed');
+      },
+    };
+
+    await assert.rejects(() => service.fetchBoard('board-1'), /fetch failed/);
+  });
+
   test('fetchCol returns column dto', async () => {
     db.workflow = {
       findUnique: async () => ({
@@ -269,5 +459,15 @@ describe('BoardService', () => {
     };
 
     await assert.rejects(() => service.fetchCol('col-1'), /fetching board/);
+  });
+
+  test('fetchCol rejects fetch failure', async () => {
+    db.workflow = {
+      findUnique: async () => {
+        throw new Error('fetch failed');
+      },
+    };
+
+    await assert.rejects(() => service.fetchCol('col-1'), /fetch failed/);
   });
 });

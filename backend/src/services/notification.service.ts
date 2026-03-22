@@ -69,12 +69,6 @@ export class NotificationService {
 
   async readNotification(notificationId: string, read: boolean): Promise<void> {
     try {
-      console.log(
-        'Reading notification with id: ',
-        notificationId,
-        ' read: ',
-        read,
-      );
       await db.notification.update({
         where: {
           id: notificationId,
@@ -83,7 +77,6 @@ export class NotificationService {
           read: read,
         },
       });
-      console.log('Notification read status updated successfully');
     } catch (error) {
       throw new Error("Can't read notification: ", { cause: error });
     }

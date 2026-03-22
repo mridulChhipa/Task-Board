@@ -261,7 +261,7 @@ export class TaskService {
         }
       }
     } catch (error) {
-      throw new Error('Error updating Task: ', { cause: error });
+      throw error;
     }
   }
 
@@ -287,7 +287,7 @@ export class TaskService {
         await syncStatusWithChildren(existingTask.parentId);
       }
     } catch (error) {
-      throw new Error('Error deleting task: ', { cause: error });
+      throw error;
     }
   }
 

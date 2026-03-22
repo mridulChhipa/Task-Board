@@ -20,7 +20,7 @@ describe('CommentService', () => {
     const server = http.createServer();
     wsServer = initWSServer(server);
     if (wsServer) {
-      wsServer.sendNotification = () => {};
+      wsServer.sendNotification = () => { };
     }
   });
 
@@ -72,6 +72,70 @@ describe('CommentService', () => {
     assert.equal(thread.taskId, 'task-1');
   });
 
+  test('createThread rejects missing task', async () => {
+    db.thread = {
+      create: async () => ({ id: 'thread-1' }),
+    };
+    db.activity = {
+      create: async () => ({ id: 'activity-1' }),
+    };
+    db.task = {
+      findUnique: async () => null,
+    };
+
+    await assert.rejects(
+      () =>
+        service.createThread({
+          taskId: 'task-1',
+          title: 'Thread Title',
+          content: 'Thread body',
+          authorId: 1,
+          isDeleted: false,
+        }),
+      /Task not found/,
+    );
+  });
+
+  test('createThread rejects notification failure', async () => {
+    db.thread = {
+      create: async () => ({
+        id: 'thread-1',
+        title: 'Thread Title',
+        content: 'Thread body',
+        taskId: 'task-1',
+        authorId: 1,
+        isDeleted: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
+    };
+    db.activity = {
+      create: async () => ({ id: 'activity-1' }),
+    };
+    db.task = {
+      findUnique: async () => ({
+        id: 'task-1',
+        title: 'Task',
+        assignee: 2,
+      }),
+    };
+    notificationService.createNotification = (async () => {
+      throw new Error('notification failed');
+    }) as any;
+
+    await assert.rejects(
+      () =>
+        service.createThread({
+          taskId: 'task-1',
+          title: 'Thread Title',
+          content: 'Thread body',
+          authorId: 1,
+          isDeleted: false,
+        }),
+      /notification failed/,
+    );
+  });
+
   test('updateThread updates thread fields', async () => {
     let updateArgs: any = null;
     db.thread = {
@@ -98,6 +162,43 @@ describe('CommentService', () => {
     assert.equal(updateArgs?.data.title, 'Updated Thread');
   });
 
+  test('updateThread rejects missing thread', async () => {
+    db.thread = {
+      findUnique: async () => null,
+    };
+
+    await assert.rejects(
+      () =>
+        service.updateThread('thread-1', {
+          taskId: 'task-1',
+          title: 'Updated Thread',
+          content: 'Updated',
+          isDeleted: false,
+        }),
+      /Thread DNE/,
+    );
+  });
+
+  test('updateThread rejects update failure', async () => {
+    db.thread = {
+      findUnique: async () => ({ id: 'thread-1' }),
+      update: async () => {
+        throw new Error('update failed');
+      },
+    };
+
+    await assert.rejects(
+      () =>
+        service.updateThread('thread-1', {
+          taskId: 'task-1',
+          title: 'Updated Thread',
+          content: 'Updated',
+          isDeleted: false,
+        }),
+      /update failed/,
+    );
+  });
+
   test('deleteThread marks thread deleted', async () => {
     let updateArgs: any = null;
     db.thread = {
@@ -114,6 +215,31 @@ describe('CommentService', () => {
     await service.deleteThread('thread-1');
 
     assert.equal(updateArgs?.data.isDeleted, true);
+  });
+
+  test('deleteThread rejects missing thread', async () => {
+    db.thread = {
+      findUnique: async () => null,
+    };
+
+    await assert.rejects(
+      () => service.deleteThread('thread-1'),
+      /Thread DNE/,
+    );
+  });
+
+  test('deleteThread rejects update failure', async () => {
+    db.thread = {
+      findUnique: async () => ({ id: 'thread-1', taskId: 'task-1' }),
+      update: async () => {
+        throw new Error('update failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.deleteThread('thread-1'),
+      /update failed/,
+    );
   });
 
   test('createComment returns created comment', async () => {
@@ -157,6 +283,128 @@ describe('CommentService', () => {
     assert.equal(comment.threadId, 'thread-1');
   });
 
+  test('createComment rejects missing task', async () => {
+    db.comment = {
+      create: async () => ({
+        id: 'comment-1',
+        content: 'Comment body',
+        threadId: 'thread-1',
+        authorId: 1,
+        parentId: null,
+        isDeleted: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
+    };
+    db.task = {
+      findUnique: async () => null,
+    };
+
+    await assert.rejects(
+      () =>
+        service.createComment({
+          taskId: 'task-1',
+          threadId: 'thread-1',
+          authorId: 1,
+          content: 'Comment body',
+          isDeleted: false,
+          parentId: null,
+        }),
+      /Task not found/,
+    );
+  });
+
+  test('createComment handles mention notification', async () => {
+    const notifications: string[] = [];
+    notificationService.createNotification = (async (payload: any) => {
+      notifications.push(payload.type);
+      return { id: 'notif-1' } as any;
+    }) as any;
+
+    db.comment = {
+      create: async () => ({
+        id: 'comment-1',
+        content: 'Hey @user@node.test',
+        threadId: 'thread-1',
+        authorId: 1,
+        parentId: null,
+        isDeleted: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
+    };
+    db.task = {
+      findUnique: async () => ({
+        id: 'task-1',
+        title: 'Task',
+        assignee: 2,
+      }),
+    };
+    db.activity = {
+      create: async () => ({ id: 'activity-1' }),
+    };
+    db.user = {
+      findUnique: async () => ({ id: 1, name: 'Author' }),
+      findFirst: async () => ({ id: 3, name: 'Mentioned' }),
+    };
+
+    await service.createComment({
+      taskId: 'task-1',
+      threadId: 'thread-1',
+      authorId: 1,
+      content: 'Hey @user@node.test',
+      isDeleted: false,
+      parentId: null,
+    });
+
+    assert.equal(notifications.length, 2);
+  });
+
+  test('createComment rejects notification failure', async () => {
+    db.comment = {
+      create: async () => ({
+        id: 'comment-1',
+        content: 'Comment body',
+        threadId: 'thread-1',
+        authorId: 1,
+        parentId: null,
+        isDeleted: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
+    };
+    db.task = {
+      findUnique: async () => ({
+        id: 'task-1',
+        title: 'Task',
+        assignee: 2,
+      }),
+    };
+    db.activity = {
+      create: async () => ({ id: 'activity-1' }),
+    };
+    db.user = {
+      findUnique: async () => ({ id: 1, name: 'Author' }),
+      findFirst: async () => null,
+    };
+    notificationService.createNotification = (async () => {
+      throw new Error('notification failed');
+    }) as any;
+
+    await assert.rejects(
+      () =>
+        service.createComment({
+          taskId: 'task-1',
+          threadId: 'thread-1',
+          authorId: 1,
+          content: 'Comment body',
+          isDeleted: false,
+          parentId: null,
+        }),
+      /notification failed/,
+    );
+  });
+
   test('updateComment updates comment', async () => {
     let updateArgs: any = null;
     db.comment = {
@@ -182,6 +430,43 @@ describe('CommentService', () => {
     assert.equal(updateArgs?.data.content, 'Updated comment');
   });
 
+  test('updateComment rejects missing comment', async () => {
+    db.comment = {
+      findUnique: async () => null,
+    };
+
+    await assert.rejects(
+      () =>
+        service.updateComment('comment-1', {
+          taskId: 'task-1',
+          threadId: 'thread-1',
+          content: 'Updated comment',
+          isDeleted: false,
+        }),
+      /Comment DNE/,
+    );
+  });
+
+  test('updateComment rejects update failure', async () => {
+    db.comment = {
+      findUnique: async () => ({ id: 'comment-1' }),
+      update: async () => {
+        throw new Error('update failed');
+      },
+    };
+
+    await assert.rejects(
+      () =>
+        service.updateComment('comment-1', {
+          taskId: 'task-1',
+          threadId: 'thread-1',
+          content: 'Updated comment',
+          isDeleted: false,
+        }),
+      /update failed/,
+    );
+  });
+
   test('deleteComment marks comment deleted', async () => {
     let updateArgs: any = null;
     db.comment = {
@@ -195,6 +480,31 @@ describe('CommentService', () => {
     await service.deleteComment('comment-1', 'thread-1');
 
     assert.equal(updateArgs?.data.isDeleted, true);
+  });
+
+  test('deleteComment rejects missing comment', async () => {
+    db.comment = {
+      findUnique: async () => null,
+    };
+
+    await assert.rejects(
+      () => service.deleteComment('comment-1', 'thread-1'),
+      /Comment DNE/,
+    );
+  });
+
+  test('deleteComment rejects update failure', async () => {
+    db.comment = {
+      findUnique: async () => ({ id: 'comment-1' }),
+      update: async () => {
+        throw new Error('update failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.deleteComment('comment-1', 'thread-1'),
+      /update failed/,
+    );
   });
 
   test('fetchComment returns dto', async () => {
@@ -220,6 +530,30 @@ describe('CommentService', () => {
     assert.equal(comment.replies[0], 'comment-2');
   });
 
+  test('fetchComment rejects missing comment', async () => {
+    db.comment = {
+      findUnique: async () => null,
+    };
+
+    await assert.rejects(
+      () => service.fetchComment('comment-1'),
+      /Comment DNE/,
+    );
+  });
+
+  test('fetchComment rejects fetch failure', async () => {
+    db.comment = {
+      findUnique: async () => {
+        throw new Error('fetch failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.fetchComment('comment-1'),
+      /fetch failed/,
+    );
+  });
+
   test('fetchThread returns dto', async () => {
     db.thread = {
       findUnique: async () => ({
@@ -241,5 +575,29 @@ describe('CommentService', () => {
     assert.equal(thread.id, 'thread-1');
     assert.equal(thread.authorName, 'Author');
     assert.equal(thread.comments[0], 'comment-1');
+  });
+
+  test('fetchThread rejects missing thread', async () => {
+    db.thread = {
+      findUnique: async () => null,
+    };
+
+    await assert.rejects(
+      () => service.fetchThread('thread-1'),
+      /Thread DNE/,
+    );
+  });
+
+  test('fetchThread rejects fetch failure', async () => {
+    db.thread = {
+      findUnique: async () => {
+        throw new Error('fetch failed');
+      },
+    };
+
+    await assert.rejects(
+      () => service.fetchThread('thread-1'),
+      /fetch failed/,
+    );
   });
 });
