@@ -10,7 +10,6 @@ import type {
   TaskDTO,
   TaskType,
 } from '../types/task.types';
-import { toThreadDTO } from './comment.utils';
 
 type TaskWithChildren = Prisma.TaskGetPayload<{
   include: {
@@ -19,7 +18,7 @@ type TaskWithChildren = Prisma.TaskGetPayload<{
       include: {
         author: true;
         comments: true;
-      }
+      };
     };
     activities: {
       include: {
@@ -52,8 +51,7 @@ export function toTaskDTO(task: TaskWithChildren): TaskDTO {
     resolvedAt: task.resolvedAt,
     closedAt: task.closedAt,
     threads: task.threads?.map((thread) => {
-      // return toThreadDTO(thread as any);
-      return {
+      const threadToReturn: ThreadDTO = {
         id: thread.id,
         title: thread.title,
         content: thread.content,
@@ -64,7 +62,8 @@ export function toTaskDTO(task: TaskWithChildren): TaskDTO {
         authorId: thread.authorId,
         comments: thread.comments?.map((comment) => comment.id) ?? [],
         authorName: thread.author.name,
-      } as ThreadDTO
+      };
+      return threadToReturn;
     }),
     children: task.children?.map((child) => {
       return child.id;
@@ -81,21 +80,21 @@ export function toTaskDTO(task: TaskWithChildren): TaskDTO {
           newStatus: activity.newStatus as ColumnDTO,
           oldAssignee: (activity.oldAssignee
             ? {
-              ...activity.oldAssignee,
-              userId: activity.oldAssignee.id,
-            }
+                ...activity.oldAssignee,
+                userId: activity.oldAssignee.id,
+              }
             : null) as UserDetails,
           newAssignee: (activity.newAssignee
             ? {
-              ...activity.newAssignee,
-              userId: activity.newAssignee.id,
-            }
+                ...activity.newAssignee,
+                userId: activity.newAssignee.id,
+              }
             : null) as UserDetails,
           user: (activity.user
             ? {
-              ...activity.user,
-              userId: activity.user.id,
-            }
+                ...activity.user,
+                userId: activity.user.id,
+              }
             : null) as UserDetails,
         },
       }),

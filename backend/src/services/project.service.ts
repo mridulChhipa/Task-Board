@@ -61,6 +61,7 @@ export class ProjectService {
 
       return retProj;
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -118,6 +119,7 @@ export class ProjectService {
         },
       });
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -158,6 +160,7 @@ export class ProjectService {
         },
       });
     } catch (error) {
+      void error;
       throw new Error('Error removing user from project: ', { cause: error });
     }
   }

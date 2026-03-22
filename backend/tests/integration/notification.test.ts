@@ -103,6 +103,10 @@ describe('Notification API Endpoints', () => {
           id: args.data.recipientId,
           name: 'Recipient User',
         },
+        sender: {
+          id: args.data.senderId,
+          name: 'Sender User',
+        },
       }),
       findUnique: async (args: Prisma.NotificationFindUniqueArgs) => {
         if (hasRecipientSelect(args)) {
@@ -121,6 +125,10 @@ describe('Notification API Endpoints', () => {
           recipient: {
             id: userId,
             name: 'Recipient User',
+          },
+          sender: {
+            id: otherUserId,
+            name: 'Sender User',
           },
         };
       },

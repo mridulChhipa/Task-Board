@@ -93,6 +93,7 @@ export class TaskService {
 
       return createdTask.id;
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -261,6 +262,7 @@ export class TaskService {
         }
       }
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -287,6 +289,7 @@ export class TaskService {
         await syncStatusWithChildren(existingTask.parentId);
       }
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -329,6 +332,7 @@ export class TaskService {
 
       return toTaskDTO(existingTask);
     } catch (error) {
+      void error;
       throw error;
     }
   }

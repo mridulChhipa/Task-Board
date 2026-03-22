@@ -44,43 +44,6 @@ describe('Comment API Endpoints (RBAC)', () => {
     return `refreshToken=${refreshToken}`;
   };
 
-  const hasProjectIdSelect = (args: Prisma.TaskFindUniqueArgs): boolean => {
-    const select = args.select;
-    if (!select || typeof select !== 'object') {
-      return false;
-    }
-
-    const status = (select as { status?: unknown }).status;
-    if (!status || typeof status !== 'object') {
-      return false;
-    }
-
-    if (!('select' in status)) {
-      return false;
-    }
-
-    const statusSelect = (status as { select?: unknown }).select;
-    if (!statusSelect || typeof statusSelect !== 'object') {
-      return false;
-    }
-
-    const board = (statusSelect as { board?: unknown }).board;
-    if (!board || typeof board !== 'object') {
-      return false;
-    }
-
-    if (!('select' in board)) {
-      return false;
-    }
-
-    const boardSelect = (board as { select?: unknown }).select;
-    return !!(
-      boardSelect &&
-      typeof boardSelect === 'object' &&
-      'projectId' in boardSelect
-    );
-  };
-
   const hasThreadTaskIdSelect = (
     args: Prisma.CommentFindUniqueArgs,
   ): boolean => {
@@ -200,28 +163,16 @@ describe('Comment API Endpoints (RBAC)', () => {
     };
 
     db.task = {
-      findUnique: async (args: Prisma.TaskFindUniqueArgs) => {
-        if (hasProjectIdSelect(args)) {
-          return {
-            status: {
-              board: {
-                projectId,
-              },
-            },
-          };
-        }
-
-        return {
-          id: taskId,
-          title: 'Sample Task',
-          assignee: otherUserId,
-          status: {
-            board: {
-              projectId,
-            },
+      findUnique: async () => ({
+        id: taskId,
+        title: 'Sample Task',
+        assignee: otherUserId,
+        status: {
+          board: {
+            projectId,
           },
-        };
-      },
+        },
+      }),
     };
 
     db.thread = {
@@ -368,6 +319,10 @@ describe('Comment API Endpoints (RBAC)', () => {
         recipient: {
           id: args.data.recipientId,
           name: 'Recipient',
+        },
+        sender: {
+          id: args.data.senderId,
+          name: 'Sender',
         },
       }),
     };

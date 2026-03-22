@@ -21,7 +21,7 @@ describe('CommentService', () => {
     const server = http.createServer();
     wsServer = initWSServer(server);
     if (wsServer) {
-      wsServer.sendNotification = () => { };
+      wsServer.sendNotification = () => {};
     }
   });
 
@@ -223,10 +223,7 @@ describe('CommentService', () => {
       findUnique: async () => null,
     };
 
-    await assert.rejects(
-      () => service.deleteThread('thread-1'),
-      /Thread DNE/,
-    );
+    await assert.rejects(() => service.deleteThread('thread-1'), /Thread DNE/);
   });
 
   test('deleteThread rejects update failure', async () => {
@@ -583,10 +580,7 @@ describe('CommentService', () => {
       findUnique: async () => null,
     };
 
-    await assert.rejects(
-      () => service.fetchThread('thread-1'),
-      /Thread DNE/,
-    );
+    await assert.rejects(() => service.fetchThread('thread-1'), /Thread DNE/);
   });
 
   test('fetchThread rejects fetch failure', async () => {
@@ -596,9 +590,6 @@ describe('CommentService', () => {
       },
     };
 
-    await assert.rejects(
-      () => service.fetchThread('thread-1'),
-      /fetch failed/,
-    );
+    await assert.rejects(() => service.fetchThread('thread-1'), /fetch failed/);
   });
 });

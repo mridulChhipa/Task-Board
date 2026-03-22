@@ -71,6 +71,7 @@ export class CommentService {
 
       return createdThread as ThreadDTO;
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -100,7 +101,7 @@ export class CommentService {
           id,
         },
       });
-      
+
       await db.activity.create({
         data: {
           type: 'THREAD_EDITED',
@@ -109,6 +110,7 @@ export class CommentService {
         },
       });
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -142,6 +144,7 @@ export class CommentService {
         },
       });
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -244,6 +247,7 @@ export class CommentService {
 
       return createdComment as CommentDTO;
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -281,6 +285,7 @@ export class CommentService {
         },
       });
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -315,6 +320,7 @@ export class CommentService {
         },
       });
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -332,11 +338,12 @@ export class CommentService {
       });
 
       if (!existingComment) {
-        throw new Error("Comment DNE");
+        throw new Error('Comment DNE');
       }
 
       return toCommentDTO(existingComment);
     } catch (err) {
+      void err;
       throw err;
     }
   }
@@ -358,10 +365,11 @@ export class CommentService {
       });
 
       if (!existingThread) {
-        throw new Error("Thread DNE");
+        throw new Error('Thread DNE');
       }
       return toThreadDTO(existingThread);
     } catch (err) {
+      void err;
       throw err;
     }
   }

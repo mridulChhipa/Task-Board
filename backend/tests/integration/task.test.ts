@@ -290,6 +290,10 @@ describe('Task API Endpoints (RBAC)', () => {
           id: args.data.recipientId,
           name: 'Recipient',
         },
+        sender: {
+          id: args.data.senderId,
+          name: 'Sender',
+        },
       }),
     };
   });

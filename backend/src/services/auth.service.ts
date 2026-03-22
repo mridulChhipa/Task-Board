@@ -52,6 +52,7 @@ export class AuthService {
         password: body.password,
       });
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -88,6 +89,7 @@ export class AuthService {
       tokens.userId = user.id;
       return tokens;
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -110,6 +112,7 @@ export class AuthService {
 
       this.wsServer?.removeUser(payload.sub);
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -159,6 +162,7 @@ export class AuthService {
 
       return tokens;
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -266,6 +270,7 @@ export class AuthService {
 
       return userData;
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -347,6 +352,7 @@ export class AuthService {
 
       return userData;
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -374,6 +380,7 @@ export class AuthService {
         },
       });
     } catch (error) {
+      void error;
       throw error;
     }
   }

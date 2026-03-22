@@ -48,7 +48,7 @@ export function highlightEmails(html: string): string {
   // Replace emails with blue-colored span
   const highlightedHtml = html.replace(
     emailRegex,
-    '<span style="color: blue; font-weight: 500;">$1</span>'
+    '<span style="color: blue; font-weight: 500;">$1</span>',
   );
 
   return highlightedHtml;
