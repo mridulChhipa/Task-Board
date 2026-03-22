@@ -31,6 +31,8 @@ export interface BoardsViewProps {
   activeBoard: Board;
   workflowState: Workflow[];
   setWorkflowState: Dispatch<SetStateAction<Workflow[]>>;
+  taskCache: Record<string, Task>;
+  setTaskCache: Dispatch<SetStateAction<Record<string, Task>>>;
   isAdding: boolean;
   setIsAdding: Dispatch<SetStateAction<boolean>>;
   boardName: string;
@@ -130,6 +132,8 @@ export interface BoardsKanbanProps {
   activeBoard: Board;
   workflowState: Workflow[];
   setWorkflowState: Dispatch<SetStateAction<Workflow[]>>;
+  taskCache: Record<string, Task>;
+  setTaskCache: Dispatch<SetStateAction<Record<string, Task>>>;
   dragHighlight: boolean[];
   setDragHighlight: Dispatch<SetStateAction<boolean[]>>;
   setEdges: Dispatch<SetStateAction<EdgeConstraint[]>>;

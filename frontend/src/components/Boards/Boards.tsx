@@ -22,6 +22,7 @@ export default function Boards({ boards, role }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const activeBoard = boards[activeIndex];
   const [workflowState, setWorkflowState] = useState(activeBoard.workflows);
+  const [taskCache, setTaskCache] = useState<Record<string, Task>>({});
   const [isAdding, setIsAdding] = useState(false);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
@@ -139,6 +140,8 @@ export default function Boards({ boards, role }: Props) {
       activeBoard={activeBoard}
       workflowState={workflowState}
       setWorkflowState={setWorkflowState}
+      taskCache={taskCache}
+      setTaskCache={setTaskCache}
       isAdding={isAdding}
       setIsAdding={setIsAdding}
       boardName={boardName}

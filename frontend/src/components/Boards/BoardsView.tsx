@@ -9,6 +9,8 @@ export default function BoardsView({
   activeBoard,
   workflowState,
   setWorkflowState,
+  taskCache,
+  setTaskCache,
   isAdding,
   setIsAdding,
   boardName,
@@ -108,6 +110,8 @@ export default function BoardsView({
         activeBoard={activeBoard}
         workflowState={workflowState}
         setWorkflowState={setWorkflowState}
+        taskCache={taskCache}
+        setTaskCache={setTaskCache}
         dragHighlight={dragHighlight}
         setDragHighlight={setDragHighlight}
         setEdges={setEdges}

@@ -18,6 +18,8 @@ export default function BoardsKanban({
   activeBoard,
   workflowState,
   setWorkflowState,
+  taskCache,
+  setTaskCache,
   dragHighlight,
   setDragHighlight,
   boardRefreshKey,
@@ -131,6 +133,8 @@ export default function BoardsKanban({
                         edges,
                         dragHighlight,
                         workflowState,
+                        taskCache,
+                        setTaskCache,
                       )
                     }
                     dragoverHandler={dragoverHandler}
@@ -142,6 +146,7 @@ export default function BoardsKanban({
                         setDragHighlight,
                       )
                     }
+                    setTaskCache={setTaskCache}
                     setState={setState}
                   />
                 );

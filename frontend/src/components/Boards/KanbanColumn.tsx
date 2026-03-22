@@ -19,6 +19,7 @@ interface Props {
   dropHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
   dragoverHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
   taskDragstartHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
+  setTaskCache?: React.Dispatch<React.SetStateAction<Record<string, Task>>>;
   setState: {
     setTaskName: React.Dispatch<React.SetStateAction<string>>;
     setTaskDescription: React.Dispatch<React.SetStateAction<string>>;
@@ -47,6 +48,7 @@ export function KanbanColumn({
   highlight,
   dragoverHandler,
   taskDragstartHandler,
+  setTaskCache,
   setState,
 }: Props) {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -92,6 +94,13 @@ export function KanbanColumn({
       );
 
       setTasks(results);
+      setTaskCache?.((prev) => {
+        const next = { ...prev };
+        for (const task of results) {
+          next[task.id] = task;
+        }
+        return next;
+      });
     }
 
     fetchTasks();

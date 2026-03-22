@@ -1,4 +1,4 @@
-import type { EdgeConstraint, Workflow } from '../types/boards.types';
+import type { EdgeConstraint, Task, Workflow } from '../types/boards.types';
 import type { Board } from '../types/project.types';
 import { sortWorkflows } from './board.utils';
 
@@ -64,6 +64,79 @@ export function taskDragstartHandler(
   setDragHighlight(allowed);
 }
 
+function syncStoriesWithChildrenOrder(
+  workflows: Workflow[],
+  taskCache: Record<string, Task>,
+): Workflow[] {
+  if (Object.keys(taskCache).length === 0) {
+    return workflows;
+  }
+
+  const workflowIndexById = new Map<string, number>();
+  const workflowOrderById = new Map<string, number>();
+  const taskToWorkflowId = new Map<string, string>();
+
+  const nextWorkflows = workflows.map((workflow, index) => {
+    workflowIndexById.set(workflow.id, index);
+    workflowOrderById.set(workflow.id, workflow.orderIdx);
+    workflow.tasks.forEach((taskId) => taskToWorkflowId.set(taskId, workflow.id));
+    return {
+      ...workflow,
+      tasks: [...workflow.tasks],
+    };
+  });
+
+  for (const task of Object.values(taskCache)) {
+    if (task.type !== 'STORY' || !task.children || task.children.length === 0) {
+      continue;
+    }
+
+    let bestWorkflowId = '';
+    let bestOrderIdx = Number.POSITIVE_INFINITY;
+
+    for (const childId of task.children) {
+      const childTask = taskCache[childId];
+      if (!childTask) {
+        continue;
+      }
+      const childWorkflowId = childTask.statusId;
+      const childOrderIdx = workflowOrderById.get(childWorkflowId);
+      if (childOrderIdx !== undefined && childOrderIdx < bestOrderIdx) {
+        bestOrderIdx = childOrderIdx;
+        bestWorkflowId = childWorkflowId;
+      }
+    }
+
+    if (!bestWorkflowId) {
+      continue;
+    }
+
+    const currentWorkflowId = taskToWorkflowId.get(task.id);
+    if (!currentWorkflowId || currentWorkflowId === bestWorkflowId) {
+      continue;
+    }
+
+    const currentIdx = workflowIndexById.get(currentWorkflowId);
+    const targetIdx = workflowIndexById.get(bestWorkflowId);
+    if (currentIdx === undefined || targetIdx === undefined) {
+      continue;
+    }
+
+    nextWorkflows[currentIdx].tasks = nextWorkflows[currentIdx].tasks.filter(
+      (id) => id !== task.id,
+    );
+    if (!nextWorkflows[targetIdx].tasks.includes(task.id)) {
+      nextWorkflows[targetIdx].tasks = [
+        ...nextWorkflows[targetIdx].tasks,
+        task.id,
+      ];
+    }
+    taskToWorkflowId.set(task.id, bestWorkflowId);
+  }
+
+  return nextWorkflows;
+}
+
 export async function dropHandler(
   event: React.DragEvent<HTMLDivElement>,
   workflows: Workflow[],
@@ -76,6 +149,8 @@ export async function dropHandler(
   edges: EdgeConstraint[],
   dragHighlight: boolean[],
   workflowState: Workflow[],
+  taskCache: Record<string, Task>,
+  setTaskCache: React.Dispatch<React.SetStateAction<Record<string, Task>>>,
 ) {
   event.stopPropagation();
   event.preventDefault();
@@ -151,9 +226,10 @@ export async function dropHandler(
       workflow.orderIdx = newOrderIdx;
       const newWorkflowState = [...workflowState];
       const sortedWF = await sortWorkflows(newWorkflowState);
-      setWorkflowState(sortedWF);
-      setDragHighlight(sortedWF.map(() => false));
-      boards[activeIndex].workflows = sortedWF;
+      const syncedWF = syncStoriesWithChildrenOrder(sortedWF, taskCache);
+      setWorkflowState(syncedWF);
+      setDragHighlight(syncedWF.map(() => false));
+      boards[activeIndex].workflows = syncedWF;
     } catch (err) {
       handleError('Column update failed with');
       throw new Error('Column update failed with error: ', { cause: err });
@@ -240,6 +316,17 @@ export async function dropHandler(
       );
       const text = await res.text();
       console.log('Task update response: ', text);
+      setTaskCache((prev) => {
+        const next = { ...prev };
+        const cachedTask = next[taskId];
+        if (cachedTask) {
+          next[taskId] = {
+            ...cachedTask,
+            statusId: colId,
+          };
+        }
+        return next;
+      });
     } catch (err) {
       console.log('Error transferring task: ', { cause: err });
       return;
@@ -305,6 +392,20 @@ export async function dropHandler(
             return workflow;
           })
         : newWFState;
+
+    if (parentTaskId && parentTaskId.length > 0 && targetParentId) {
+      setTaskCache((prev) => {
+        const next = { ...prev };
+        const cachedParent = next[parentTaskId];
+        if (cachedParent) {
+          next[parentTaskId] = {
+            ...cachedParent,
+            statusId: targetParentId,
+          };
+        }
+        return next;
+      });
+    }
 
     console.log(newWFState2);
     const sortedWF = await sortWorkflows(newWFState2);
