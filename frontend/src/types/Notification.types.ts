@@ -4,8 +4,7 @@ export type NotifType =
   | 'COMMENT_ADDED' // Boardcast
   | 'THREAD_STARTED' // Boardcast
   | 'MENTIONED' // Personal
-  | 'REPLY' // Personal
-
+  | 'REPLY'; // Personal
 
 export interface NotifBody {
   recipientId: number;

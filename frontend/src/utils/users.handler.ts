@@ -20,10 +20,7 @@ interface Props {
   handleError: (message: string) => void;
 }
 
-export async function handleAdd(
-  e: SubmitEvent,
-  props: Props,
-) {
+export async function handleAdd(e: SubmitEvent, props: Props) {
   e.preventDefault();
   if (props.operation === 'Add') {
     try {
@@ -125,10 +122,7 @@ export async function handleAdd(
   }
 }
 
-export async function addGlobal(
-  e: SubmitEvent,
-  props: Props,
-) {
+export async function addGlobal(e: SubmitEvent, props: Props) {
   e.preventDefault();
   try {
     await fetch(`http://localhost:3000/api/auth/update-user`, {
@@ -148,9 +142,7 @@ export async function addGlobal(
   }
 }
 
-export async function getMembers(
-  props: Props,
-): Promise<ProjectMember[]> {
+export async function getMembers(props: Props): Promise<ProjectMember[]> {
   async function getEmail(userId: number): Promise<string> {
     try {
       const res = await fetch(`http://localhost:3000/api/auth/${userId}`, {

@@ -27,7 +27,7 @@ export interface TaskCardSetState {
 export interface BoardsViewProps {
   boards: Board[];
   activeIndex: number;
-  setActiveIndex: Dispatch<SetStateAction<number>>;
+  setActiveIndex: (index: number) => void;
   activeBoard: Board;
   workflowState: Workflow[];
   setWorkflowState: Dispatch<SetStateAction<Workflow[]>>;
@@ -126,7 +126,7 @@ export interface BoardsModalStackProps {
 export interface BoardsKanbanProps {
   boards: Board[];
   activeIndex: number;
-  setActiveIndex: Dispatch<SetStateAction<number>>;
+  setActiveIndex: (index: number) => void;
   activeBoard: Board;
   workflowState: Workflow[];
   setWorkflowState: Dispatch<SetStateAction<Workflow[]>>;

@@ -33,13 +33,13 @@
   line-height: 1.5;
 }
 
-.editableArea[data-empty="true"]::before {
+.editableArea[data-empty='true']::before {
   content: attr(data-placeholder);
   color: #999;
   pointer-events: none;
 }
 
-.editableArea[data-empty="true"]:not(:focus)::before {
+.editableArea[data-empty='true']:not(:focus)::before {
   content: attr(data-placeholder);
   color: #999;
   pointer-events: none;

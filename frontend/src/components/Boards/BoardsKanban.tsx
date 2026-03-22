@@ -3,7 +3,12 @@ import Button from '../Button/Button';
 import { handleError } from '../../App';
 import { KanbanColumn } from './KanbanColumn';
 import EditWorkflowButton from './EditWorkflowButton';
-import { dragoverHandler, dragstartHandler, dropHandler, taskDragstartHandler } from '../../utils/dragDrop.utils';
+import {
+  dragoverHandler,
+  dragstartHandler,
+  dropHandler,
+  taskDragstartHandler,
+} from '../../utils/dragDrop.utils';
 import type { BoardsKanbanProps } from './BoardsView.types';
 
 export default function BoardsKanban({
@@ -33,7 +38,15 @@ export default function BoardsKanban({
 }: BoardsKanbanProps) {
   return (
     <div className={styles.container}>
-      <div className={styles.tabList} role="tablist" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div
+        className={styles.tabList}
+        role="tablist"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <div>
           {boards.map((board, idx) => {
             const isActive = idx === activeIndex;
@@ -58,8 +71,12 @@ export default function BoardsKanban({
             );
           })}
         </div>
-        <Button 
-          onClick={() => {setShowViewEdgesModal(true); console.log(role);}}>
+        <Button
+          onClick={() => {
+            setShowViewEdgesModal(true);
+            console.log(role);
+          }}
+        >
           Transitions
         </Button>
       </div>
@@ -84,12 +101,15 @@ export default function BoardsKanban({
                       if (
                         workflow.tasks.length >= workflow.limit &&
                         workflow.limit !== -1
-                      )
+                      ) {
                         return;
+                      }
                       setShowAddTaskModal(true);
                       setActiveColumnId(workflow.id);
                     }}
-                    deleteColumn={async () => await boardHandlers.deleteColumn(workflow.id)}
+                    deleteColumn={async () =>
+                      await boardHandlers.deleteColumn(workflow.id)
+                    }
                     renameColumn={async (name) =>
                       await boardHandlers.renameColumn(workflow.id, name)
                     }
@@ -98,33 +118,43 @@ export default function BoardsKanban({
                     dragstartHandler={
                       role === 'PROJECT_ADMIN' ? dragstartHandler : undefined
                     }
-                    dropHandler={(e) => dropHandler(
-                      e,
-                      workflowState,
-                      activeBoard,
-                      boards,
-                      activeIndex,
-                      setWorkflowState,
-                      setDragHighlight,
-                      handleError,
-                      edges,
-                      dragHighlight,
-                      workflowState,
-                    )}
+                    dropHandler={(e) =>
+                      dropHandler(
+                        e,
+                        workflowState,
+                        activeBoard,
+                        boards,
+                        activeIndex,
+                        setWorkflowState,
+                        setDragHighlight,
+                        handleError,
+                        edges,
+                        dragHighlight,
+                        workflowState,
+                      )
+                    }
                     dragoverHandler={dragoverHandler}
-                    taskDragstartHandler={(e) => taskDragstartHandler(
-                      e,
-                      workflowState,
-                      edges,
-                      setDragHighlight
-                    )}
+                    taskDragstartHandler={(e) =>
+                      taskDragstartHandler(
+                        e,
+                        workflowState,
+                        edges,
+                        setDragHighlight,
+                      )
+                    }
                     setState={setState}
                   />
                 );
               })}
 
             {activeBoard && role === 'PROJECT_ADMIN' && (
-              <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
+              <div
+                style={{
+                  position: 'relative',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
                 <EditWorkflowButton
                   isAdding={isAdding}
                   setIsAdding={setIsAdding}

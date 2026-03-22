@@ -17,12 +17,8 @@ export function createWorkflowHandlers(
   const { fromEdgeName, toEdgeName } = edgeForm;
   const { workflowState, edges } = state;
 
-  const {
-    setWorkflowState,
-    setDragHighlight,
-    setIsAddingEdge,
-    setEdges,
-  } = setters;
+  const { setWorkflowState, setDragHighlight, setIsAddingEdge, setEdges } =
+    setters;
 
   const deleteColumn = async (workflowId: string) => {
     if (!projectId || !activeBoard) {

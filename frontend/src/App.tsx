@@ -15,44 +15,47 @@ import { PopupContext, triggerPopup } from './context/PopupProvider.tsx';
 
 function App() {
   const showPopup = useContext(PopupContext);
-  if(!showPopup){
-    throw new Error("PopupContext not found");
+  if (!showPopup) {
+    throw new Error('PopupContext not found');
   }
   return (
     <AuthProvider>
       <BrowserRouter>
-      <Loader />
-      <NavBar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/signin" element={<LogInPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/dashboard" element={<DashBoard />} />
-        <Route
-          path="/project/:pid"
-          element={
-            <ProjectProvider>
-              <ProjectPage></ProjectPage>
-            </ProjectProvider>
-          }
-        />
+        <Loader />
+        <NavBar />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/signin" element={<LogInPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/dashboard" element={<DashBoard />} />
+          <Route
+            path="/project/:pid"
+            element={
+              <ProjectProvider>
+                <ProjectPage></ProjectPage>
+              </ProjectProvider>
+            }
+          />
 
-        <Route
-          path="/project/:pid/task/:tid"
-          element={
-            <ProjectProvider>
-              <TaskPage />
-            </ProjectProvider>
-          }
-        />
-        <Route path="/account" element={<Account />} />
-      </Routes>
-    </BrowserRouter>
+          <Route
+            path="/project/:pid/task/:tid"
+            element={
+              <ProjectProvider>
+                <TaskPage />
+              </ProjectProvider>
+            }
+          />
+          <Route path="/account" element={<Account />} />
+        </Routes>
+      </BrowserRouter>
     </AuthProvider>
   );
 }
 
-export async function handleNotification(senderId: number, notification: string) {
+export async function handleNotification(
+  senderId: number,
+  notification: string,
+) {
   const res = await fetch(`http://localhost:3000/api/auth/${senderId}`, {
     method: 'GET',
     credentials: 'include',
@@ -62,8 +65,8 @@ export async function handleNotification(senderId: number, notification: string)
   triggerPopup(sender, notification, false);
 }
 
-export async function handleError(message: string){
-  triggerPopup("ERROR", message, true);
+export async function handleError(message: string) {
+  triggerPopup('ERROR', message, true);
 }
 
 export default App;

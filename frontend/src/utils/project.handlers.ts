@@ -1,6 +1,6 @@
 import { type SubmitEvent, type Dispatch, type SetStateAction } from 'react';
 import type { Project } from '../types/project.types';
-import type { User } from '../context/AuthContext';
+import type { DispatchType, User } from '../context/AuthContext';
 
 interface Props {
   name: string;
@@ -17,14 +17,11 @@ interface Props {
   setUpdatedIsArchived: Dispatch<SetStateAction<boolean>>;
   setShowUpdateModal: Dispatch<SetStateAction<boolean>>;
   user: User | null;
-  dispatch: Dispatch<any>;
+  dispatch: Dispatch<DispatchType>;
   handleError: (message: string) => void;
 }
 
-export async function handleCreate(
-  e: SubmitEvent,
-  props: Props,
-) {
+export async function handleCreate(e: SubmitEvent, props: Props) {
   e.preventDefault();
 
   try {
@@ -67,17 +64,20 @@ export async function handleCreate(
             },
           });
 
-          await fetch(`http://localhost:3000/api/project/assign-user/${project.id}`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
+          await fetch(
+            `http://localhost:3000/api/project/assign-user/${project.id}`,
+            {
+              method: 'POST',
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userMail: props.user.email,
+                role: 'PROJECT_ADMIN',
+              }),
             },
-            body: JSON.stringify({
-              userMail: props.user.email,
-              role: 'PROJECT_ADMIN',
-            }),
-          });
+          );
         }
       })
       .catch((err) => {
@@ -96,10 +96,7 @@ export async function handleCreate(
   }
 }
 
-export async function handleUpdate(
-  e: SubmitEvent,
-  props: Props,
-) {
+export async function handleUpdate(e: SubmitEvent, props: Props) {
   e.preventDefault();
 
   try {

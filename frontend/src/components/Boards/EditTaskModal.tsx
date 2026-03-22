@@ -137,18 +137,21 @@ export default function EditTaskModal({
             />
           </InputArea>
           <div style={{ display: 'flex', flexDirection: 'row', gap: '0.5rem' }}>
-            <Label htmlFor="showParent">Set parent story (uncheck to keep same parent)</Label>
+            <Label htmlFor="showParent">
+              Set parent story (uncheck to keep same parent)
+            </Label>
             <input
-              type='checkbox'
-              name='showParent'
+              type="checkbox"
+              name="showParent"
               checked={setParent}
               onChange={(e) => setSetParent(e.target.checked)}
               disabled={taskType === 'STORY'}
-              defaultChecked={false}
             />
           </div>
           <InputArea>
-            <Label htmlFor="parentTask">parentTask (contains last copied task ID)</Label>
+            <Label htmlFor="parentTask">
+              parentTask (contains last copied task ID)
+            </Label>
             <FormControl
               type="string"
               name="parentTask"
@@ -158,11 +161,7 @@ export default function EditTaskModal({
             />
           </InputArea>
           <div className={formStyles.buttonGroup}>
-            <Button
-              priority="second"
-              type="button"
-              onClick={onClose}
-            >
+            <Button priority="second" type="button" onClick={onClose}>
               Cancel
             </Button>
             <Button priority="first" type="submit">

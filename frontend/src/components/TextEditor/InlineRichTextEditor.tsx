@@ -11,7 +11,7 @@ export interface InlineRichTextEditorProps {
   placeholder?: string;
   name?: string;
   id?: string;
-  required?: boolean,
+  required?: boolean;
 }
 
 export default function InlineRichTextEditor({
@@ -44,26 +44,26 @@ export default function InlineRichTextEditor({
 
   const handleInput = (): void => {
     const element = editorRef.current;
-    if (!element) return;
+    if (!element) {
+      return;
+    }
 
     const html = element.innerHTML;
-    const text = element.textContent?.trim() ?? "";
+    const text = element.textContent?.trim() ?? '';
 
     const isEmpty =
-      text === "" ||
-      html === "<br>" ||
-      html === "<div><br></div>";
+      text === '' || html === '<br>' || html === '<div><br></div>';
 
     if (isEmpty) {
-      element.setAttribute("data-empty", "true");
+      element.setAttribute('data-empty', 'true');
     } else {
-      element.removeAttribute("data-empty");
+      element.removeAttribute('data-empty');
     }
 
     if (onChange) {
       onChange({
         target: {
-          value: isEmpty ? "" : html,
+          value: isEmpty ? '' : html,
         },
       });
     }
@@ -71,7 +71,9 @@ export default function InlineRichTextEditor({
 
   const formatText = (command: string): void => {
     const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return;
+    if (!selection || selection.rangeCount === 0) {
+      return;
+    }
 
     const range = selection.getRangeAt(0);
     const selectedText = range.extractContents();
@@ -79,14 +81,14 @@ export default function InlineRichTextEditor({
     let wrapper: HTMLElement;
 
     switch (command) {
-      case "bold":
-        wrapper = document.createElement("b");
+      case 'bold':
+        wrapper = document.createElement('b');
         break;
-      case "italic":
-        wrapper = document.createElement("i");
+      case 'italic':
+        wrapper = document.createElement('i');
         break;
-      case "underline":
-        wrapper = document.createElement("u");
+      case 'underline':
+        wrapper = document.createElement('u');
         break;
       default:
         return;
@@ -107,10 +109,12 @@ export default function InlineRichTextEditor({
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>): void => {
     e.preventDefault();
 
-    const text = e.clipboardData.getData("text/plain");
+    const text = e.clipboardData.getData('text/plain');
 
     const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return;
+    if (!selection || selection.rangeCount === 0) {
+      return;
+    }
 
     const range = selection.getRangeAt(0);
 
@@ -175,4 +179,4 @@ export default function InlineRichTextEditor({
       />
     </div>
   );
-};
+}

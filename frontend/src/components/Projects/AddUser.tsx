@@ -38,9 +38,15 @@ export default function AddUser({
         onChange={(e) => setOperation(e.target.value as Operation)}
       >
         <option value="View">View Users</option>
-        <option value="Add" disabled={!canManageUsers}>Add User</option>
-        <option value="Edit" disabled={!canManageUsers}>Edit User Role</option>
-        <option value="Remove" disabled={!canManageUsers}>Remove User</option>
+        <option value="Add" disabled={!canManageUsers}>
+          Add User
+        </option>
+        <option value="Edit" disabled={!canManageUsers}>
+          Edit User Role
+        </option>
+        <option value="Remove" disabled={!canManageUsers}>
+          Remove User
+        </option>
       </select>
       <h2
         style={{

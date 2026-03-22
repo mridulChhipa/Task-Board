@@ -22,17 +22,19 @@ interface Props {
 }
 
 export default function Thread({ thread, deleteThread, refreshTask }: Props) {
-  if (thread.isDeleted) return <></>;
-
   const { tid: taskId } = useParams();
   const authContext = useContext(AuthContext);
 
   const [comment, setComment] = useState<string>();
   const [comments, setComments] = useState<string[]>(thread.comments ?? []);
   const [isEditing, setIsEditing] = useState(false);
-  const [editingField, setEditingField] = useState<'title' | 'content' | null>(null);
+  const [editingField, setEditingField] = useState<'title' | 'content' | null>(
+    null,
+  );
   const [editedTitle, setEditedTitle] = useState(thread.title);
-  const [editedContent, setEditedContent] = useState<string>(thread.content ?? '');
+  const [editedContent, setEditedContent] = useState<string>(
+    thread.content ?? '',
+  );
 
   const handleSave = async () => {
     const hasTitleChange = editedTitle !== thread.title && editedTitle !== '';
@@ -158,6 +160,10 @@ export default function Thread({ thread, deleteThread, refreshTask }: Props) {
     }
   }
 
+  if (thread.isDeleted) {
+    return <></>;
+  }
+
   return (
     <div className={styles.threadContainer}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -178,7 +184,6 @@ export default function Thread({ thread, deleteThread, refreshTask }: Props) {
             }}
             style={{ cursor: 'text', flexGrow: 1, margin: 0 }}
             title="Click to edit"
-
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(editedTitle) }}
           />
         )}

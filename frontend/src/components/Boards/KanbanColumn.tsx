@@ -107,9 +107,7 @@ export function KanbanColumn({
     }
   }, [role, isEditingName]);
 
-  async function handleRenameSubmit(
-    event?: SubmitEvent,
-  ) {
+  async function handleRenameSubmit(event?: SubmitEvent) {
     event?.preventDefault();
     const nextName = draftName.trim();
     if (nextName === '' || nextName === workflow.name) {
@@ -123,7 +121,7 @@ export function KanbanColumn({
 
   return (
     <div
-      className={highlight? styles.kanbanColumnDisable : styles.kanbanColumn}
+      className={highlight ? styles.kanbanColumnDisable : styles.kanbanColumn}
       id={id}
       draggable={draggable}
       onDragStart={dragstartHandler}
@@ -147,10 +145,7 @@ export function KanbanColumn({
                 autoFocus
               />
               <div className={styles.columnEditActions}>
-                <button
-                  className={styles.columnEditBtn}
-                  type="submit"
-                >
+                <button className={styles.columnEditBtn} type="submit">
                   Save
                 </button>
                 <button

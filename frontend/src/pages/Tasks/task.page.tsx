@@ -41,10 +41,12 @@ export default function TaskPage() {
 
         const formattedTask: Task = {
           ...rawTask,
-          threads: rawTask.threads.map((thread: { comments: CommentDTO[] }) => ({
-            ...thread,
-            comments: thread.comments.map((x: CommentDTO) => x.id),
-          })),
+          threads: rawTask.threads.map(
+            (thread: { comments: CommentDTO[] }) => ({
+              ...thread,
+              comments: thread.comments.map((x: CommentDTO) => x.id),
+            }),
+          ),
         };
 
         setTask(formattedTask);
@@ -106,9 +108,9 @@ export default function TaskPage() {
       setTask((prev) =>
         prev
           ? {
-            ...prev,
-            threads: [...(prev.threads ?? []), newThread],
-          }
+              ...prev,
+              threads: [...(prev.threads ?? []), newThread],
+            }
           : prev,
       );
       setThreadContent('');
@@ -154,7 +156,7 @@ export default function TaskPage() {
             return (
               <Thread
                 refreshTask={() => {
-                  setRefreshKey(refreshKey + 1)
+                  setRefreshKey(refreshKey + 1);
                 }}
                 deleteThread={deleteThread}
                 key={idx}

@@ -57,17 +57,17 @@ export interface ActivityDTO {
 }
 
 export interface EdgeConstraint {
-  id: String;
-  boardId: String;
+  id: string;
+  boardId: string;
   board?: Board;
-  uId: String;
+  uId: string;
   u?: Workflow;
-  vId: String;
+  vId: string;
   v?: Workflow;
 }
 
 export interface ProjectMember {
- userId: number;
+  userId: number;
 }
 
 export type TaskType = 'STORY' | 'TASK' | 'BUG';

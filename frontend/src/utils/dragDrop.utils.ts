@@ -16,19 +16,30 @@ export function dragstartHandler(event: React.DragEvent<HTMLDivElement>) {
   event.dataTransfer.setData(dragData.columnOrderId, event.currentTarget.id);
 }
 
-export function taskDragstartHandler(event: React.DragEvent<HTMLDivElement>, workflowState: Workflow[], edges: EdgeConstraint[], setDragHighlight: React.Dispatch<React.SetStateAction<boolean[]>>) {
+export function taskDragstartHandler(
+  event: React.DragEvent<HTMLDivElement>,
+  workflowState: Workflow[],
+  edges: EdgeConstraint[],
+  setDragHighlight: React.Dispatch<React.SetStateAction<boolean[]>>,
+) {
   console.log('task drag start');
   event.stopPropagation();
   event.dataTransfer.setData(dragData.itemType, 'task');
-  event.dataTransfer.setData(dragData.taskId, event.currentTarget.dataset.id ?? '');
+  event.dataTransfer.setData(
+    dragData.taskId,
+    event.currentTarget.dataset.id ?? '',
+  );
   event.dataTransfer.setData(
     dragData.originColumnId,
     event.currentTarget.dataset.parent ?? '',
   );
-  let allowed: boolean[] = workflowState.map(() => true);
-    for(const edge of edges){
+
+  const allowed: boolean[] = workflowState.map(() => true);
+  for (const edge of edges) {
     const idx = workflowState.findIndex((workflow) => workflow.id === edge.vId);
-    if(edge.uId === event.currentTarget.dataset.parent) allowed[idx] = false;
+    if (edge.uId === event.currentTarget.dataset.parent) {
+      allowed[idx] = false;
+    }
   }
   setDragHighlight(allowed);
 }
@@ -49,28 +60,36 @@ export async function dropHandler(
   event.stopPropagation();
   event.preventDefault();
   const dragItemType = event.dataTransfer.getData(dragData.itemType);
-  const draggedColumnOrderId = event.dataTransfer.getData(dragData.columnOrderId);
+  const draggedColumnOrderId = event.dataTransfer.getData(
+    dragData.columnOrderId,
+  );
   const draggedTaskId = event.dataTransfer.getData(dragData.taskId);
-  const draggedOriginColumnId = event.dataTransfer.getData(dragData.originColumnId);
+  const draggedOriginColumnId = event.dataTransfer.getData(
+    dragData.originColumnId,
+  );
   setDragHighlight(dragHighlight.map(() => false));
   if (event.currentTarget.dataset.column === 'true') {
     if (dragItemType === 'task') {
       // check for wip limit, adjacent column, same columns
       const currCol = workflows[Number(event.currentTarget.id)].id;
-      const foundEdge = edges.find((edge) => edge.uId === draggedOriginColumnId && edge.vId === currCol);
+      const foundEdge = edges.find(
+        (edge) => edge.uId === draggedOriginColumnId && edge.vId === currCol,
+      );
       if (!foundEdge) {
         handleError('Task transfer not allowed due to edge constraints');
-        throw new Error ('Task transfer not allowed due to edge constraints');
+        throw new Error('Task transfer not allowed due to edge constraints');
       }
       const ogColIdx = workflows.find(
         (workflow) => workflow.id === draggedOriginColumnId,
       )?.orderIdx;
       const currColIdx = Number(event.currentTarget.id);
-      if (ogColIdx === undefined) return;
+      if (ogColIdx === undefined) {
+        return;
+      }
       const limit = workflows[currColIdx].limit;
       const taskCount = workflows[currColIdx].tasks.length;
       console.log(currColIdx);
-      if (limit != -1 && taskCount >= limit) {
+      if (limit !== -1 && taskCount >= limit) {
         handleError('Task transfer not allowed due to WIP limit');
         throw new Error('Task transfer not allowed due to WIP limit');
       }
@@ -138,22 +157,30 @@ export async function dropHandler(
         credentials: 'include',
       });
       const data = await res1.json();
-      if(data.task.type === 'STORY' && data.task.subtasks && data.task.subtasks.length > 0){
-        handleError('Cannot move a story with existing subtasks. Please move the subtasks first.');
-        throw new Error('Cannot move a story with existing subtasks. Please move the subtasks first.');
+      if (
+        data.task.type === 'STORY' &&
+        data.task.subtasks &&
+        data.task.subtasks.length > 0
+      ) {
+        handleError(
+          'Cannot move a story with existing subtasks. Please move the subtasks first.',
+        );
+        throw new Error(
+          'Cannot move a story with existing subtasks. Please move the subtasks first.',
+        );
       }
       parentTaskId = data.task.parentId;
-      if(parentTaskId && parentTaskId !== ''){
+      if (parentTaskId && parentTaskId !== '') {
         const res2 = await fetch(
-            `http://localhost:3000/api/task/${parentTaskId}`,
-            {
-              credentials: 'include',
-            },
-          );
-          const data_parent = await res2.json();
-          ogParentId = data_parent.task.statusId;
-          console.log('Old parent column: ', ogParentId);
-          subtaskIds = data_parent.task.children ?? [];
+          `http://localhost:3000/api/task/${parentTaskId}`,
+          {
+            credentials: 'include',
+          },
+        );
+        const dataParent = await res2.json();
+        ogParentId = dataParent.task.statusId;
+        console.log('Old parent column: ', ogParentId);
+        subtaskIds = dataParent.task.children ?? [];
       }
       const res = await fetch(
         `http://localhost:3000/api/task/update/${taskId}`,
@@ -182,35 +209,39 @@ export async function dropHandler(
       return;
     }
     const newWFState = workflowState.map((workflow) => {
-      if(workflow.id === draggedOriginColumnId){
+      if (workflow.id === draggedOriginColumnId) {
         return {
           ...workflow,
           tasks: workflow.tasks.filter((id) => id !== taskId),
-        }
-      } else if(workflow.id === colId){
+        };
+      } else if (workflow.id === colId) {
         return {
           ...workflow,
           tasks: [...workflow.tasks, taskId],
-        }
+        };
+      } else {
+        return workflow;
       }
-      else return workflow;
     });
     console.log(newWFState);
     let targetParentId = '';
-    if(parentTaskId && parentTaskId !== ''){
+    if (parentTaskId && parentTaskId !== '') {
       try {
         const subtasksColIds = await Promise.all(
           subtaskIds.map(async (subtaskId) => {
-            const res = await fetch(`http://localhost:3000/api/task/${subtaskId}`, {
-              credentials: 'include',
-            });
+            const res = await fetch(
+              `http://localhost:3000/api/task/${subtaskId}`,
+              {
+                credentials: 'include',
+              },
+            );
             const data = await res.json();
             return data.task.statusId;
           }),
         );
-        for(const workflow of newWFState){
+        for (const workflow of newWFState) {
           console.log('Checking workflow ', workflow.orderIdx);
-          if(subtasksColIds.some((id) => id === workflow.id)){
+          if (subtasksColIds.some((id) => id === workflow.id)) {
             console.log('Found new parent column: ', workflow.id);
             targetParentId = workflow.id;
             break;
@@ -221,21 +252,23 @@ export async function dropHandler(
         return;
       }
     }
-    const newWFState2 = (parentTaskId && parentTaskId.length > 0) ? newWFState.map((workflow) => {
-      if (workflow.id === ogParentId) {
-        return {
-          ...workflow,
-          tasks: workflow.tasks.filter((id) => id !== parentTaskId),
-        }
-      }
-      else if(workflow.id === targetParentId){
-        return {
-          ...workflow,
-          tasks: [...workflow.tasks, parentTaskId],
-        }
-      }
-      return workflow;
-    }) : newWFState;
+    const newWFState2 =
+      parentTaskId && parentTaskId.length > 0
+        ? newWFState.map((workflow) => {
+            if (workflow.id === ogParentId) {
+              return {
+                ...workflow,
+                tasks: workflow.tasks.filter((id) => id !== parentTaskId),
+              };
+            } else if (workflow.id === targetParentId) {
+              return {
+                ...workflow,
+                tasks: [...workflow.tasks, parentTaskId],
+              };
+            }
+            return workflow;
+          })
+        : newWFState;
 
     console.log(newWFState2);
     const sortedWF = await sortWorkflows(newWFState2);

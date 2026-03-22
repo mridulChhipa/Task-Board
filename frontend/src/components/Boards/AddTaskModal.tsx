@@ -139,29 +139,29 @@ export default function AddTaskModal({
           <div style={{ display: 'flex', flexDirection: 'row', gap: '0.5rem' }}>
             <Label htmlFor="showParent">Set parent story</Label>
             <input
-              type='checkbox'
-              name='showParent'
+              type="checkbox"
+              name="showParent"
               checked={setParent}
               onChange={(e) => setSetParent(e.target.checked)}
               disabled={taskType === 'STORY'}
             />
           </div>
-          {setParent && <InputArea>
-            <Label htmlFor="parentTask">parentTask (contains last copied task ID)</Label>
-            <FormControl
-              type="string"
-              name="parentTask"
-              id="parentTask"
-              value={taskId}
-              disabled
-            />
-          </InputArea>}
+          {setParent && (
+            <InputArea>
+              <Label htmlFor="parentTask">
+                parentTask (contains last copied task ID)
+              </Label>
+              <FormControl
+                type="string"
+                name="parentTask"
+                id="parentTask"
+                value={taskId}
+                disabled
+              />
+            </InputArea>
+          )}
           <div className={formStyles.buttonGroup}>
-            <Button
-              priority="second"
-              type="button"
-              onClick={onClose}
-            >
+            <Button priority="second" type="button" onClick={onClose}>
               Cancel
             </Button>
             <Button priority="first" type="submit">

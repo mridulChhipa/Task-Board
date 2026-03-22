@@ -8,20 +8,22 @@ import BoardTransitionsModal from './BoardTransitionsModal';
 import type { BoardsModalStackProps } from './BoardsView.types';
 
 function ShowChildrenModal({ children }: { children: Task[] | null }) {
-  if (!children) return [];
+  if (!children) {
+    return [];
+  }
   return (
     <>
       <div className={styles.childContainer}>
-        {children.map((child) =>
+        {children.map((child) => (
           <TaskCard
             key={child.id}
             task={child}
             showDelete={false}
             showSettings={false}
             draggable={false}
-            dragstartHandler={() => { }}
+            dragstartHandler={() => {}}
           />
-        )}
+        ))}
       </div>
     </>
   );
@@ -129,9 +131,11 @@ export default function BoardsModalStack({
         toEdgeName={toEdgeName}
         setToEdgeName={setToEdgeName}
       />
-      {showChild && <Modal onclick={() => setShowChild(false)}>
-        <ShowChildrenModal children={showChildOf} />
-      </Modal>}
+      {showChild && (
+        <Modal onclick={() => setShowChild(false)}>
+          <ShowChildrenModal>{showChildOf}</ShowChildrenModal>
+        </Modal>
+      )}
     </>
   );
 }

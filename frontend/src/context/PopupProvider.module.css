@@ -1,23 +1,23 @@
-.popup{
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #353247ab;
-    color: white;
-    padding: 15px;
-    border-radius: 5px;
-    z-index: 1000;
-    max-width: 30vw;
+.popup {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #353247ab;
+  color: white;
+  padding: 15px;
+  border-radius: 5px;
+  z-index: 1000;
+  max-width: 30vw;
 }
 
-.error{
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #ff5757cb;
-    color: white;
-    padding: 15px;
-    border-radius: 5px;
-    z-index: 1000;
-    max-width: 30vw;
+.error {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #ff5757cb;
+  color: white;
+  padding: 15px;
+  border-radius: 5px;
+  z-index: 1000;
+  max-width: 30vw;
 }

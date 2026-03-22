@@ -1,10 +1,14 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import type { Board } from '../../types/project.types';
-import type { EdgeConstraint, Task, TaskType, Priority } from '../../types/boards.types';
+import type {
+  EdgeConstraint,
+  Task,
+  TaskType,
+  Priority,
+} from '../../types/boards.types';
 import { createBoardHandlers } from '../../utils/board.utils';
 import { useParams } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-// import { ProjectContext } from '../../context/ProjectContext';
 import { handleError } from '../../App';
 import BoardsView from './BoardsView';
 
@@ -14,17 +18,7 @@ interface Props {
 }
 
 export default function Boards({ boards, role }: Props) {
-  if (boards.length === 0) {
-    return (
-      <>
-        <br />
-        <h1>Start Working</h1>
-      </>
-    );
-  }
-
   const { user } = useContext(AuthContext);
-  // const { project } = useContext(ProjectContext);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeBoard = boards[activeIndex];
   const [workflowState, setWorkflowState] = useState(activeBoard.workflows);
@@ -36,7 +30,9 @@ export default function Boards({ boards, role }: Props) {
   const [boardName, setBoardName] = useState<string>('');
   const [boardLimit, setBoardLimit] = useState<number>(0);
 
-  const [dragHighlight, setDragHighlight] = useState<boolean[]>([]);
+  const [dragHighlight, setDragHighlight] = useState<boolean[]>(
+    activeBoard.workflows.map(() => false),
+  );
   const [taskName, setTaskName] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
   const [taskType, setTaskType] = useState<TaskType>('STORY');
@@ -49,7 +45,7 @@ export default function Boards({ boards, role }: Props) {
   const [showChild, setShowChild] = useState(false);
   const [showChildOf, setShowChildOf] = useState<Task[] | null>(null);
   const [showViewEdgesModal, setShowViewEdgesModal] = useState(false);
-  const [edges, setEdges] = useState<EdgeConstraint[]>([]);
+  const [edges, setEdges] = useState<EdgeConstraint[]>(activeBoard.edges ?? []);
   const [boardRefreshKey, setBoardRefreshKey] = useState(0);
 
   const [fromEdgeName, setFromEdgeName] = useState<string>('');
@@ -72,11 +68,13 @@ export default function Boards({ boards, role }: Props) {
     setShowChildOf: setShowChildOf,
   };
 
-  useEffect(() => {
-    setWorkflowState(activeBoard.workflows);
-    setDragHighlight(activeBoard.workflows.map(() => false));
-    setEdges(activeBoard.edges ?? []);
-  }, [activeIndex]);
+  const handleSetActiveIndex = (index: number) => {
+    const nextBoard = boards[index];
+    setActiveIndex(index);
+    setWorkflowState(nextBoard.workflows);
+    setDragHighlight(nextBoard.workflows.map(() => false));
+    setEdges(nextBoard.edges ?? []);
+  };
 
   const boardHandlers = createBoardHandlers({
     runtime: {
@@ -123,12 +121,21 @@ export default function Boards({ boards, role }: Props) {
       setEdges,
     },
   });
-  // console.log(role);
+
+  if (boards.length === 0) {
+    return (
+      <>
+        <br />
+        <h1>Start Working</h1>
+      </>
+    );
+  }
+
   return (
     <BoardsView
       boards={boards}
       activeIndex={activeIndex}
-      setActiveIndex={setActiveIndex}
+      setActiveIndex={handleSetActiveIndex}
       activeBoard={activeBoard}
       workflowState={workflowState}
       setWorkflowState={setWorkflowState}

@@ -1,9 +1,5 @@
 import type { SubmitEventHandler } from 'react';
-import type {
-  Priority,
-  ProjectMember,
-  Workflow,
-} from '../types/boards.types';
+import type { Priority, ProjectMember, Workflow } from '../types/boards.types';
 import { sortWorkflows } from './board.utils';
 import type {
   RuntimeContext,
@@ -37,7 +33,8 @@ export function createTaskHandlers(
   state: BoardState,
   setters: BoardSetters,
 ) {
-  const { projectId, activeBoard, boards, activeIndex, user, onError } = runtime;
+  const { projectId, activeBoard, boards, activeIndex, user, onError } =
+    runtime;
   const {
     activeColumnId,
     assignee,
@@ -87,10 +84,13 @@ export function createTaskHandlers(
     const dateObject = dueDate !== '' ? new Date(dueDate) : null;
 
     try {
-      const res1 = await fetch(`http://localhost:3000/api/project/${projectId}`, {
-        method: 'GET',
-        credentials: 'include',
-      });
+      const res1 = await fetch(
+        `http://localhost:3000/api/project/${projectId}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+        },
+      );
       const projectData = await res1.json();
       const members = projectData.data.members.map(
         (member: ProjectMember) => member.userId,
@@ -152,9 +152,12 @@ export function createTaskHandlers(
     }
 
     try {
-      const ogRes = await fetch(`http://localhost:3000/api/task/${currentTaskId}`, {
-        credentials: 'include',
-      });
+      const ogRes = await fetch(
+        `http://localhost:3000/api/task/${currentTaskId}`,
+        {
+          credentials: 'include',
+        },
+      );
       const ogData = await ogRes.json();
       const parentId = ogData.task.parentId;
       const statusId = ogData.task.statusId;
@@ -162,17 +165,22 @@ export function createTaskHandlers(
       const assigneeId: number = await getUserIdFromEmail(assignee, onError);
 
       if (projectId) {
-        const projectRes = await fetch(`http://localhost:3000/api/project/${projectId}`, {
-          method: 'GET',
-          credentials: 'include',
-        });
+        const projectRes = await fetch(
+          `http://localhost:3000/api/project/${projectId}`,
+          {
+            method: 'GET',
+            credentials: 'include',
+          },
+        );
         const projectData = await projectRes.json();
         const members = projectData.data.members.map(
           (member: ProjectMember) => member.userId,
         );
 
         if (!members.includes(assigneeId)) {
-          onError('Assignee is not a member of the project, failed to edit task');
+          onError(
+            'Assignee is not a member of the project, failed to edit task',
+          );
           throw new Error('Assignee is not a member of the project');
         }
       }

@@ -2,6 +2,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useCallback,
   type KeyboardEvent,
   type SubmitEvent,
 } from 'react';
@@ -23,7 +24,12 @@ interface Props {
   refreshTask: () => void;
 }
 
-export function Comment({ commentId, deleteHandler, threadId, refreshTask }: Props) {
+export function Comment({
+  commentId,
+  deleteHandler,
+  threadId,
+  refreshTask,
+}: Props) {
   // console.log('Cid: ', commentId);
 
   const [comment, setComment] = useState<CommentDTO>();
@@ -36,38 +42,51 @@ export function Comment({ commentId, deleteHandler, threadId, refreshTask }: Pro
   const { tid: taskId } = useParams();
   const authContext = useContext(AuthContext);
 
-  async function fetchComment(cid: string) {
-    try {
-      const res = await fetch(`http://localhost:3000/api/comment/t/${cid}?threadId=${encodeURIComponent(threadId)}`, {
-        credentials: 'include',
-      });
+  const fetchComment = useCallback(
+    async (cid: string) => {
+      try {
+        const res = await fetch(
+          `http://localhost:3000/api/comment/t/${cid}?threadId=${encodeURIComponent(threadId)}`,
+          {
+            credentials: 'include',
+          },
+        );
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error("Can't fetch comment at the moment", {
-          cause: errorText,
-        });
-      }
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error("Can't fetch comment at the moment", {
+            cause: errorText,
+          });
+        }
 
-      const data = await res.json();
-      // console.log("Comment Data: ", data);
-      setComment(data.comment);
-      if (!isEditing) {
-        setEditedContent(data.comment.content ?? '');
+        const data = await res.json();
+        // console.log("Comment Data: ", data);
+        setComment(data.comment);
+        if (!isEditing) {
+          setEditedContent(data.comment.content ?? '');
+        }
+        const nextReplies = data.comment.replies ?? [];
+        setReplies(nextReplies);
+        setComment((prev) =>
+          prev ? { ...prev, replies: nextReplies } : data.comment,
+        );
+      } catch (err) {
+        throw new Error("Can't fetch comment", { cause: err });
       }
-      const nextReplies = data.comment.replies ?? [];
-      setReplies(nextReplies);
-      setComment((prev) => (prev ? { ...prev, replies: nextReplies } : data.comment));
-    } catch (err) {
-      throw new Error("Can't fetch comment", { cause: err });
-    }
-  }
+    },
+    [isEditing, threadId],
+  );
 
   const handleSave = async () => {
-    if (!comment) return;
+    if (!comment) {
+      return;
+    }
     const hasContentChange = editedContent !== (comment.content ?? '');
 
-    console.log('Saving comment updates:', { content: editedContent, commentId: comment.id });
+    console.log('Saving comment updates:', {
+      content: editedContent,
+      commentId: comment.id,
+    });
     if (hasContentChange) {
       try {
         const res = await fetch(
@@ -182,9 +201,11 @@ export function Comment({ commentId, deleteHandler, threadId, refreshTask }: Pro
 
   useEffect(() => {
     fetchComment(commentId);
-  }, [commentId]);
+  }, [commentId, fetchComment]);
 
-  if (!comment || comment.isDeleted) return <></>;
+  if (!comment || comment.isDeleted) {
+    return <></>;
+  }
 
   return (
     <>
@@ -266,9 +287,10 @@ export function Comment({ commentId, deleteHandler, threadId, refreshTask }: Pro
               onClick={() => setIsEditing(true)}
               style={{ cursor: 'text', margin: 0 }}
               title="Click to edit"
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(comment.content), }}
-            >
-            </p>
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHtml(comment.content),
+              }}
+            ></p>
           )}
         </div>
         <div style={{ marginTop: '8px', marginBottom: '8px' }}>

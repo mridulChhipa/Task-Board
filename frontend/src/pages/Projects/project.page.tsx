@@ -16,11 +16,13 @@ export default function ProjectPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [boardName, setBoardName] = useState('');
 
-  const {user} = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   const dispatch = useContext(ProjectDispatchContext);
   const { project } = useContext(ProjectContext);
-  const role = project?.members.find((member) => member.userId === user?.userId)?.role;
+  const role = project?.members.find(
+    (member) => member.userId === user?.userId,
+  )?.role;
 
   async function handleAdd(e: SubmitEvent) {
     e.preventDefault();
@@ -51,10 +53,12 @@ export default function ProjectPage() {
       const rawBoard = resJson.board;
       const board: Board = {
         ...rawBoard,
-        workflows: (rawBoard.workflows ?? []).map((workflow: Board['workflows'][number]) => ({
-          ...workflow,
-          tasks: workflow.tasks ?? [],
-        })),
+        workflows: (rawBoard.workflows ?? []).map(
+          (workflow: Board['workflows'][number]) => ({
+            ...workflow,
+            tasks: workflow.tasks ?? [],
+          }),
+        ),
         edges: rawBoard.edgeConstraints ?? rawBoard.edges ?? [],
       };
       console.log(board);
@@ -102,10 +106,13 @@ export default function ProjectPage() {
             <h1 className={styles.desc}>{project.name}</h1>
             <p className={styles.desc}>{project.description}</p>
           </div>
-          {(project.role === 'PROJECT_ADMIN' || user?.role === 'GLOBAL_ADMIN' ) && (
-            <Button onClick={() => {
-              setShowAddModal(true);
-            }}>
+          {(project.role === 'PROJECT_ADMIN' ||
+            user?.role === 'GLOBAL_ADMIN') && (
+            <Button
+              onClick={() => {
+                setShowAddModal(true);
+              }}
+            >
               Add Board
             </Button>
           )}

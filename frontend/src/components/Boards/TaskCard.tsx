@@ -49,14 +49,18 @@ async function getMailfromId(id: number): Promise<string> {
 }
 
 async function childrenOf(task: Task | null): Promise<Task[]> {
-  if (!task) return [];
-  const children = await Promise.all(task.children.map(async (child: string) => {
-    const res = await fetch(`http://localhost:3000/api/task/${child}`, {
-      credentials: 'include',
-    });
-    const data = await res.json();
-    return data.task as Task;
-  }));
+  if (!task) {
+    return [];
+  }
+  const children = await Promise.all(
+    task.children.map(async (child: string) => {
+      const res = await fetch(`http://localhost:3000/api/task/${child}`, {
+        credentials: 'include',
+      });
+      const data = await res.json();
+      return data.task as Task;
+    }),
+  );
   return children;
 }
 
@@ -75,36 +79,45 @@ export function TaskCard({
   const navigate = useNavigate();
 
   return (
-      <div
-        className={styles.taskCard}
-        draggable={draggable}
-        onDragStart={dragstartHandler}
-        data-parent={task.statusId}
-        data-id={task.id}
-        onClick={() => {
-          navigate(`task/${task.id}`);
-        }}
-      >
-        <div className={styles.taskTop}>
-          <span
-            className={`${styles.taskTypeBadge} ${styles[`type${task.type}`]}`}
+    <div
+      className={styles.taskCard}
+      draggable={draggable}
+      onDragStart={dragstartHandler}
+      data-parent={task.statusId}
+      data-id={task.id}
+      onClick={() => {
+        navigate(`task/${task.id}`);
+      }}
+    >
+      <div className={styles.taskTop}>
+        <span
+          className={`${styles.taskTypeBadge} ${styles[`type${task.type}`]}`}
+        >
+          {task.type}
+        </span>
+        <span className={styles.taskId}>{task.id}</span>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '5px',
+              justifyContent: 'flex-end',
+            }}
           >
-            {task.type}
-          </span>
-          <span className={styles.taskId}>{task.id}</span>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', flexDirection: 'row', gap: '5px', justifyContent: 'flex-end' }}>
-              {task.type === 'STORY' &&
-                <span 
-                  className={styles.copyIcon}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setState?.setTaskId(task.id);
-                  }}
+            {task.type === 'STORY' && (
+              <span
+                className={styles.copyIcon}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setState?.setTaskId(task.id);
+                }}
               >
                 <IconCopy />
-              </span>}
-              {showDelete && <span
+              </span>
+            )}
+            {showDelete && (
+              <span
                 className={styles.deleteIcon}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -112,8 +125,10 @@ export function TaskCard({
                 }}
               >
                 <IconDelete />
-              </span>}
-              {showSettings && <span
+              </span>
+            )}
+            {showSettings && (
+              <span
                 className={styles.settingsIcon}
                 onClick={async (e) => {
                   e.stopPropagation();
@@ -132,44 +147,48 @@ export function TaskCard({
                 }}
               >
                 <IconSettings />
-              </span>}
-            </div>
-            {task.type === 'STORY' && <button className={styles.childButton}
+              </span>
+            )}
+          </div>
+          {task.type === 'STORY' && (
+            <button
+              className={styles.childButton}
               onClick={async (e) => {
                 e.stopPropagation();
                 setState?.setShowChild(true);
                 const taskWithChildren = await childrenOf(task);
                 setState?.setShowChildOf(taskWithChildren);
-              }}   
+              }}
             >
               Children
-            </button>}
-          </div>
+            </button>
+          )}
         </div>
+      </div>
 
-        <div className={styles.taskTitle}>{task.title}</div>
+      <div className={styles.taskTitle}>{task.title}</div>
 
-        {task.dueDate && (
-          <div
-            className={`${styles.taskDue} ${overdue ? styles.taskDueoverdue : styles.taskDueupcoming}`}
-          >
-            {overdue ? <IconWarning /> : <IconCalendar />}
-            {formatDate(task.dueDate)}
-          </div>
-        )}
+      {task.dueDate && (
+        <div
+          className={`${styles.taskDue} ${overdue ? styles.taskDueoverdue : styles.taskDueupcoming}`}
+        >
+          {overdue ? <IconWarning /> : <IconCalendar />}
+          {formatDate(task.dueDate)}
+        </div>
+      )}
 
-        <div className={styles.taskFooter}>
-          <span
-            className={`${styles.taskpriority} ${styles[`priority${task.priority}`]}`}
-          >
-            {task.priority}
-          </span>
-          <div className={styles.taskFooterRight}>
-            <div className={styles.taskavatar}>
-              {task.assignee ? `#${task.assignee}` : <IconUser size={11} />}
-            </div>
+      <div className={styles.taskFooter}>
+        <span
+          className={`${styles.taskpriority} ${styles[`priority${task.priority}`]}`}
+        >
+          {task.priority}
+        </span>
+        <div className={styles.taskFooterRight}>
+          <div className={styles.taskavatar}>
+            {task.assignee ? `#${task.assignee}` : <IconUser size={11} />}
           </div>
         </div>
       </div>
+    </div>
   );
 }

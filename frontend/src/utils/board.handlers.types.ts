@@ -1,8 +1,4 @@
-import type {
-  Dispatch,
-  SetStateAction,
-  SubmitEventHandler,
-} from 'react';
+import type { Dispatch, SetStateAction, SubmitEventHandler } from 'react';
 import type { User } from '../context/AuthContext';
 import type {
   EdgeConstraint,

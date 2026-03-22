@@ -88,7 +88,7 @@ export default function LogInPage() {
       setIsLoading(false);
     }
   }
-  
+
   useEffect(() => {
     if (authContext.user) {
       navigate('/dashboard');

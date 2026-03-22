@@ -52,10 +52,6 @@ export default defineConfig([
 
       'no-restricted-syntax': [
         'error',
-        // {
-        //   selector: 'ExportDefaultDeclaration',
-        //   message: 'Do not use default exports. Use named exports instead.',
-        // },
         {
           selector: 'TSModuleDeclaration',
           message: 'Do not use TypeScript namespaces. Use ES modules instead.',

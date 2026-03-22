@@ -96,7 +96,7 @@ export async function sortWorkflows(
       throw new Error('Error fetching task details', { cause: err });
     }
   }
-  console.log(workflows)
+  console.log(workflows);
   const workflowTasks = await Promise.all(
     workflows.map(async (workflow) =>
       Promise.all(

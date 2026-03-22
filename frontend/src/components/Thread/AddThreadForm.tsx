@@ -16,9 +16,9 @@ export default function AddThreadForm({
   threadTitle,
   setThreadTitle,
   threadContent,
-  setThreadContent
+  setThreadContent,
 }: AddThreadProps) {
-  return(
+  return (
     <>
       <Form onSubmit={handleThreadSubmit}>
         <InputArea>

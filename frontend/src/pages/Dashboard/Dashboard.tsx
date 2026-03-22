@@ -1,8 +1,5 @@
 import { useContext, useEffect, useState, type SubmitEvent } from 'react';
-import {
-  AuthContext,
-  DispatchContext,
-} from '../../context/AuthContext';
+import { AuthContext, DispatchContext } from '../../context/AuthContext';
 import { useFetchUser } from '../../utils/auth.utils';
 import { Link } from 'react-router-dom';
 import type { Project } from '../../types/project.types';
@@ -20,11 +17,24 @@ import {
   IconEnvelopeClosed,
   IconSettings,
 } from '../../components/Boards/boards.images';
-import Form, { FormControl, InputArea, Label } from '../../components/Form/Form';
+import Form, {
+  FormControl,
+  InputArea,
+  Label,
+} from '../../components/Form/Form';
 import { handleError } from '../../App';
-import { setNotifications, typeToString, type NotifDisplay } from '../../utils/notifications.utils';
+import {
+  setNotifications,
+  typeToString,
+  type NotifDisplay,
+} from '../../utils/notifications.utils';
 import { handleCreate, handleUpdate } from '../../utils/project.handlers';
-import { handleAdd, addGlobal, getMembers, type ProjectMember } from '../../utils/users.handler';
+import {
+  handleAdd,
+  addGlobal,
+  getMembers,
+  type ProjectMember,
+} from '../../utils/users.handler';
 
 export type Operation = 'View' | 'Add' | 'Edit' | 'Remove';
 
@@ -62,7 +72,7 @@ function DashBoard() {
       console.log('fetching user');
       fetchUser();
     }
-  }, [fetchUser]);
+  }, [fetchUser, userId]);
 
   useEffect(() => {
     if (user?.notifications) {
@@ -79,24 +89,26 @@ function DashBoard() {
             description={description}
             setDescription={setDescription}
             setShowCreateModal={setShowCreateModal}
-            handleCreate={(e: SubmitEvent) => handleCreate(e, {
-              name,
-              setName,
-              description,
-              setDescription,
-              setShowCreateModal,
-              currProject,
-              updatedName,
-              setUpdatedName,
-              updatedDesc,
-              setUpdatedDesc,
-              updatedIsArchived,
-              setUpdatedIsArchived,
-              setShowUpdateModal,
-              user,
-              dispatch,
-              handleError,
-            })}
+            handleCreate={(e: SubmitEvent) =>
+              handleCreate(e, {
+                name,
+                setName,
+                description,
+                setDescription,
+                setShowCreateModal,
+                currProject,
+                updatedName,
+                setUpdatedName,
+                updatedDesc,
+                setUpdatedDesc,
+                updatedIsArchived,
+                setUpdatedIsArchived,
+                setShowUpdateModal,
+                user,
+                dispatch,
+                handleError,
+              })
+            }
           />
         </Modal>
       )}
@@ -111,24 +123,26 @@ function DashBoard() {
             updatedArc={updatedIsArchived}
             setUpdatedArc={setUpdatedIsArchived}
             setShowUpdateModal={setShowUpdateModal}
-            handleUpdate={(e: SubmitEvent) => handleUpdate(e, {
-              name,
-              setName,
-              description,
-              setDescription,
-              setShowCreateModal,
-              currProject,
-              updatedName,
-              setUpdatedName,
-              updatedDesc,
-              setUpdatedDesc,
-              updatedIsArchived,
-              setUpdatedIsArchived,
-              setShowUpdateModal,
-              user,
-              dispatch,
-              handleError,
-            })}
+            handleUpdate={(e: SubmitEvent) =>
+              handleUpdate(e, {
+                name,
+                setName,
+                description,
+                setDescription,
+                setShowCreateModal,
+                currProject,
+                updatedName,
+                setUpdatedName,
+                updatedDesc,
+                setUpdatedDesc,
+                updatedIsArchived,
+                setUpdatedIsArchived,
+                setShowUpdateModal,
+                user,
+                dispatch,
+                handleError,
+              })
+            }
           />
         </Modal>
       )}
@@ -142,64 +156,110 @@ function DashBoard() {
             setUserToAdd={setUserToAdd}
             newRole={newRole}
             setNewRole={setNewRole}
-            handleAdd={(e: SubmitEvent) => handleAdd(e, {
-              operation,
-              setOperation,
-              userToAdd,
-              setUserToAdd,
-              newRole,
-              setNewRole,
-              setAddUser,
-              currProject,
-              globalAdminEmail,
-              handleError,
-            })}
+            handleAdd={(e: SubmitEvent) =>
+              handleAdd(e, {
+                operation,
+                setOperation,
+                userToAdd,
+                setUserToAdd,
+                newRole,
+                setNewRole,
+                setAddUser,
+                currProject,
+                globalAdminEmail,
+                handleError,
+              })
+            }
             setAddUser={setAddUser}
             projectMembers={projectMembers}
             canManageUsers={
               user?.role === 'GLOBAL_ADMIN' ||
-              projects.find((p) => p.id === currProject)?.role === 'PROJECT_ADMIN'
+              projects.find((p) => p.id === currProject)?.role ===
+                'PROJECT_ADMIN'
             }
           />
         </Modal>
       )}
 
       {showNotifications && (
-        <Modal onclick={async () => {
-          setShowNotifications(false);
-        }}>
+        <Modal
+          onclick={async () => {
+            setShowNotifications(false);
+          }}
+        >
           <h2>Your Notifications</h2>
-          {(user?.notifications === undefined || user?.notifications.length === 0) && <p>No notifications</p>}
+          {(user?.notifications === undefined ||
+            user?.notifications.length === 0) && <p>No notifications</p>}
           {notifs.map((notification) => {
             return (
-              <div className={styles.notification} key={notification.id} style={{ backgroundColor: notification.read ? '#f0f0f0' : '#e0e7ff' }}>
-                <div className={styles.notifText}>{typeToString(notification)}</div>
-                <div className={styles.notifSender}>From: {notification.sender}</div>
-                <div style={{ display: 'flex', flexDirection: 'row', gap: '15px' }}>
-                  <span onClick={async () => {
-                    console.log('current status: ', notification.read);
-                    setNotifs((prev) => prev.map((n) => n.id === notification.id ? { ...n, read: !notification.read } : n));
-                    await fetch(`http://localhost:3000/api/notification/${notification.id}`, {
-                      method: 'PATCH',
-                      credentials: 'include',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({ read: !notification.read }),
-                    });
-                    console.log("status changed to: ", !notification.read);
-                  }}
-                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                    {notification.read ? <IconEnvelopeClosed size={15} /> : <IconEnvelopeOpen size={15} />}
+              <div
+                className={styles.notification}
+                key={notification.id}
+                style={{
+                  backgroundColor: notification.read ? '#f0f0f0' : '#e0e7ff',
+                }}
+              >
+                <div className={styles.notifText}>
+                  {typeToString(notification)}
+                </div>
+                <div className={styles.notifSender}>
+                  From: {notification.sender}
+                </div>
+                <div
+                  style={{ display: 'flex', flexDirection: 'row', gap: '15px' }}
+                >
+                  <span
+                    onClick={async () => {
+                      console.log('current status: ', notification.read);
+                      setNotifs((prev) =>
+                        prev.map((n) =>
+                          n.id === notification.id
+                            ? { ...n, read: !notification.read }
+                            : n,
+                        ),
+                      );
+                      await fetch(
+                        `http://localhost:3000/api/notification/${notification.id}`,
+                        {
+                          method: 'PATCH',
+                          credentials: 'include',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({ read: !notification.read }),
+                        },
+                      );
+                      console.log('status changed to: ', !notification.read);
+                    }}
+                    style={{
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    {notification.read ? (
+                      <IconEnvelopeClosed size={15} />
+                    ) : (
+                      <IconEnvelopeOpen size={15} />
+                    )}
                   </span>
-                  <span onClick={async () => {
-                    setNotifs(notifs.filter((n) => n.id !== notification.id));
-                    await fetch(`http://localhost:3000/api/notification/${notification.id}`, {
-                      method: 'DELETE',
-                      credentials: 'include',
-                    });
-                  }}
-                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                  <span
+                    onClick={async () => {
+                      setNotifs(notifs.filter((n) => n.id !== notification.id));
+                      await fetch(
+                        `http://localhost:3000/api/notification/${notification.id}`,
+                        {
+                          method: 'DELETE',
+                          credentials: 'include',
+                        },
+                      );
+                    }}
+                    style={{
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
                     <IconDelete size={15} />
                   </span>
                 </div>
@@ -207,36 +267,45 @@ function DashBoard() {
             );
           })}
         </Modal>
-
       )}
 
       {showAdminModal && (
         <Modal onclick={() => setShowAdminModal(false)}>
           <h2>Add Global Administrators</h2>
-          <Form onSubmit={(e: SubmitEvent) => addGlobal(e, {
-            operation: 'Add',
-            setOperation: setOperation,
-            userToAdd: '',
-            setUserToAdd: setUserToAdd,
-            newRole: '',
-            setNewRole: setNewRole,
-            setAddUser: setAddUser,
-            currProject: '',
-            globalAdminEmail,
-            handleError,
-          })}>
+          <Form
+            onSubmit={(e: SubmitEvent) =>
+              addGlobal(e, {
+                operation: 'Add',
+                setOperation: setOperation,
+                userToAdd: '',
+                setUserToAdd: setUserToAdd,
+                newRole: '',
+                setNewRole: setNewRole,
+                setAddUser: setAddUser,
+                currProject: '',
+                globalAdminEmail,
+                handleError,
+              })
+            }
+          >
             <InputArea>
-              <Label htmlFor='email'>User Email</Label>
+              <Label htmlFor="email">User Email</Label>
               <FormControl
-                type='email'
-                placeholder='e.g. admin@example.com'
-                name='email'
+                type="email"
+                placeholder="e.g. admin@example.com"
+                name="email"
                 required
                 value={globalAdminEmail}
                 onChange={(e) => setGlobalAdminEmail(e.target.value)}
               />
             </InputArea>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '10px',
+              }}
+            >
               <Button
                 priority="second"
                 type="button"
@@ -332,9 +401,14 @@ function DashBoard() {
                     <button
                       type="button"
                       onClick={() => {
-                        if (project.role !== 'PROJECT_ADMIN' && user?.role !== 'GLOBAL_ADMIN') {
-                          handleError("You don't have permission to edit this project");
-                          console.log("error raised");
+                        if (
+                          project.role !== 'PROJECT_ADMIN' &&
+                          user?.role !== 'GLOBAL_ADMIN'
+                        ) {
+                          handleError(
+                            "You don't have permission to edit this project",
+                          );
+                          console.log('error raised');
                           return;
                         }
                         setCurrProject(project.id);
@@ -373,15 +447,33 @@ function DashBoard() {
           </div>
           <div className={styles.notifSidebar} style={{ textAlign: 'center' }}>
             <h2>Your Notifications</h2>
-            <ul style={{ marginLeft: '0px', paddingLeft: '0px', listStyleType: 'none' }}>
-              {(notifs === undefined || notifs.length === 0) && <li>No notifications</li>}
-              {notifs?.filter((n) => !n.read).map((notification, index) => {
-                if (index < 5) return <li key={index} className={styles.notifPreview}>{typeToString(notification)}</li>;
-              })}
+            <ul
+              style={{
+                marginLeft: '0px',
+                paddingLeft: '0px',
+                listStyleType: 'none',
+              }}
+            >
+              {(notifs === undefined || notifs.length === 0) && (
+                <li>No notifications</li>
+              )}
+              {notifs
+                ?.filter((n) => !n.read)
+                .map((notification, index) => {
+                  if (index < 5) {
+                    return (
+                      <li key={index} className={styles.notifPreview}>
+                        {typeToString(notification)}
+                      </li>
+                    );
+                  }
+                })}
             </ul>
-            <Button onClick={async () => {
-              setShowNotifications(true);
-            }}>
+            <Button
+              onClick={async () => {
+                setShowNotifications(true);
+              }}
+            >
               View All
             </Button>
           </div>

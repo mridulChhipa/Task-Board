@@ -1,10 +1,10 @@
-import { IconPlus } from "./boards.images";
+import { IconPlus } from './boards.images';
 import styles from './Boards.module.css';
-import { FormControl } from "../Form/Form";
-import Button from "../Button/Button";
-import { addWorkflow } from "../../utils/board.utils";
-import type { Workflow } from "../../types/boards.types";
-import type { Board } from "../../types/project.types";
+import { FormControl } from '../Form/Form';
+import Button from '../Button/Button';
+import { addWorkflow } from '../../utils/board.utils';
+import type { Workflow } from '../../types/boards.types';
+import type { Board } from '../../types/project.types';
 import type { Dispatch, SetStateAction } from 'react';
 
 interface Props {
@@ -66,7 +66,9 @@ export default function EditWorkflowButton({
             name="limit"
             onChange={(e) => setBoardLimit(e.target.valueAsNumber)}
           />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div
+            style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
+          >
             <Button
               onClick={() => {
                 if (boardName === '') {

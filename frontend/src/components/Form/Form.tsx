@@ -1,4 +1,9 @@
-import type { FormHTMLAttributes, InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from 'react';
+import type {
+  FormHTMLAttributes,
+  InputHTMLAttributes,
+  ReactNode,
+  TextareaHTMLAttributes,
+} from 'react';
 import styles from './form.module.css';
 
 interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
@@ -13,9 +18,6 @@ const Form = ({ children, className, ...props }: FormProps) => {
   );
 };
 
-interface FormControlProps extends InputHTMLAttributes<HTMLInputElement> {
-}
-
 export function FormControl({
   type = 'text',
   name,
@@ -26,7 +28,7 @@ export function FormControl({
   checked = false,
   required = false,
   ...props
-}: FormControlProps) {
+}: InputHTMLAttributes<HTMLInputElement>) {
   const isCheckbox = type === 'checkbox';
 
   return (
@@ -45,9 +47,6 @@ export function FormControl({
   );
 }
 
-interface TextAreaControlProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-}
-
 export function TextAreaControl({
   name,
   id,
@@ -57,7 +56,7 @@ export function TextAreaControl({
   required = false,
   rows = 4,
   ...props
-}: TextAreaControlProps) {
+}: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       name={name}

@@ -26,8 +26,8 @@ const ActivityContent: React.FC<{ activity: ActivityDTO }> = ({ activity }) => {
     case 'TASK_STATUS_UPDATED':
       return (
         <p className={styles.activityText}>
-          <span className={styles.author}>{metadata.user?.name}</span>{' '}
-          changed status from
+          <span className={styles.author}>{metadata.user?.name}</span> changed
+          status from
           <span className={styles.statusOld}>
             {metadata.oldStatus?.name || 'None'}
           </span>
@@ -39,8 +39,8 @@ const ActivityContent: React.FC<{ activity: ActivityDTO }> = ({ activity }) => {
     case 'TASK_ASSIGNEE_CHANGED':
       return (
         <p className={styles.activityText}>
-          <span className={styles.author}>{metadata.user?.name}</span>{' '}
-          assigned task to User #{metadata.newAssignee?.name}
+          <span className={styles.author}>{metadata.user?.name}</span> assigned
+          task to User #{metadata.newAssignee?.name}
         </p>
       );
 
@@ -48,28 +48,31 @@ const ActivityContent: React.FC<{ activity: ActivityDTO }> = ({ activity }) => {
       return (
         <div className={styles.commentBox}>
           <span className={styles.activityText}>
-            <span className={styles.author}>
-              {metadata.user?.name}
-            </span>{' '}
-            added a comment:&nbsp;
+            <span className={styles.author}>{metadata.user?.name}</span> added a
+            comment:&nbsp;
           </span>
-          <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(`"${metadata.comment?.content}"`) }} className={styles.commentQuote} />
+          <span
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHtml(`"${metadata.comment?.content}"`),
+            }}
+            className={styles.commentQuote}
+          />
         </div>
       );
 
     case 'COMMENT_EDITED':
       return (
         <p className={styles.activityText}>
-          <span className={styles.author}>{metadata.user?.name}</span>{' '}
-          edited comment #{metadata.comment?.content}
+          <span className={styles.author}>{metadata.user?.name}</span> edited
+          comment #{metadata.comment?.content}
         </p>
       );
 
     case 'COMMENT_DELETED':
       return (
         <p className={styles.activityText}>
-          <span className={styles.author}>{metadata.user?.name}</span>{' '}
-          deleted a comment
+          <span className={styles.author}>{metadata.user?.name}</span> deleted a
+          comment
         </p>
       );
 
@@ -77,28 +80,31 @@ const ActivityContent: React.FC<{ activity: ActivityDTO }> = ({ activity }) => {
       return (
         <div className={styles.commentBox}>
           <span className={styles.activityText}>
-            <span className={styles.author}>
-              {metadata.user?.name}
-            </span>
+            <span className={styles.author}>{metadata.user?.name}</span>
             started a new thread:
           </span>
-          <span dangerouslySetInnerHTML={{__html: sanitizeHtml(`"#${metadata.thread?.title}"`)}} className={styles.commentQuote} />
+          <span
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHtml(`"#${metadata.thread?.title}"`),
+            }}
+            className={styles.commentQuote}
+          />
         </div>
       );
 
     case 'THREAD_EDITED':
       return (
         <p className={styles.activityText}>
-          <span className={styles.author}>{metadata.user?.name}</span>{' '}
-          edited thread #{metadata.thread?.title}
+          <span className={styles.author}>{metadata.user?.name}</span> edited
+          thread #{metadata.thread?.title}
         </p>
       );
 
     case 'THREAD_DELETED':
       return (
         <p className={styles.activityText}>
-          <span className={styles.author}>{metadata.user?.name}</span>{' '}
-          deleted a thread
+          <span className={styles.author}>{metadata.user?.name}</span> deleted a
+          thread
         </p>
       );
 

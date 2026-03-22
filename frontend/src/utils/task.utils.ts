@@ -7,13 +7,13 @@ export async function taskLoader({
   const tid = params.tid;
 
   if (!tid) {
-    throw new Response('Not Found', { status: 404 });
+    throw new Error('Not Found');
   }
 
   const res = await fetch(`http://localhost:3000/api/task/${tid}`);
 
   if (!res.ok) {
-    throw new Response('Failed to fetch product', { status: res.status });
+    throw new Error('Failed to fetch task', { cause: res.status });
   }
 
   const data = await res.json();

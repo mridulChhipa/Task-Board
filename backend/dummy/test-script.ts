@@ -107,7 +107,7 @@ async function seedProjectsAndWorkItems(userIds: number[]) {
 
     const todoWorkflow = await db.workflow.create({
       data: {
-        name: 'To Do',
+        name: 'to do',
         orderIdx: 0,
         boardId: board.id,
         limit: 20,
@@ -116,7 +116,7 @@ async function seedProjectsAndWorkItems(userIds: number[]) {
 
     await db.workflow.create({
       data: {
-        name: 'In Progress',
+        name: 'in progress',
         orderIdx: 1,
         boardId: board.id,
         limit: 10,
@@ -125,7 +125,7 @@ async function seedProjectsAndWorkItems(userIds: number[]) {
 
     await db.workflow.create({
       data: {
-        name: 'Done',
+        name: 'done',
         orderIdx: 2,
         boardId: board.id,
         limit: 30,
