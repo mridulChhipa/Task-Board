@@ -7,7 +7,7 @@ import {
   AuthContext,
 } from './AuthContext';
 import { NotificationWebSocket } from '../utils/Websockets.utils';
-import { handleNotification } from '../App';
+import { triggerPopup } from './PopupProvider';
 
 let isRefreshing = false;
 let refreshPromise: Promise<Record<string, unknown> | null> | null = null;
@@ -46,6 +46,30 @@ async function tryRefreshToken(): Promise<Record<string, unknown> | null> {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [authContext, dispatch] = useReducer(authReducer, defaultAuth);
+
+  async function handleNotification(senderId: number, notification: string) {
+    try {
+      const senderRes = await fetch(`http://localhost:3000/api/auth/${senderId}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const senderData = await senderRes.json();
+      const sender = senderData.data.personalData.name;
+      triggerPopup(sender, notification, false);
+
+      const meRes = await fetch('http://localhost:3000/api/auth/me', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const meData = await meRes.json();
+      dispatch({
+        type: 'SET_NOTIFICATIONS',
+        payload: meData.notifications || [],
+      });
+    } catch (err) {
+      console.error('Notification handling failed:', err);
+    }
+  }
 
   useEffect(() => {
     const restoreUser = async () => {

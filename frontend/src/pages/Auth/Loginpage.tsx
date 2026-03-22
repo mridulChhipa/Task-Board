@@ -10,7 +10,8 @@ import Form, {
   Label,
 } from '../../components/Form/Form';
 import { NotificationWebSocket } from '../../utils/Websockets.utils';
-import { handleError, handleNotification } from '../../App';
+import { handleError } from '../../App';
+import { triggerPopup } from '../../context/PopupProvider';
 
 export default function LogInPage() {
   const navigate = useNavigate();
@@ -21,6 +22,30 @@ export default function LogInPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  async function handleNotification(senderId: number, notification: string) {
+    try {
+      const res1 = await fetch(`http://localhost:3000/api/auth/${senderId}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data1 = await res1.json();
+      const sender = data1.data.personalData.name;
+      triggerPopup(sender, notification, false);
+
+      const res = await fetch('http://localhost:3000/api/auth/me', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      dispatch({
+        type: 'SET_NOTIFICATIONS',
+        payload: data.notifications || [],
+      });
+    } catch (err) {
+      console.error('Notification handling failed:', err);
+    }
+  }
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();

@@ -74,19 +74,6 @@ function App() {
   );
 }
 
-export async function handleNotification(
-  senderId: number,
-  notification: string,
-) {
-  const res = await fetch(`http://localhost:3000/api/auth/${senderId}`, {
-    method: 'GET',
-    credentials: 'include',
-  });
-  const user = await res.json();
-  const sender = user.data.personalData.name;
-  triggerPopup(sender, notification, false);
-}
-
 export async function handleError(message: string) {
   triggerPopup('ERROR', message, true);
 }
