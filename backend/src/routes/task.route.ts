@@ -1,7 +1,10 @@
 import { Router } from 'express';
 import { taskController } from '../controllers/task.controller';
 import { authenticateToken } from '../middlewares/guards/auth.guard';
-import { authorizeStatusIdRole, authorizeTaskIdRole } from '../middlewares/guards/task.guard';
+import {
+  authorizeStatusIdRole,
+  authorizeTaskIdRole,
+} from '../middlewares/guards/task.guard';
 import { ProjectRole } from '../types/project.types';
 
 const taskRouter = Router({ mergeParams: true });
@@ -9,7 +12,10 @@ taskRouter.use(authenticateToken);
 
 taskRouter.post(
   '/create',
-  authorizeStatusIdRole([ProjectRole.PROJECT_ADMIN, ProjectRole.PROJECT_MEMBER]),
+  authorizeStatusIdRole([
+    ProjectRole.PROJECT_ADMIN,
+    ProjectRole.PROJECT_MEMBER,
+  ]),
   (req, res, next) => {
     taskController.create(req, res, next);
   },

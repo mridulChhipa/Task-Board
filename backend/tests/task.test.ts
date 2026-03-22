@@ -10,7 +10,6 @@ import type { PrismaClient } from '@prisma/client/extension';
 import { ProjectRole } from '../src/types/project.types';
 import { PriorityType, TaskType } from '../src/types/task.types';
 import { initWSServer, shutdownWSServer } from '../src/websocket/ws.service';
-import { NotifType } from '../src/types/notifcation.types';
 
 describe('Task API Endpoints (RBAC)', () => {
   let server: http.Server;
@@ -36,7 +35,11 @@ describe('Task API Endpoints (RBAC)', () => {
   const taskBaseUrl = (): string => `${baseUrl}/api/task`;
 
   const authCookieFor = (email = userEmail, id = userId): string => {
-    const { refreshToken } = generateAuthTokens(id, email, `session-${Date.now()}`);
+    const { refreshToken } = generateAuthTokens(
+      id,
+      email,
+      `session-${Date.now()}`,
+    );
     return `refreshToken=${refreshToken}`;
   };
 
@@ -70,10 +73,16 @@ describe('Task API Endpoints (RBAC)', () => {
     }
 
     const boardSelect = (board as { select?: unknown }).select;
-    return !!(boardSelect && typeof boardSelect === 'object' && 'projectId' in boardSelect);
+    return !!(
+      boardSelect &&
+      typeof boardSelect === 'object' &&
+      'projectId' in boardSelect
+    );
   };
 
-  const hasWorkflowProjectSelect = (args: Prisma.WorkflowFindUniqueArgs): boolean => {
+  const hasWorkflowProjectSelect = (
+    args: Prisma.WorkflowFindUniqueArgs,
+  ): boolean => {
     const select = args.select;
     if (!select || typeof select !== 'object') {
       return false;
@@ -89,7 +98,11 @@ describe('Task API Endpoints (RBAC)', () => {
     }
 
     const boardSelect = (board as { select?: unknown }).select;
-    return !!(boardSelect && typeof boardSelect === 'object' && 'projectId' in boardSelect);
+    return !!(
+      boardSelect &&
+      typeof boardSelect === 'object' &&
+      'projectId' in boardSelect
+    );
   };
 
   before(async () => {
@@ -319,7 +332,10 @@ describe('Task API Endpoints (RBAC)', () => {
     });
 
     assert.equal(response.status, 201);
-    const data = (await response.json()) as { status?: string; taskId?: string };
+    const data = (await response.json()) as {
+      status?: string;
+      taskId?: string;
+    };
     assert.equal(data.status, 'success');
     assert.equal(data.taskId, taskId);
   });

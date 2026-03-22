@@ -36,7 +36,11 @@ describe('Comment API Endpoints (RBAC)', () => {
   const commentBaseUrl = (): string => `${baseUrl}/api/comment`;
 
   const authCookieFor = (email = userEmail, id = userId): string => {
-    const { refreshToken } = generateAuthTokens(id, email, `session-${Date.now()}`);
+    const { refreshToken } = generateAuthTokens(
+      id,
+      email,
+      `session-${Date.now()}`,
+    );
     return `refreshToken=${refreshToken}`;
   };
 
@@ -70,10 +74,16 @@ describe('Comment API Endpoints (RBAC)', () => {
     }
 
     const boardSelect = (board as { select?: unknown }).select;
-    return !!(boardSelect && typeof boardSelect === 'object' && 'projectId' in boardSelect);
+    return !!(
+      boardSelect &&
+      typeof boardSelect === 'object' &&
+      'projectId' in boardSelect
+    );
   };
 
-  const hasThreadTaskIdSelect = (args: Prisma.CommentFindUniqueArgs): boolean => {
+  const hasThreadTaskIdSelect = (
+    args: Prisma.CommentFindUniqueArgs,
+  ): boolean => {
     const select = args.select;
     if (!select || typeof select !== 'object') {
       return false;
@@ -89,7 +99,11 @@ describe('Comment API Endpoints (RBAC)', () => {
     }
 
     const threadSelect = (thread as { select?: unknown }).select;
-    return !!(threadSelect && typeof threadSelect === 'object' && 'taskId' in threadSelect);
+    return !!(
+      threadSelect &&
+      typeof threadSelect === 'object' &&
+      'taskId' in threadSelect
+    );
   };
 
   before(async () => {
@@ -385,7 +399,10 @@ describe('Comment API Endpoints (RBAC)', () => {
     });
 
     assert.equal(response.status, 201);
-    const data = (await response.json()) as { status?: string; thread?: { id?: string } };
+    const data = (await response.json()) as {
+      status?: string;
+      thread?: { id?: string };
+    };
     assert.equal(data.status, 'success');
     assert.equal(data.thread?.id, threadId);
   });
@@ -443,7 +460,10 @@ describe('Comment API Endpoints (RBAC)', () => {
     });
 
     assert.equal(response.status, 201);
-    const data = (await response.json()) as { status?: string; comment?: { id?: string } };
+    const data = (await response.json()) as {
+      status?: string;
+      comment?: { id?: string };
+    };
     assert.equal(data.status, 'success');
     assert.equal(data.comment?.id, commentId);
   });
@@ -485,19 +505,22 @@ describe('Comment API Endpoints (RBAC)', () => {
     };
     membershipRole = null;
 
-    const response = await fetch(`${commentBaseUrl()}/update-thread/${threadId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Cookie: authCookieFor(),
+    const response = await fetch(
+      `${commentBaseUrl()}/update-thread/${threadId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Cookie: authCookieFor(),
+        },
+        body: JSON.stringify({
+          taskId,
+          title: 'Updated Thread',
+          content: 'Updated body',
+          isDeleted: false,
+        }),
       },
-      body: JSON.stringify({
-        taskId,
-        title: 'Updated Thread',
-        content: 'Updated body',
-        isDeleted: false,
-      }),
-    });
+    );
 
     assert.equal(response.status, 200);
     const data = (await response.json()) as { status?: string };
@@ -512,19 +535,22 @@ describe('Comment API Endpoints (RBAC)', () => {
     };
     membershipRole = null;
 
-    const response = await fetch(`${commentBaseUrl()}/update-thread/${threadId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Cookie: authCookieFor(otherEmail, otherUserId),
+    const response = await fetch(
+      `${commentBaseUrl()}/update-thread/${threadId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Cookie: authCookieFor(otherEmail, otherUserId),
+        },
+        body: JSON.stringify({
+          taskId,
+          title: 'Updated Thread',
+          content: 'Updated body',
+          isDeleted: false,
+        }),
       },
-      body: JSON.stringify({
-        taskId,
-        title: 'Updated Thread',
-        content: 'Updated body',
-        isDeleted: false,
-      }),
-    });
+    );
 
     assert.equal(response.status, 500);
     const data = (await response.json()) as { msg?: string };
@@ -539,19 +565,22 @@ describe('Comment API Endpoints (RBAC)', () => {
     };
     membershipRole = null;
 
-    const response = await fetch(`${commentBaseUrl()}/update-comment/${commentId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Cookie: authCookieFor(),
+    const response = await fetch(
+      `${commentBaseUrl()}/update-comment/${commentId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Cookie: authCookieFor(),
+        },
+        body: JSON.stringify({
+          taskId,
+          threadId,
+          content: 'Updated comment',
+          isDeleted: false,
+        }),
       },
-      body: JSON.stringify({
-        taskId,
-        threadId,
-        content: 'Updated comment',
-        isDeleted: false,
-      }),
-    });
+    );
 
     assert.equal(response.status, 200);
     const data = (await response.json()) as { status?: string };
@@ -566,19 +595,22 @@ describe('Comment API Endpoints (RBAC)', () => {
     };
     membershipRole = null;
 
-    const response = await fetch(`${commentBaseUrl()}/update-comment/${commentId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Cookie: authCookieFor(otherEmail, otherUserId),
+    const response = await fetch(
+      `${commentBaseUrl()}/update-comment/${commentId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Cookie: authCookieFor(otherEmail, otherUserId),
+        },
+        body: JSON.stringify({
+          taskId,
+          threadId,
+          content: 'Updated comment',
+          isDeleted: false,
+        }),
       },
-      body: JSON.stringify({
-        taskId,
-        threadId,
-        content: 'Updated comment',
-        isDeleted: false,
-      }),
-    });
+    );
 
     assert.equal(response.status, 500);
     const data = (await response.json()) as { msg?: string };
@@ -593,12 +625,15 @@ describe('Comment API Endpoints (RBAC)', () => {
     };
     membershipRole = null;
 
-    const response = await fetch(`${commentBaseUrl()}/delete-thread/${threadId}`, {
-      method: 'PATCH',
-      headers: {
-        Cookie: authCookieFor(),
+    const response = await fetch(
+      `${commentBaseUrl()}/delete-thread/${threadId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          Cookie: authCookieFor(),
+        },
       },
-    });
+    );
 
     assert.equal(response.status, 204);
   });
@@ -611,12 +646,15 @@ describe('Comment API Endpoints (RBAC)', () => {
     };
     membershipRole = null;
 
-    const response = await fetch(`${commentBaseUrl()}/delete-thread/${threadId}`, {
-      method: 'PATCH',
-      headers: {
-        Cookie: authCookieFor(otherEmail, otherUserId),
+    const response = await fetch(
+      `${commentBaseUrl()}/delete-thread/${threadId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          Cookie: authCookieFor(otherEmail, otherUserId),
+        },
       },
-    });
+    );
 
     assert.equal(response.status, 500);
     const data = (await response.json()) as { msg?: string };
@@ -631,16 +669,19 @@ describe('Comment API Endpoints (RBAC)', () => {
     };
     membershipRole = null;
 
-    const response = await fetch(`${commentBaseUrl()}/delete-comment/${commentId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Cookie: authCookieFor(),
+    const response = await fetch(
+      `${commentBaseUrl()}/delete-comment/${commentId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Cookie: authCookieFor(),
+        },
+        body: JSON.stringify({
+          threadId,
+        }),
       },
-      body: JSON.stringify({
-        threadId,
-      }),
-    });
+    );
 
     assert.equal(response.status, 204);
   });
@@ -653,16 +694,19 @@ describe('Comment API Endpoints (RBAC)', () => {
     };
     membershipRole = null;
 
-    const response = await fetch(`${commentBaseUrl()}/delete-comment/${commentId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Cookie: authCookieFor(otherEmail, otherUserId),
+    const response = await fetch(
+      `${commentBaseUrl()}/delete-comment/${commentId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Cookie: authCookieFor(otherEmail, otherUserId),
+        },
+        body: JSON.stringify({
+          threadId,
+        }),
       },
-      body: JSON.stringify({
-        threadId,
-      }),
-    });
+    );
 
     assert.equal(response.status, 500);
     const data = (await response.json()) as { msg?: string };
@@ -685,7 +729,10 @@ describe('Comment API Endpoints (RBAC)', () => {
     });
 
     assert.equal(response.status, 200);
-    const data = (await response.json()) as { status?: string; comment?: { id?: string } };
+    const data = (await response.json()) as {
+      status?: string;
+      comment?: { id?: string };
+    };
     assert.equal(data.status, 'success');
     assert.equal(data.comment?.id, commentId);
   });
@@ -726,7 +773,10 @@ describe('Comment API Endpoints (RBAC)', () => {
     });
 
     assert.equal(response.status, 200);
-    const data = (await response.json()) as { status?: string; thread?: { id?: string } };
+    const data = (await response.json()) as {
+      status?: string;
+      thread?: { id?: string };
+    };
     assert.equal(data.status, 'success');
     assert.equal(data.thread?.id, threadId);
   });

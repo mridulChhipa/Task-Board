@@ -1,8 +1,8 @@
 import type { Prisma } from '../../generated/prisma/client';
 import { db } from '../config/db';
-import { UserDetails } from '../types/auth.types';
-import { ColumnDTO } from '../types/board.types';
-import { CommentDTO, ThreadDTO } from '../types/comment.types';
+import type { UserDetails } from '../types/auth.types';
+import type { ColumnDTO } from '../types/board.types';
+import type { CommentDTO, ThreadDTO } from '../types/comment.types';
 import type {
   ActivityDTO,
   ActivityType,
@@ -13,19 +13,19 @@ import type {
 
 type TaskWithChildren = Prisma.TaskGetPayload<{
   include: {
-    children: true,
-    threads: true,
+    children: true;
+    threads: true;
     activities: {
       include: {
-        newAssignee: true,
-        oldAssignee: true,
-        oldStatus: true,
-        newStatus: true,
-        user: true,
-        comment: true,
-        thread: true,
-      }
-    }
+        newAssignee: true;
+        oldAssignee: true;
+        oldStatus: true;
+        newStatus: true;
+        user: true;
+        comment: true;
+        thread: true;
+      };
+    };
   };
 }>;
 
@@ -61,18 +61,24 @@ export function toTaskDTO(task: TaskWithChildren): TaskDTO {
           comment: activity.comment as CommentDTO,
           oldStatus: activity.oldStatus as ColumnDTO,
           newStatus: activity.newStatus as ColumnDTO,
-          oldAssignee: (activity.oldAssignee ? {
-            ...activity.oldAssignee,
-            userId: activity.oldAssignee.id,
-          } : null) as UserDetails,
-          newAssignee: (activity.newAssignee ? {
-            ...activity.newAssignee,
-            userId: activity.newAssignee.id,
-          } : null) as UserDetails,
-          user: (activity.user ? {
-            ...activity.user,
-            userId: activity.user.id,
-          } : null) as UserDetails,
+          oldAssignee: (activity.oldAssignee
+            ? {
+                ...activity.oldAssignee,
+                userId: activity.oldAssignee.id,
+              }
+            : null) as UserDetails,
+          newAssignee: (activity.newAssignee
+            ? {
+                ...activity.newAssignee,
+                userId: activity.newAssignee.id,
+              }
+            : null) as UserDetails,
+          user: (activity.user
+            ? {
+                ...activity.user,
+                userId: activity.user.id,
+              }
+            : null) as UserDetails,
         },
       }),
     ),

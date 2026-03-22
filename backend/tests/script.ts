@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const files = readdirSync(__dirname).filter(
-  (file) => file.endsWith('.test.ts') && !file.startsWith('.')
+  (file) => file.endsWith('.test.ts') && !file.startsWith('.'),
 );
 
 console.log(`Found ${files.length} test files to run:`);
@@ -24,11 +24,11 @@ for (const file of files) {
   try {
     execSync(`tsx --test "${filePath}"`, {
       stdio: 'inherit',
-      cwd: join(__dirname, '..')
+      cwd: join(__dirname, '..'),
     });
     console.log(`\x1b[32m✔ ${file} passed.\x1b[0m\n`);
   } catch (error) {
-    console.error(`\x1b[31m✖ ${file} failed.\x1b[0m\n`);
+    console.error(`\x1b[31m✖ ${file} failed.\x1b[0m\n`, error);
     hasFailures = true;
   }
 }

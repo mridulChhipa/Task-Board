@@ -62,15 +62,19 @@ export class NotificationService {
           id: notificationId,
         },
       });
-    }
-    catch (error) {
+    } catch (error) {
       throw new Error("Can't delete notification: ", { cause: error });
     }
   }
 
   async readNotification(notificationId: string, read: boolean): Promise<void> {
     try {
-      console.log('Reading notification with id: ', notificationId, ' read: ', read);
+      console.log(
+        'Reading notification with id: ',
+        notificationId,
+        ' read: ',
+        read,
+      );
       await db.notification.update({
         where: {
           id: notificationId,
@@ -80,8 +84,7 @@ export class NotificationService {
         },
       });
       console.log('Notification read status updated successfully');
-    }
-    catch (error) {
+    } catch (error) {
       throw new Error("Can't read notification: ", { cause: error });
     }
   }

@@ -7,7 +7,20 @@ import { generateAuthTokens } from '../src/utils/jwt';
 import { prisma } from '../lib/prisma';
 import type { PrismaClient } from '@prisma/client/extension';
 import { ProjectRole } from '../src/types/project.types';
-import type { BoardCreateArgs, BoardDeleteArgs, BoardFindUniqueArgs, BoardUpdateArgs, EdgeConstraintCreateArgs, EdgeConstraintDeleteArgs, ProjectMemberFindUniqueArgs, UserFindUniqueArgs, WorkflowCreateArgs, WorkflowDeleteArgs, WorkflowFindFirstArgs, WorkflowUpdateArgs } from '../generated/prisma/models';
+import type {
+  BoardCreateArgs,
+  BoardDeleteArgs,
+  BoardFindUniqueArgs,
+  BoardUpdateArgs,
+  EdgeConstraintCreateArgs,
+  EdgeConstraintDeleteArgs,
+  ProjectMemberFindUniqueArgs,
+  UserFindUniqueArgs,
+  WorkflowCreateArgs,
+  WorkflowDeleteArgs,
+  WorkflowFindFirstArgs,
+  WorkflowUpdateArgs,
+} from '../generated/prisma/models';
 
 describe('Board API Endpoints (RBAC)', () => {
   let server: http.Server;
@@ -37,7 +50,11 @@ describe('Board API Endpoints (RBAC)', () => {
     `${baseUrl}/api/project/${project}/board`;
 
   const authCookieFor = (email = userEmail, id = userId): string => {
-    const { refreshToken } = generateAuthTokens(id, email, `session-${Date.now()}`);
+    const { refreshToken } = generateAuthTokens(
+      id,
+      email,
+      `session-${Date.now()}`,
+    );
     return `refreshToken=${refreshToken}`;
   };
 
@@ -250,7 +267,10 @@ describe('Board API Endpoints (RBAC)', () => {
     });
 
     assert.equal(response.status, 201);
-    const data = (await response.json()) as { status: string; board: { id: string } };
+    const data = (await response.json()) as {
+      status: string;
+      board: { id: string };
+    };
     assert.equal(data.status, 'success');
     assert.equal(data.board.id, boardId);
   });
@@ -391,7 +411,10 @@ describe('Board API Endpoints (RBAC)', () => {
     });
 
     assert.equal(response.status, 201);
-    const data = (await response.json()) as { status: string; column: { id: string } };
+    const data = (await response.json()) as {
+      status: string;
+      column: { id: string };
+    };
     assert.equal(data.status, 'success');
     assert.equal(data.column.id, columnId);
   });
@@ -404,18 +427,21 @@ describe('Board API Endpoints (RBAC)', () => {
     };
     membershipRole = ProjectRole.PROJECT_MEMBER;
 
-    const response = await fetch(`${boardBaseUrl()}/${boardId}/update-column/${columnId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Cookie: authCookieFor(),
+    const response = await fetch(
+      `${boardBaseUrl()}/${boardId}/update-column/${columnId}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Cookie: authCookieFor(),
+        },
+        body: JSON.stringify({
+          name: 'Updated Column',
+          limit: 4,
+          orderIdx: 3,
+        }),
       },
-      body: JSON.stringify({
-        name: 'Updated Column',
-        limit: 4,
-        orderIdx: 3,
-      }),
-    });
+    );
 
     assert.equal(response.status, 200);
     const data = (await response.json()) as { msg: string; status: string };
@@ -431,12 +457,15 @@ describe('Board API Endpoints (RBAC)', () => {
     };
     membershipRole = ProjectRole.PROJECT_MEMBER;
 
-    const response = await fetch(`${boardBaseUrl()}/${boardId}/remove-column/${columnId}`, {
-      method: 'DELETE',
-      headers: {
-        Cookie: authCookieFor(),
+    const response = await fetch(
+      `${boardBaseUrl()}/${boardId}/remove-column/${columnId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Cookie: authCookieFor(),
+        },
       },
-    });
+    );
 
     assert.equal(response.status, 200);
     const data = (await response.json()) as { msg: string; status: string };
@@ -465,7 +494,11 @@ describe('Board API Endpoints (RBAC)', () => {
     });
 
     assert.equal(response.status, 200);
-    const data = (await response.json()) as { msg: string; status: string; edge: { id: string } };
+    const data = (await response.json()) as {
+      msg: string;
+      status: string;
+      edge: { id: string };
+    };
     assert.equal(data.status, 'success');
     assert.equal(data.msg, 'Edge added Successfully');
     assert.equal(data.edge.id, edgeId);
@@ -479,12 +512,15 @@ describe('Board API Endpoints (RBAC)', () => {
     };
     membershipRole = ProjectRole.PROJECT_MEMBER;
 
-    const response = await fetch(`${boardBaseUrl()}/${boardId}/remove-edge/${edgeId}`, {
-      method: 'DELETE',
-      headers: {
-        Cookie: authCookieFor(),
+    const response = await fetch(
+      `${boardBaseUrl()}/${boardId}/remove-edge/${edgeId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Cookie: authCookieFor(),
+        },
       },
-    });
+    );
 
     assert.equal(response.status, 200);
     const data = (await response.json()) as { msg: string; status: string };
@@ -508,7 +544,10 @@ describe('Board API Endpoints (RBAC)', () => {
     });
 
     assert.equal(response.status, 200);
-    const data = (await response.json()) as { status: string; board: { id: string } };
+    const data = (await response.json()) as {
+      status: string;
+      board: { id: string };
+    };
     assert.equal(data.status, 'success');
     assert.equal(data.board.id, boardId);
   });
@@ -549,7 +588,10 @@ describe('Board API Endpoints (RBAC)', () => {
     });
 
     assert.equal(response.status, 200);
-    const data = (await response.json()) as { status: string; fcol: { id: string } };
+    const data = (await response.json()) as {
+      status: string;
+      fcol: { id: string };
+    };
     assert.equal(data.status, 'success');
     assert.equal(data.fcol.id, columnId);
   });

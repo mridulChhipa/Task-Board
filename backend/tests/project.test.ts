@@ -7,7 +7,15 @@ import { generateAuthTokens } from '../src/utils/jwt';
 import { prisma } from '../lib/prisma';
 import type { PrismaClient } from '@prisma/client/extension';
 import { ProjectRole } from '../src/types/project.types';
-import type { ProjectCreateArgs, ProjectMemberCreateArgs, ProjectMemberDeleteArgs, ProjectMemberFindUniqueArgs, ProjectMemberUpdateArgs, ProjectUpdateArgs, UserFindUniqueArgs } from '../generated/prisma/models';
+import type {
+  ProjectCreateArgs,
+  ProjectMemberCreateArgs,
+  ProjectMemberDeleteArgs,
+  ProjectMemberFindUniqueArgs,
+  ProjectMemberUpdateArgs,
+  ProjectUpdateArgs,
+  UserFindUniqueArgs,
+} from '../generated/prisma/models';
 
 describe('Project API Endpoints (RBAC)', () => {
   let server: http.Server;
@@ -34,7 +42,11 @@ describe('Project API Endpoints (RBAC)', () => {
   const userEmail = 'admin@node.test';
 
   const authCookieFor = (email = userEmail, id = userId): string => {
-    const { refreshToken } = generateAuthTokens(id, email, `session-${Date.now()}`);
+    const { refreshToken } = generateAuthTokens(
+      id,
+      email,
+      `session-${Date.now()}`,
+    );
     return `refreshToken=${refreshToken}`;
   };
 
@@ -206,7 +218,10 @@ describe('Project API Endpoints (RBAC)', () => {
     });
 
     assert.equal(response.status, 201);
-    const data = (await response.json()) as { message: string; data: { id: string } };
+    const data = (await response.json()) as {
+      message: string;
+      data: { id: string };
+    };
     assert.equal(data.message, 'Project Creation Successful');
     assert.equal(data.data.id, projectId);
   });
@@ -252,7 +267,10 @@ describe('Project API Endpoints (RBAC)', () => {
     });
 
     assert.equal(response.status, 200);
-    const data = (await response.json()) as { status: string; data: { id: string } };
+    const data = (await response.json()) as {
+      status: string;
+      data: { id: string };
+    };
     assert.equal(data.status, 'Success');
     assert.equal(data.data.id, projectId);
   });
@@ -299,7 +317,10 @@ describe('Project API Endpoints (RBAC)', () => {
     });
 
     assert.equal(response.status, 200);
-    const data = (await response.json()) as { message: string; data: { id: string } };
+    const data = (await response.json()) as {
+      message: string;
+      data: { id: string };
+    };
     assert.equal(data.message, 'Project updation Successful');
     assert.equal(data.data.id, projectId);
   });

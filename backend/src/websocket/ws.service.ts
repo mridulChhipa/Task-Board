@@ -1,15 +1,15 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import { get, type Server as HttpServer } from 'http';
+import { type Server as HttpServer } from 'http';
 
 type WSMessage =
   | { messageType: 'NEW_USER'; userId: number }
   | {
-    messageType: 'NOTIFICATION';
-    senderId: number;
-    recieverId: number;
-    notification: string;
-  };
-  
+      messageType: 'NOTIFICATION';
+      senderId: number;
+      recieverId: number;
+      notification: string;
+    };
+
 let wsServer: WebSocketService;
 
 export function initWSServer(httpServer: HttpServer) {
@@ -44,7 +44,7 @@ export class WebSocketService {
       const data = JSON.parse(message.toString()) as WSMessage;
       if (data.messageType === 'NEW_USER') {
         this.addUser(ws, data.userId);
-        console.log("User added to hashmap")
+        console.log('User added to hashmap');
       } else if (data.messageType === 'NOTIFICATION') {
         this.sendNotification(
           data.senderId,
@@ -71,11 +71,7 @@ export class WebSocketService {
     return this.userSockets.get(userId);
   }
 
-  sendNotification(
-    senderId: number,
-    recieverId: number,
-    notification: string,
-  ) {
+  sendNotification(senderId: number, recieverId: number, notification: string) {
     const recieverSocket = this.userSockets.get(recieverId);
     console.log('Reciever Socket: ', recieverSocket);
     if (recieverSocket) {
@@ -86,7 +82,7 @@ export class WebSocketService {
       recieverSocket.send(
         JSON.stringify({ messageType: 'NOTIFICATION', senderId, notification }),
       );
-      console.log("Sent notification");
+      console.log('Sent notification');
     } else {
       console.error('No WebSocket found for userId: ', recieverId);
     }

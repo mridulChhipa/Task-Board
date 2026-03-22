@@ -5,7 +5,6 @@ import type { CreateTaskBody, TaskDTO } from '../types/task.types';
 import { notificationService } from './notification.service';
 import { NotifType } from '../types/notifcation.types';
 import { sendNotif } from '../websocket/ws.service';
-import { send } from 'node:process';
 
 export class TaskService {
   async create({
@@ -43,7 +42,11 @@ export class TaskService {
         type: NotifType.TASK_ASSIGNED,
       });
 
-      sendNotif(reporter, assignee, `You have been assigned a new task: ${title}`);
+      sendNotif(
+        reporter,
+        assignee,
+        `You have been assigned a new task: ${title}`,
+      );
 
       if (parentId) {
         await syncStatusWithChildren(parentId);
@@ -91,7 +94,8 @@ export class TaskService {
       });
 
       const isStoryUpdate = type === 'STORY' && existingTask.type === 'STORY';
-      const nextStatusId = isStoryUpdate && childCount > 0 ? existingTask.statusId : statusId;
+      const nextStatusId =
+        isStoryUpdate && childCount > 0 ? existingTask.statusId : statusId;
 
       await db.task.update({
         data: {
@@ -146,7 +150,11 @@ export class TaskService {
             threadId: null,
           });
 
-          sendNotif(reporter, assignee, `Assigned Task Status Updated: ${title}`);
+          sendNotif(
+            reporter,
+            assignee,
+            `Assigned Task Status Updated: ${title}`,
+          );
         }
       }
 
@@ -171,7 +179,11 @@ export class TaskService {
             threadId: null,
           });
 
-          sendNotif(reporter, assignee, `You have been assigned a new task: ${title}`);
+          sendNotif(
+            reporter,
+            assignee,
+            `You have been assigned a new task: ${title}`,
+          );
         }
       }
     } catch (error) {
@@ -222,7 +234,7 @@ export class TaskService {
               newStatus: true,
               comment: true,
               thread: true,
-            }
+            },
           },
           threads: {
             include: {

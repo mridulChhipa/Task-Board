@@ -58,12 +58,17 @@ async function authorizeForTask(
   }
 }
 
-async function resolveTaskIdFromComment(commentId: string): Promise<string | null> {
+async function resolveTaskIdFromComment(
+  commentId: string,
+): Promise<string | null> {
   let currentId: string | null = commentId;
   let safety = 0;
 
   while (currentId && safety < 20) {
-    const comment: { thread: { taskId: string } | null; parentId: string | null } | null = await db.comment.findUnique({
+    const comment: {
+      thread: { taskId: string } | null;
+      parentId: string | null;
+    } | null = await db.comment.findUnique({
       where: {
         id: currentId,
       },
@@ -182,7 +187,9 @@ export function authorizeCommentIdRole(
       const email = authReq.user.email;
 
       const rawCommentId =
-        authReq.params.cid ?? authReq.params.commentId ?? authReq.body.commentId;
+        authReq.params.cid ??
+        authReq.params.commentId ??
+        authReq.body.commentId;
       const commentId =
         typeof rawCommentId === 'string' && rawCommentId.trim() !== ''
           ? rawCommentId
@@ -195,8 +202,7 @@ export function authorizeCommentIdRole(
       let taskId = await resolveTaskIdFromComment(commentId);
 
       if (!taskId) {
-        const rawThreadId =
-          authReq.query.threadId ?? authReq.body.threadId;
+        const rawThreadId = authReq.query.threadId ?? authReq.body.threadId;
         const threadId =
           typeof rawThreadId === 'string' && rawThreadId.trim() !== ''
             ? rawThreadId

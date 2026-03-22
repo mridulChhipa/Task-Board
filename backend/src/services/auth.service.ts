@@ -14,10 +14,10 @@ import type {
 
 import { generateAuthTokens, verifyToken } from '../utils/jwt';
 import { GlobalRole } from '../../generated/prisma/enums';
-import { ProjectDetails, ProjectRole } from '../types/project.types';
+import { type ProjectDetails, ProjectRole } from '../types/project.types';
 import { projectService } from './project.service';
-import { NotifType } from '../types/notifcation.types';
-import { WebSocketService } from '../websocket/ws.service';
+import type { NotifType } from '../types/notifcation.types';
+import type { WebSocketService } from '../websocket/ws.service';
 import { getWSServer } from '../websocket/ws';
 
 export class AuthService {
@@ -25,7 +25,7 @@ export class AuthService {
   constructor() {
     this.wsServer = getWSServer();
   }
-  
+
   async register(body: RegisterBody): Promise<AuthToken> {
     try {
       const existingUser = await db.user.findUnique({
@@ -175,7 +175,7 @@ export class AuthService {
             include: {
               recipient: true,
               sender: true,
-            }
+            },
           },
         },
       });
@@ -227,7 +227,9 @@ export class AuthService {
         const globalProjects = await projectService.fetchGlobalAdminProjects();
         // allProjs.splice(0, allProjs.length);
         for (const currProj of globalProjects) {
-          if (projectMap.has(currProj.id)) continue; 
+          if (projectMap.has(currProj.id)) {
+            continue;
+          }
           allProjs.push({
             id: currProj.id,
             name: currProj.name,
@@ -280,7 +282,7 @@ export class AuthService {
             include: {
               recipient: true,
               sender: true,
-            }
+            },
           },
         },
       });

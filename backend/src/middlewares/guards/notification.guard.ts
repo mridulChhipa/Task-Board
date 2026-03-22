@@ -14,7 +14,8 @@ export function authorizeNotificationOwner(): RequestHandler {
       const userId = authReq.user.sub;
       const email = authReq.user.email;
 
-      const rawNotificationId = authReq.params.nid ?? authReq.body.notificationId;
+      const rawNotificationId =
+        authReq.params.nid ?? authReq.body.notificationId;
       const notificationId =
         typeof rawNotificationId === 'string' && rawNotificationId.trim() !== ''
           ? rawNotificationId

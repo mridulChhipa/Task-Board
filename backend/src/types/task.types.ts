@@ -1,6 +1,6 @@
-import { UserDetails } from './auth.types';
-import { ColumnDTO } from './board.types';
-import { CommentDTO, ThreadDTO } from './comment.types';
+import type { UserDetails } from './auth.types';
+import type { ColumnDTO } from './board.types';
+import type { CommentDTO, ThreadDTO } from './comment.types';
 
 export enum TaskType {
   STORY = 'STORY',

@@ -1,11 +1,20 @@
 import { db } from '../config/db';
-import type { BoardDTO, ColumnDTO, EdgeConstraintDTO } from '../types/board.types';
+import type {
+  BoardDTO,
+  ColumnDTO,
+  EdgeConstraintDTO,
+} from '../types/board.types';
 
 export class BoardService {
   async create(projectId: string, name: string): Promise<BoardDTO> {
     try {
-      console.log('Creating board with name: ', name, ' for projectId: ', projectId);
-      
+      console.log(
+        'Creating board with name: ',
+        name,
+        ' for projectId: ',
+        projectId,
+      );
+
       const createdBoard = await db.board.create({
         data: {
           projectId,
@@ -24,24 +33,8 @@ export class BoardService {
         { name: 'done', order: 3 },
       ];
 
-      const defaultEdges = [
-        { source: 'to do', target: 'in progress' },
-        { source: 'in progress', target: 'review' },
-        { source: 'review', target: 'done' },
-      ];
-
       const createdWorkflows = [];
-      // const createdWorkflow = Promise.all(defaultWorkflows.map(async (defWorkflow) => {
-      //   const createdWorkflow = await db.workflow.create({
-      //     data: {
-      //       name: defWorkflow.name,
-      //       orderIdx: defWorkflow.order,
-      //       boardId: createdBoard.id,
-      //       limit: defWorkflow.name === 'in progress' ? 5 : -1,
-      //     },
-      //   });
-      //   createdWorkflows.push(createdWorkflow);
-      // }));
+
       for (const defWorkflow of defaultWorkflows) {
         const createdWorkflow = await db.workflow.create({
           data: {
@@ -190,9 +183,18 @@ export class BoardService {
     }
   }
 
-  async addEdge(boardId: string, sourceColId: string, targetColId: string): Promise<EdgeConstraintDTO> {
+  async addEdge(
+    boardId: string,
+    sourceColId: string,
+    targetColId: string,
+  ): Promise<EdgeConstraintDTO> {
     try {
-      console.log('Adding edge with sourceColId: ', sourceColId, ' and targetColId: ', targetColId);
+      console.log(
+        'Adding edge with sourceColId: ',
+        sourceColId,
+        ' and targetColId: ',
+        targetColId,
+      );
       const existingBoard = await db.board.findFirst({
         where: {
           id: boardId,
@@ -210,7 +212,7 @@ export class BoardService {
           vId: targetColId,
         },
       });
-      
+
       const edge: EdgeConstraintDTO = {
         id: newEdge.id,
         boardId: newEdge.boardId,
@@ -281,23 +283,6 @@ export class BoardService {
 
         allCols.push(currCol);
       }
-
-      const us = await Promise.all(board.edgeConstraints.map(async (edge) => {
-        return await db.edgeConstraint.findUnique({
-          where: {
-            id: edge.uId,
-          },
-        });
-      }));
-
-      const vs = await Promise.all(board.edgeConstraints.map(async (edge) => {
-        return await db.edgeConstraint.findUnique({
-          where: {
-            id: edge.vId,
-          },
-        });
-      }));
-
 
       const bdto: BoardDTO = {
         id: board.id,

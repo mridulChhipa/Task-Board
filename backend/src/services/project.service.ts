@@ -10,7 +10,6 @@ import {
   type UpdateBody,
   type UpdateRoleBody,
 } from '../types/project.types';
-import { sendNotif } from '../websocket/ws.service';
 
 export class ProjectService {
   async create({ name, description }: CreateBody): Promise<Project> {
@@ -166,7 +165,7 @@ export class ProjectService {
 
   async updateUserRole(
     projectId: string,
-    { userMail, role}: UpdateRoleBody,
+    { userMail, role }: UpdateRoleBody,
   ): Promise<void> {
     try {
       const user = await db.user.findUnique({
@@ -281,9 +280,12 @@ export class ProjectService {
       }
       return allGlobalProjects;
     } catch (error) {
-      throw new Error("Can't fetch projects for global admin [fetchglobaladmin]", {
-        cause: error,
-      });
+      throw new Error(
+        "Can't fetch projects for global admin [fetchglobaladmin]",
+        {
+          cause: error,
+        },
+      );
     }
   }
 }

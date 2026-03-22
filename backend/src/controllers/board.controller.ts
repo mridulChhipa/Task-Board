@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { boardService } from '../services/board.service';
-import { BoardDTO } from '../types/board.types';
+import type { BoardDTO } from '../types/board.types';
 
 export class BoardController {
   async createBoard(
@@ -15,7 +15,10 @@ export class BoardController {
         throw new Error('Invalid type for projectId');
       }
 
-      const board: BoardDTO = await boardService.create(projectId, req.body.name);
+      const board: BoardDTO = await boardService.create(
+        projectId,
+        req.body.name,
+      );
       res.status(201).json({
         status: 'success',
         board,
@@ -81,7 +84,12 @@ export class BoardController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      console.log('Updating column with id: ', req.params.columnId, ' in board: ', req.params.boardId);
+      console.log(
+        'Updating column with id: ',
+        req.params.columnId,
+        ' in board: ',
+        req.params.boardId,
+      );
       const columnId = req.params.columnId;
       const boardId = req.params.boardId;
 
@@ -153,8 +161,7 @@ export class BoardController {
         msg: 'Edge added Successfully',
         edge,
       });
-    }
-    catch (error) {
+    } catch (error) {
       next(error);
     }
   }

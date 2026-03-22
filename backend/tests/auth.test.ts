@@ -115,7 +115,6 @@ describe('Auth API Endpoints', () => {
   });
 
   test('POST /api/auth/register should return 201 on success', async () => {
-
     const response = await fetch(`${baseUrl}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

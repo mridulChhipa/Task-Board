@@ -16,11 +16,11 @@ export interface ColumnDTO {
 }
 
 export interface EdgeConstraintDTO {
-  id: String;
-  boardId: String;
+  id: string;
+  boardId: string;
   board?: BoardDTO;
-  uId: String;
+  uId: string;
   u?: ColumnDTO;
-  vId: String;
+  vId: string;
   v?: ColumnDTO;
 }

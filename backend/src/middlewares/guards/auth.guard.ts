@@ -9,7 +9,6 @@ export function authenticateToken(
   next: NextFunction,
 ): void {
   try {
-
     const token = req.cookies.refreshToken;
 
     if (!token) {

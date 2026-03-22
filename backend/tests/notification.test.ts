@@ -30,11 +30,17 @@ describe('Notification API Endpoints', () => {
   const notificationBaseUrl = (): string => `${baseUrl}/api/notification`;
 
   const authCookieFor = (email = userEmail, id = userId): string => {
-    const { refreshToken } = generateAuthTokens(id, email, `session-${Date.now()}`);
+    const { refreshToken } = generateAuthTokens(
+      id,
+      email,
+      `session-${Date.now()}`,
+    );
     return `refreshToken=${refreshToken}`;
   };
 
-  const hasRecipientSelect = (args: Prisma.NotificationFindUniqueArgs): boolean => {
+  const hasRecipientSelect = (
+    args: Prisma.NotificationFindUniqueArgs,
+  ): boolean => {
     const select = args.select;
     if (!select || typeof select !== 'object') {
       return false;
@@ -161,7 +167,10 @@ describe('Notification API Endpoints', () => {
     });
 
     assert.equal(response.status, 201);
-    const data = (await response.json()) as { status?: string; notification?: { id?: string } };
+    const data = (await response.json()) as {
+      status?: string;
+      notification?: { id?: string };
+    };
     assert.equal(data.status, 'success');
     assert.equal(data.notification?.id, notificationId);
   });
@@ -181,7 +190,10 @@ describe('Notification API Endpoints', () => {
     });
 
     assert.equal(response.status, 201);
-    const data = (await response.json()) as { status?: string; notifcation?: { id?: string } };
+    const data = (await response.json()) as {
+      status?: string;
+      notifcation?: { id?: string };
+    };
     assert.equal(data.status, 'success');
     assert.equal(data.notifcation?.id, notificationId);
   });

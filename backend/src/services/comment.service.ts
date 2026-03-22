@@ -8,7 +8,11 @@ import type {
   UpdateThreadBody,
 } from '../types/comment.types';
 import { NotifType } from '../types/notifcation.types';
-import { extractEmailMentions, toCommentDTO, toThreadDTO } from '../utils/comment.utils';
+import {
+  extractEmailMentions,
+  toCommentDTO,
+  toThreadDTO,
+} from '../utils/comment.utils';
 import { notificationService } from './notification.service';
 import { sendNotif } from '../websocket/ws.service';
 
@@ -42,10 +46,10 @@ export class CommentService {
         const task = await db.task.findUnique({
           where: {
             id: taskId,
-          }
+          },
         });
 
-        if(!task){
+        if (!task) {
           throw new Error('Task not found');
         }
 
@@ -58,8 +62,11 @@ export class CommentService {
           type: NotifType.THREAD_STARTED,
         });
 
-        sendNotif(authorId, task.assignee, `New thread started on task: ${task.title}`);
-
+        sendNotif(
+          authorId,
+          task.assignee,
+          `New thread started on task: ${task.title}`,
+        );
       }
 
       return createdThread as ThreadDTO;
@@ -151,7 +158,7 @@ export class CommentService {
       const task = await db.task.findUnique({
         where: {
           id: taskId,
-        }
+        },
       });
 
       if (!task) {
@@ -184,38 +191,47 @@ export class CommentService {
         const author = await db.user.findUnique({
           where: {
             id: authorId,
-          }
+          },
         });
 
         for (const mention of mentions) {
           const normalizedEmail = mention.startsWith('@')
             ? mention.slice(1)
             : mention;
-          console.log("Mentioned: ", normalizedEmail);
+          console.log('Mentioned: ', normalizedEmail);
           const user = await db.user.findFirst({
             where: {
               email: {
                 equals: normalizedEmail,
                 mode: 'insensitive',
               },
-            }
+            },
           });
 
           if (user) {
-            const createdNotification = await notificationService.createNotification({
-              recipientId: user.id,
-              senderId: authorId,
-              taskId: taskId,
-              type: NotifType.MENTIONED,
-              commentId: createdComment.id,
-              threadId: threadId,
-            });
+            const createdNotification =
+              await notificationService.createNotification({
+                recipientId: user.id,
+                senderId: authorId,
+                taskId: taskId,
+                type: NotifType.MENTIONED,
+                commentId: createdComment.id,
+                threadId: threadId,
+              });
 
-            sendNotif(authorId, user.id, `${createdNotification.type}: You were mentioned in a comment on task: ${task.title} by ${author?.name}`);
+            sendNotif(
+              authorId,
+              user.id,
+              `${createdNotification.type}: You were mentioned in a comment on task: ${task.title} by ${author?.name}`,
+            );
           }
         }
 
-        sendNotif(authorId, task.assignee, `New comment added to task: ${task.title}`);
+        sendNotif(
+          authorId,
+          task.assignee,
+          `New comment added to task: ${task.title}`,
+        );
       }
 
       return createdComment as CommentDTO;
@@ -226,7 +242,7 @@ export class CommentService {
 
   async updateComment(
     id: string,
-    { content, isDeleted, threadId }: UpdateCommentBody,
+    { content, isDeleted }: UpdateCommentBody,
   ): Promise<void> {
     try {
       const existingComment = await db.comment.findUnique({

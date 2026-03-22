@@ -18,33 +18,49 @@ commentRouter.post(
   '/create-thread',
   authorizeTaskIdRole([ProjectRole.PROJECT_ADMIN, ProjectRole.PROJECT_MEMBER]),
   (req, res, next) => {
-  commentController.createThread(req, res, next);
+    commentController.createThread(req, res, next);
   },
 );
 commentRouter.post(
   '/create-comment',
   authorizeTaskIdRole([ProjectRole.PROJECT_ADMIN, ProjectRole.PROJECT_MEMBER]),
   (req, res, next) => {
-  commentController.createComment(req, res, next);
+    commentController.createComment(req, res, next);
   },
 );
 
-commentRouter.patch('/update-thread/:tid', authoriseThreadAuthor(), (req, res, next) => {
-  commentController.updateThread(req, res, next);
-});
+commentRouter.patch(
+  '/update-thread/:tid',
+  authoriseThreadAuthor(),
+  (req, res, next) => {
+    commentController.updateThread(req, res, next);
+  },
+);
 
-commentRouter.patch('/update-comment/:cid', authoriseCommentAuthor(), (req, res, next) => {
-  commentController.updateComment(req, res, next);
-});
+commentRouter.patch(
+  '/update-comment/:cid',
+  authoriseCommentAuthor(),
+  (req, res, next) => {
+    commentController.updateComment(req, res, next);
+  },
+);
 
-commentRouter.patch('/delete-thread/:tid', authoriseThreadAuthor(), (req, res, next) => {
-  commentController.deleteThread(req, res, next);
-});
+commentRouter.patch(
+  '/delete-thread/:tid',
+  authoriseThreadAuthor(),
+  (req, res, next) => {
+    commentController.deleteThread(req, res, next);
+  },
+);
 
-commentRouter.patch('/delete-comment/:cid', authoriseCommentAuthor(), (req, res, next) => {
-  console.log(req.body);
-  commentController.deleteComment(req, res, next);
-});
+commentRouter.patch(
+  '/delete-comment/:cid',
+  authoriseCommentAuthor(),
+  (req, res, next) => {
+    console.log(req.body);
+    commentController.deleteComment(req, res, next);
+  },
+);
 
 commentRouter.get(
   '/t/:cid',
@@ -54,7 +70,7 @@ commentRouter.get(
     ProjectRole.PROJECT_VIEWER,
   ]),
   (req, res, next) => {
-  commentController.fetchComment(req, res, next);
+    commentController.fetchComment(req, res, next);
   },
 );
 
@@ -66,7 +82,7 @@ commentRouter.get(
     ProjectRole.PROJECT_VIEWER,
   ]),
   (req, res, next) => {
-  commentController.fetchThread(req, res, next);
+    commentController.fetchThread(req, res, next);
   },
 );
 
