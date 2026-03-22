@@ -85,6 +85,8 @@ export function TaskCard({
       onDragStart={dragstartHandler}
       data-parent={task.statusId}
       data-id={task.id}
+      data-tasktype={task.type}
+      data-childcount={task.children?.length ?? 0}
       onClick={() => {
         navigate(`task/${task.id}`);
       }}

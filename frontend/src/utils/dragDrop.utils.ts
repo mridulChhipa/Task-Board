@@ -7,6 +7,8 @@ const dragData = {
   columnOrderId: 'text/x-taskboard-column-order-id',
   taskId: 'text/x-taskboard-task-id',
   originColumnId: 'text/x-taskboard-origin-column-id',
+  taskType: 'text/x-taskboard-task-type',
+  taskHasChildren: 'text/x-taskboard-task-has-children',
 } as const;
 
 export function dragstartHandler(event: React.DragEvent<HTMLDivElement>) {
@@ -24,6 +26,9 @@ export function taskDragstartHandler(
 ) {
   console.log('task drag start');
   event.stopPropagation();
+  const taskType = event.currentTarget.dataset.tasktype ?? '';
+  const childCount = Number(event.currentTarget.dataset.childcount ?? 0);
+  const hasChildren = childCount > 0;
   event.dataTransfer.setData(dragData.itemType, 'task');
   event.dataTransfer.setData(
     dragData.taskId,
@@ -33,6 +38,21 @@ export function taskDragstartHandler(
     dragData.originColumnId,
     event.currentTarget.dataset.parent ?? '',
   );
+  event.dataTransfer.setData(dragData.taskType, taskType);
+  event.dataTransfer.setData(
+    dragData.taskHasChildren,
+    hasChildren ? 'true' : 'false',
+  );
+
+  if (taskType === 'STORY' && hasChildren) {
+    const originId = event.currentTarget.dataset.parent ?? '';
+    const originIdx = workflowState.findIndex(
+      (workflow) => workflow.id === originId,
+    );
+    const allowed = workflowState.map((_, idx) => idx === originIdx);
+    setDragHighlight(allowed);
+    return;
+  }
 
   const allowed: boolean[] = workflowState.map(() => true);
   for (const edge of edges) {
@@ -67,11 +87,27 @@ export async function dropHandler(
   const draggedOriginColumnId = event.dataTransfer.getData(
     dragData.originColumnId,
   );
+  const draggedTaskType = event.dataTransfer.getData(dragData.taskType);
+  const draggedTaskHasChildren =
+    event.dataTransfer.getData(dragData.taskHasChildren) === 'true';
   setDragHighlight(dragHighlight.map(() => false));
   if (event.currentTarget.dataset.column === 'true') {
     if (dragItemType === 'task') {
+      const currColId = workflows[Number(event.currentTarget.id)].id;
+      if (
+        draggedTaskType === 'STORY' &&
+        draggedTaskHasChildren &&
+        draggedOriginColumnId !== currColId
+      ) {
+        handleError(
+          'Cannot move a story with existing children. Please move the children first.',
+        );
+        throw new Error(
+          'Cannot move a story with existing children. Please move the children first.',
+        );
+      }
       // check for wip limit, adjacent column, same columns
-      const currCol = workflows[Number(event.currentTarget.id)].id;
+      const currCol = currColId;
       const foundEdge = edges.find(
         (edge) => edge.uId === draggedOriginColumnId && edge.vId === currCol,
       );
@@ -159,14 +195,14 @@ export async function dropHandler(
       const data = await res1.json();
       if (
         data.task.type === 'STORY' &&
-        data.task.subtasks &&
-        data.task.subtasks.length > 0
+        data.task.children &&
+        data.task.children.length > 0
       ) {
         handleError(
-          'Cannot move a story with existing subtasks. Please move the subtasks first.',
+          'Cannot move a story with existing children. Please move the children first.',
         );
         throw new Error(
-          'Cannot move a story with existing subtasks. Please move the subtasks first.',
+          'Cannot move a story with existing children. Please move the children first.',
         );
       }
       parentTaskId = data.task.parentId;

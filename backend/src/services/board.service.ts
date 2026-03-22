@@ -1,4 +1,5 @@
 import { db } from '../config/db';
+import { syncStatusWithChildren } from '../utils/task.utils';
 import type {
   BoardDTO,
   ColumnDTO,
@@ -152,6 +153,25 @@ export class BoardService {
           id: columnId,
         },
       });
+
+      const storiesToSync = await db.task.findMany({
+        where: {
+          type: 'STORY',
+          status: {
+            boardId,
+          },
+          children: {
+            some: {},
+          },
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      await Promise.all(
+        storiesToSync.map((story) => syncStatusWithChildren(story.id)),
+      );
     } catch (error) {
       throw new Error('Adding column...Failed with: ', { cause: error });
     }
