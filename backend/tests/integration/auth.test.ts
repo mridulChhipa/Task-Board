@@ -1,14 +1,14 @@
 import * as http from 'node:http';
 import { after, before, describe, test } from 'node:test';
 
-import type { AuthToken } from '../src/types/auth.types';
-import { hash } from '../src/utils/hash';
+import type { AuthToken } from '../../src/types/auth.types';
+import { hash } from '../../src/utils/hash';
 import assert from 'node:assert';
-import { app } from '../src/app';
-import { generateAuthTokens } from '../src/utils/jwt';
+import { app } from '../../src/app';
+import { generateAuthTokens } from '../../src/utils/jwt';
 
-import { prisma } from '../lib/prisma';
-import type { Prisma } from '../generated/prisma/client';
+import { prisma } from '../../lib/prisma';
+import type { Prisma } from '../../generated/prisma/client';
 import type { PrismaClient } from '@prisma/client/extension';
 
 describe('Auth API Endpoints', () => {

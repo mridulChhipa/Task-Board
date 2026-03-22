@@ -122,7 +122,6 @@ export default function Thread({ thread, deleteThread, refreshTask }: Props) {
       }
 
       const data = await res.json();
-
       setComments([...comments, data.comment.id]);
       setComment('');
       refreshTask();

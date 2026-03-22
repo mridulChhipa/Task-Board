@@ -159,7 +159,7 @@ export class AuthService {
 
       return tokens;
     } catch (error) {
-      throw new Error('Error refreshing token:', { cause: error });
+      throw error;
     }
   }
 

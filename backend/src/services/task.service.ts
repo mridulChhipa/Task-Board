@@ -93,7 +93,7 @@ export class TaskService {
 
       return createdTask.id;
     } catch (error) {
-      throw new Error('Error creating Task: ', { cause: error });
+      throw error;
     }
   }
 
@@ -328,8 +328,8 @@ export class TaskService {
       }
 
       return toTaskDTO(existingTask);
-    } catch (err) {
-      throw new Error('Error fetching task: ', { cause: err });
+    } catch (error) {
+      throw error;
     }
   }
 }

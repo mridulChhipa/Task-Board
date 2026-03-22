@@ -2,12 +2,12 @@ import * as http from 'node:http';
 import { after, before, describe, test } from 'node:test';
 import assert from 'node:assert';
 
-import { app } from '../src/app';
-import { generateAuthTokens } from '../src/utils/jwt';
-import { prisma } from '../lib/prisma';
-import type { Prisma } from '../generated/prisma/client';
+import { app } from '../../src/app';
+import { generateAuthTokens } from '../../src/utils/jwt';
+import { prisma } from '../../lib/prisma';
+import type { Prisma } from '../../generated/prisma/client';
 import type { PrismaClient } from '@prisma/client/extension';
-import { NotifType } from '../src/types/notifcation.types';
+import { NotifType } from '../../src/types/notifcation.types';
 
 describe('Notification API Endpoints', () => {
   let server: http.Server;

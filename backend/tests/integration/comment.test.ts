@@ -2,13 +2,13 @@ import * as http from 'node:http';
 import { after, before, describe, test } from 'node:test';
 import assert from 'node:assert';
 
-import { app } from '../src/app';
-import { generateAuthTokens } from '../src/utils/jwt';
-import { prisma } from '../lib/prisma';
-import type { Prisma } from '../generated/prisma/client';
+import { app } from '../../src/app';
+import { generateAuthTokens } from '../../src/utils/jwt';
+import { prisma } from '../../lib/prisma';
+import type { Prisma } from '../../generated/prisma/client';
 import type { PrismaClient } from '@prisma/client/extension';
-import { ProjectRole } from '../src/types/project.types';
-import { initWSServer, shutdownWSServer } from '../src/websocket/ws.service';
+import { ProjectRole } from '../../src/types/project.types';
+import { initWSServer, shutdownWSServer } from '../../src/websocket/ws.service';
 
 describe('Comment API Endpoints (RBAC)', () => {
   let server: http.Server;
@@ -256,6 +256,10 @@ describe('Comment API Endpoints (RBAC)', () => {
                 parentId: null,
               },
             ],
+            author: {
+              id: userId,
+              name: 'Comment User',
+            },
           };
         }
 
@@ -315,6 +319,10 @@ describe('Comment API Endpoints (RBAC)', () => {
             createdAt: new Date(),
             updatedAt: new Date(),
             replies: [],
+            author: {
+              id: userId,
+              name: 'Comment User',
+            },
           };
         }
 

@@ -2,11 +2,11 @@ import * as http from 'node:http';
 import { after, before, describe, test } from 'node:test';
 import assert from 'node:assert';
 
-import { app } from '../src/app';
-import { generateAuthTokens } from '../src/utils/jwt';
-import { prisma } from '../lib/prisma';
+import { app } from '../../src/app';
+import { generateAuthTokens } from '../../src/utils/jwt';
+import { prisma } from '../../lib/prisma';
 import type { PrismaClient } from '@prisma/client/extension';
-import { ProjectRole } from '../src/types/project.types';
+import { ProjectRole } from '../../src/types/project.types';
 import type {
   BoardCreateArgs,
   BoardDeleteArgs,
@@ -20,7 +20,7 @@ import type {
   WorkflowDeleteArgs,
   WorkflowFindFirstArgs,
   WorkflowUpdateArgs,
-} from '../generated/prisma/models';
+} from '../../generated/prisma/models';
 
 describe('Board API Endpoints (RBAC)', () => {
   let server: http.Server;
@@ -222,6 +222,10 @@ describe('Board API Endpoints (RBAC)', () => {
         orderIdx: 2,
         limit: 3,
       }),
+    };
+
+    db.task = {
+      findMany: async () => [],
     };
 
     db.edgeConstraint = {

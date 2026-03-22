@@ -95,7 +95,7 @@ export class BoardService {
         },
       });
     } catch (error) {
-      throw new Error('Board Updation failed: ', { cause: error });
+      throw error;
     }
   }
 
@@ -173,7 +173,7 @@ export class BoardService {
         storiesToSync.map((story) => syncStatusWithChildren(story.id)),
       );
     } catch (error) {
-      throw new Error('Adding column...Failed with: ', { cause: error });
+      throw error;
     }
   }
 
@@ -242,7 +242,7 @@ export class BoardService {
 
       return edge;
     } catch (error) {
-      throw new Error('Failed to add edge: ', { cause: error });
+      throw error;
     }
   }
 
@@ -319,7 +319,7 @@ export class BoardService {
 
       return bdto;
     } catch (error) {
-      throw new Error('Board Deletions...Failed with: ', { cause: error });
+      throw error;
     }
   }
 
@@ -345,7 +345,7 @@ export class BoardService {
 
       return coldto;
     } catch (error) {
-      throw new Error('Board Deletions...Failed with: ', { cause: error });
+      throw error;
     }
   }
 }

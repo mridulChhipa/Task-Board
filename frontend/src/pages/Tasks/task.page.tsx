@@ -38,13 +38,12 @@ export default function TaskPage() {
         const data = await res.json();
 
         const rawTask = data.task;
-
         const formattedTask: Task = {
           ...rawTask,
           threads: rawTask.threads.map(
             (thread: { comments: CommentDTO[] }) => ({
               ...thread,
-              comments: thread.comments.map((x: CommentDTO) => x.id),
+              comments: thread.comments,
             }),
           ),
         };
@@ -108,9 +107,9 @@ export default function TaskPage() {
       setTask((prev) =>
         prev
           ? {
-              ...prev,
-              threads: [...(prev.threads ?? []), newThread],
-            }
+            ...prev,
+            threads: [...(prev.threads ?? []), newThread],
+          }
           : prev,
       );
       setThreadContent('');

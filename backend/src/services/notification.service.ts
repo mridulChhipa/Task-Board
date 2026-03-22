@@ -51,7 +51,7 @@ export class NotificationService {
       const ndto: NotificationDTO = toNotifDTO(notif);
       return ndto;
     } catch (error) {
-      throw new Error("Can't create notification: ", { cause: error });
+      throw error;
     }
   }
 

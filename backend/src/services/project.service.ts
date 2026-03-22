@@ -119,7 +119,7 @@ export class ProjectService {
         },
       });
     } catch (error) {
-      throw new Error('Error assigning user: ', { cause: error });
+      throw error;
     }
   }
 
