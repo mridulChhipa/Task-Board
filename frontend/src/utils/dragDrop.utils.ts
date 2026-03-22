@@ -64,7 +64,7 @@ export function taskDragstartHandler(
   setDragHighlight(allowed);
 }
 
-function syncStoriesWithChildrenOrder(
+export function syncStoriesWithChildrenOrder(
   workflows: Workflow[],
   taskCache: Record<string, Task>,
 ): Workflow[] {
@@ -375,23 +375,30 @@ export async function dropHandler(
         return;
       }
     }
-    const newWFState2 =
-      parentTaskId && parentTaskId.length > 0
-        ? newWFState.map((workflow) => {
-            if (workflow.id === ogParentId) {
-              return {
-                ...workflow,
-                tasks: workflow.tasks.filter((id) => id !== parentTaskId),
-              };
-            } else if (workflow.id === targetParentId) {
-              return {
-                ...workflow,
-                tasks: [...workflow.tasks, parentTaskId],
-              };
-            }
-            return workflow;
-          })
-        : newWFState;
+    const shouldMoveParent =
+      parentTaskId &&
+      parentTaskId.length > 0 &&
+      targetParentId &&
+      targetParentId !== ogParentId;
+    const newWFState2 = shouldMoveParent
+      ? newWFState.map((workflow) => {
+        if (workflow.id === ogParentId) {
+          return {
+            ...workflow,
+            tasks: workflow.tasks.filter((id) => id !== parentTaskId),
+          };
+        }
+        if (workflow.id === targetParentId) {
+          return {
+            ...workflow,
+            tasks: workflow.tasks.includes(parentTaskId)
+              ? workflow.tasks
+              : [...workflow.tasks, parentTaskId],
+          };
+        }
+        return workflow;
+      })
+      : newWFState;
 
     if (parentTaskId && parentTaskId.length > 0 && targetParentId) {
       setTaskCache((prev) => {

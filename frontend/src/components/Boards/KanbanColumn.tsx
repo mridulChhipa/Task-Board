@@ -5,10 +5,14 @@ import { TaskCard } from './TaskCard';
 import styles from './column.module.css';
 import type { TaskType, Priority } from '../../types/boards.types';
 import { handleError } from '../../App';
+import { syncStoriesWithChildrenOrder } from '../../utils/dragDrop.utils';
 
 interface Props {
   id: string;
   workflow: Workflow;
+  workflowState: Workflow[];
+  setWorkflowState: React.Dispatch<React.SetStateAction<Workflow[]>>;
+  taskCache: Record<string, Task>;
   onAddTask: () => void;
   deleteColumn: () => void;
   renameColumn: (name: string) => Promise<void>;
@@ -19,7 +23,7 @@ interface Props {
   dropHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
   dragoverHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
   taskDragstartHandler?: (event: React.DragEvent<HTMLDivElement>) => void;
-  setTaskCache?: React.Dispatch<React.SetStateAction<Record<string, Task>>>;
+  setTaskCache: React.Dispatch<React.SetStateAction<Record<string, Task>>>;
   setState: {
     setTaskName: React.Dispatch<React.SetStateAction<string>>;
     setTaskDescription: React.Dispatch<React.SetStateAction<string>>;
@@ -38,6 +42,9 @@ interface Props {
 export function KanbanColumn({
   id,
   workflow,
+  workflowState,
+  setWorkflowState,
+  taskCache,
   onAddTask,
   deleteColumn,
   renameColumn,
@@ -70,6 +77,32 @@ export function KanbanColumn({
       }
 
       setTasks(tasks.filter((task) => task.id !== taskId));
+      const deletedTask = taskCache[taskId];
+      const nextCache = { ...taskCache };
+      delete nextCache[taskId];
+      if (deletedTask?.parentId && nextCache[deletedTask.parentId]) {
+        const parent = nextCache[deletedTask.parentId];
+        nextCache[deletedTask.parentId] = {
+          ...parent,
+          children: parent.children.filter((id) => id !== taskId),
+        };
+      }
+      setTaskCache(nextCache);
+
+      const updatedWorkflows = workflowState.map((col) => {
+        if (col.id !== workflow.id) {
+          return col;
+        }
+        return {
+          ...col,
+          tasks: col.tasks.filter((id) => id !== taskId),
+        };
+      });
+      const syncedWorkflows = syncStoriesWithChildrenOrder(
+        updatedWorkflows,
+        nextCache,
+      );
+      setWorkflowState(syncedWorkflows);
     } catch (err) {
       handleError('Error deleting task');
       throw new Error('Error deleting task', { cause: err });
@@ -94,7 +127,7 @@ export function KanbanColumn({
       );
 
       setTasks(results);
-      setTaskCache?.((prev) => {
+      setTaskCache((prev) => {
         const next = { ...prev };
         for (const task of results) {
           next[task.id] = task;

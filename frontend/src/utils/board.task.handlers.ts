@@ -1,6 +1,12 @@
 import type { SubmitEventHandler } from 'react';
-import type { Priority, ProjectMember, Workflow } from '../types/boards.types';
+import type {
+  Priority,
+  ProjectMember,
+  Task,
+  Workflow,
+} from '../types/boards.types';
 import { sortWorkflows } from './board.utils';
+import { syncStoriesWithChildrenOrder } from './dragDrop.utils';
 import type {
   RuntimeContext,
   TaskFormState,
@@ -47,11 +53,12 @@ export function createTaskHandlers(
     taskId,
     currentTaskId,
   } = taskForm;
-  const { workflowState } = state;
+  const { workflowState, taskCache } = state;
 
   const {
     setWorkflowState,
     setDragHighlight,
+    setTaskCache,
     setShowAddTaskModal,
     setTaskName,
     setTaskDescription,
@@ -132,9 +139,45 @@ export function createTaskHandlers(
       );
 
       const sortedWF = await sortWorkflows(updatedWorkflowState, onError);
-      setWorkflowState(sortedWF);
-      setDragHighlight(sortedWF.map(() => false));
-      boards[activeIndex].workflows = sortedWF;
+      const now = new Date();
+      const nextCache: Record<string, Task> = {
+        ...taskCache,
+        [newTaskId]: {
+          id: newTaskId,
+          title: taskName,
+          description: taskDescription,
+          type: taskType,
+          priority,
+          assignee: assigneeId,
+          reporter: reporterId,
+          dueDate: dateObject ?? undefined,
+          statusId: activeColumnId,
+          createdAt: now,
+          updatedAt: now,
+          resolvedAt: undefined,
+          closedAt: undefined,
+          parentId: setParent ? taskId : undefined,
+          threads: [],
+          activities: [],
+          children: [],
+        },
+      };
+
+      if (setParent && taskId && nextCache[taskId]) {
+        const parent = nextCache[taskId];
+        nextCache[taskId] = {
+          ...parent,
+          children: parent.children.includes(newTaskId)
+            ? parent.children
+            : [...parent.children, newTaskId],
+        };
+      }
+
+      const syncedWF = syncStoriesWithChildrenOrder(sortedWF, nextCache);
+      setTaskCache(nextCache);
+      setWorkflowState(syncedWF);
+      setDragHighlight(syncedWF.map(() => false));
+      boards[activeIndex].workflows = syncedWF;
     } catch (err) {
       console.error('Error creating task:', { cause: err });
       onError('Failed to create task');

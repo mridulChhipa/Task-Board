@@ -39,6 +39,13 @@
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
   border-radius: 8px;
   overflow: hidden;
+  min-width: 720px;
+}
+
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
 }
 
 .projectTable th {
@@ -127,12 +134,15 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  width: auto;
-  align-items: center;
+  width: 100%;
+  max-width: 320px;
+  flex: 0 0 320px;
+  align-items: stretch;
   border-left: 1px solid #b9c6d8;
-  flex-grow: 1;
-  height: 91vh;
-  max-width: 25vw;
+  padding: 20px 16px;
+  height: auto;
+  background-color: #f8fafc;
+  border-radius: 12px;
 }
 
 .dashboard {
@@ -140,7 +150,7 @@
   flex-direction: column;
   gap: 0rem;
   padding: 20px;
-  width: 100px;
+  width: 100%;
   flex-grow: 8;
 }
 
@@ -230,11 +240,31 @@
   }
 
   .sidebar {
-    /* display: none; */
-    width: 100vw;
+    width: 100%;
+    max-width: none;
+    flex: 1 1 auto;
+    border-left: none;
   }
 
   .mainContainer {
     flex-direction: column;
+  }
+
+  .projectTable th,
+  .projectTable td {
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .mainContainer {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    max-width: none;
+    flex: 1 1 auto;
+    border-left: none;
   }
 }

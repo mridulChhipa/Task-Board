@@ -90,6 +90,12 @@
   height: auto;
 }
 
+.aboutLogo {
+  width: min(220px, 60vw);
+  height: auto;
+  object-fit: contain;
+}
+
 .aboutText {
   display: flex;
   flex-direction: column;
@@ -141,5 +147,8 @@
   }
   .aboutContainer {
     flex-direction: column;
+  }
+  .aboutLogo {
+    width: min(180px, 70vw);
   }
 }

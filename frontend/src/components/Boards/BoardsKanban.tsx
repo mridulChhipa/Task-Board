@@ -98,6 +98,9 @@ export default function BoardsKanban({
                     key={`${activeBoard.id}-${workflow.id}-${boardRefreshKey}`}
                     id={workflow.orderIdx.toString()}
                     workflow={workflow}
+                    workflowState={workflowState}
+                    setWorkflowState={setWorkflowState}
+                    taskCache={taskCache}
                     highlight={dragHighlight[index]}
                     onAddTask={() => {
                       if (

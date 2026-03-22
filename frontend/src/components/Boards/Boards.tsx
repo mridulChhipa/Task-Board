@@ -105,10 +105,12 @@ export default function Boards({ boards, role }: Props) {
     state: {
       workflowState,
       edges,
+      taskCache,
     },
     setters: {
       setWorkflowState,
       setDragHighlight,
+      setTaskCache,
       setShowAddTaskModal,
       setTaskName,
       setTaskDescription,

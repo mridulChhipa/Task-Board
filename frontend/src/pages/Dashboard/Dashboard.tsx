@@ -175,7 +175,7 @@ function DashBoard() {
             canManageUsers={
               user?.role === 'GLOBAL_ADMIN' ||
               projects.find((p) => p.id === currProject)?.role ===
-                'PROJECT_ADMIN'
+              'PROJECT_ADMIN'
             }
           />
         </Modal>
@@ -332,101 +332,103 @@ function DashBoard() {
               Create Project
             </Button>
           </div>
-          <table className={styles.projectTable}>
-            <thead>
-              <tr>
-                <th>Project Name</th>
-                <th>Role</th>
-                <th>Description</th>
-                {/* <th>Last Modified</th> */}
-                <th>Members</th>
-                <th>More Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {projects.map((project, index) => (
-                <tr
-                  key={project.id}
-                  style={{ cursor: 'pointer' }}
-                  className={index % 2 === 0 ? styles.evenRow : styles.oddRow}
-                >
-                  <td>
-                    <Link
-                      className={styles.projectLink}
-                      to={`/project/${project.id}`}
-                    >
-                      {project.name}
-                    </Link>
-                  </td>
-                  <td>{project.role}</td>
-                  <td>{project.description}</td>
-                  {/* <td>{make_date(project.lastModified)}</td> */}
-                  <td style={{ position: 'relative' }}>
-                    <Button
-                      onClick={() => {
-                        const canManageUsers =
-                          user?.role === 'GLOBAL_ADMIN' ||
-                          project.role === 'PROJECT_ADMIN';
-                        setAddUser(true);
-                        setCurrProject(project.id);
-                        if (!canManageUsers) {
-                          setOperation('View');
-                        }
-                        void getMembers({
-                          operation,
-                          setOperation,
-                          userToAdd,
-                          setUserToAdd,
-                          newRole,
-                          setNewRole,
-                          setAddUser,
-                          currProject: project.id,
-                          globalAdminEmail,
-                          handleError,
-                        })
-                          .then((members) => setProjectMembers(members))
-                          .catch(() => setProjectMembers([]));
-                      }}
-                    >
-                      Manage
-                    </Button>
-                  </td>
-                  <td
-                    style={{
-                      verticalAlign: 'middle',
-                      textAlign: 'center',
-                      height: '100%',
-                    }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (
-                          project.role !== 'PROJECT_ADMIN' &&
-                          user?.role !== 'GLOBAL_ADMIN'
-                        ) {
-                          handleError(
-                            "You don't have permission to edit this project",
-                          );
-                          console.log('error raised');
-                          return;
-                        }
-                        setCurrProject(project.id);
-                        setUpdatedDesc(project.description);
-                        setUpdatedName(project.name);
-                        setUpdatedIsArchived(project.isArchived);
-                        setShowUpdateModal(true);
-                      }}
-                      aria-label={`Settings for ${project.name}`}
-                      className={styles.settingsButton}
-                    >
-                      <IconSettings size={25} />
-                    </button>
-                  </td>
+          <div className={styles.tableWrapper}>
+            <table className={styles.projectTable}>
+              <thead>
+                <tr>
+                  <th>Project Name</th>
+                  <th>Role</th>
+                  <th>Description</th>
+                  {/* <th>Last Modified</th> */}
+                  <th>Members</th>
+                  <th>More Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {projects.map((project, index) => (
+                  <tr
+                    key={project.id}
+                    style={{ cursor: 'pointer' }}
+                    className={index % 2 === 0 ? styles.evenRow : styles.oddRow}
+                  >
+                    <td>
+                      <Link
+                        className={styles.projectLink}
+                        to={`/project/${project.id}`}
+                      >
+                        {project.name}
+                      </Link>
+                    </td>
+                    <td>{project.role}</td>
+                    <td>{project.description}</td>
+                    {/* <td>{make_date(project.lastModified)}</td> */}
+                    <td style={{ position: 'relative' }}>
+                      <Button
+                        onClick={() => {
+                          const canManageUsers =
+                            user?.role === 'GLOBAL_ADMIN' ||
+                            project.role === 'PROJECT_ADMIN';
+                          setAddUser(true);
+                          setCurrProject(project.id);
+                          if (!canManageUsers) {
+                            setOperation('View');
+                          }
+                          void getMembers({
+                            operation,
+                            setOperation,
+                            userToAdd,
+                            setUserToAdd,
+                            newRole,
+                            setNewRole,
+                            setAddUser,
+                            currProject: project.id,
+                            globalAdminEmail,
+                            handleError,
+                          })
+                            .then((members) => setProjectMembers(members))
+                            .catch(() => setProjectMembers([]));
+                        }}
+                      >
+                        Manage
+                      </Button>
+                    </td>
+                    <td
+                      style={{
+                        verticalAlign: 'middle',
+                        textAlign: 'center',
+                        height: '100%',
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (
+                            project.role !== 'PROJECT_ADMIN' &&
+                            user?.role !== 'GLOBAL_ADMIN'
+                          ) {
+                            handleError(
+                              "You don't have permission to edit this project",
+                            );
+                            console.log('error raised');
+                            return;
+                          }
+                          setCurrProject(project.id);
+                          setUpdatedDesc(project.description);
+                          setUpdatedName(project.name);
+                          setUpdatedIsArchived(project.isArchived);
+                          setShowUpdateModal(true);
+                        }}
+                        aria-label={`Settings for ${project.name}`}
+                        className={styles.settingsButton}
+                      >
+                        <IconSettings size={25} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         <div className={styles.sidebar}>
           {user?.role === 'GLOBAL_ADMIN' && (

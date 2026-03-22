@@ -3,6 +3,7 @@ import type { User } from '../context/AuthContext';
 import type {
   EdgeConstraint,
   Priority,
+  Task,
   TaskType,
   Workflow,
 } from '../types/boards.types';
@@ -38,11 +39,13 @@ export interface EdgeFormState {
 export interface BoardState {
   workflowState: Workflow[];
   edges: EdgeConstraint[];
+  taskCache: Record<string, Task>;
 }
 
 export interface BoardSetters {
   setWorkflowState: Dispatch<SetStateAction<Workflow[]>>;
   setDragHighlight: Dispatch<SetStateAction<boolean[]>>;
+  setTaskCache: Dispatch<SetStateAction<Record<string, Task>>>;
   setShowAddTaskModal: Dispatch<SetStateAction<boolean>>;
   setTaskName: Dispatch<SetStateAction<string>>;
   setTaskDescription: Dispatch<SetStateAction<string>>;
