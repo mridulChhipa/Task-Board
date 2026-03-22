@@ -31,6 +31,8 @@ interface Props {
     setPriority: React.Dispatch<React.SetStateAction<Priority>>;
     setAssignee: React.Dispatch<React.SetStateAction<string>>;
     setDueDate: React.Dispatch<React.SetStateAction<string>>;
+    setIsResolved: React.Dispatch<React.SetStateAction<boolean>>;
+    setIsClosed: React.Dispatch<React.SetStateAction<boolean>>;
     setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
     setCurrentTaskId: React.Dispatch<React.SetStateAction<string | null>>;
     setTaskId: React.Dispatch<React.SetStateAction<string>>;
@@ -80,24 +82,26 @@ export function KanbanColumn({
       const deletedTask = taskCache[taskId];
       const nextCache = { ...taskCache };
       delete nextCache[taskId];
+      const removedIds = new Set<string>([taskId]);
+      if (deletedTask?.type === 'STORY' && deletedTask.children?.length) {
+        for (const childId of deletedTask.children) {
+          removedIds.add(childId);
+          delete nextCache[childId];
+        }
+      }
       if (deletedTask?.parentId && nextCache[deletedTask.parentId]) {
         const parent = nextCache[deletedTask.parentId];
         nextCache[deletedTask.parentId] = {
           ...parent,
-          children: parent.children.filter((id) => id !== taskId),
+          children: parent.children.filter((id) => !removedIds.has(id)),
         };
       }
       setTaskCache(nextCache);
 
-      const updatedWorkflows = workflowState.map((col) => {
-        if (col.id !== workflow.id) {
-          return col;
-        }
-        return {
-          ...col,
-          tasks: col.tasks.filter((id) => id !== taskId),
-        };
-      });
+      const updatedWorkflows = workflowState.map((col) => ({
+        ...col,
+        tasks: col.tasks.filter((id) => !removedIds.has(id)),
+      }));
       const syncedWorkflows = syncStoriesWithChildrenOrder(
         updatedWorkflows,
         nextCache,
@@ -118,26 +122,54 @@ export function KanbanColumn({
 
       const results = await Promise.all(
         workflow.tasks.map(async (id) => {
-          const res = await fetch(`http://localhost:3000/api/task/${id}`, {
-            credentials: 'include',
-          });
-          const data = await res.json();
-          return data.task;
+          try {
+            const res = await fetch(`http://localhost:3000/api/task/${id}`, {
+              credentials: 'include',
+            });
+            if (!res.ok) {
+              return null;
+            }
+            const data = await res.json();
+            return data.task as Task;
+          } catch {
+            return null;
+          }
         }),
       );
 
-      setTasks(results);
+      const validTasks = results.filter((task): task is Task => Boolean(task));
+      const missingIds = workflow.tasks.filter(
+        (id) => !validTasks.some((task) => task.id === id),
+      );
+
+      setTasks(validTasks);
       setTaskCache((prev) => {
         const next = { ...prev };
-        for (const task of results) {
+        for (const task of validTasks) {
           next[task.id] = task;
+        }
+        for (const missingId of missingIds) {
+          delete next[missingId];
         }
         return next;
       });
+
+      if (missingIds.length > 0) {
+        setWorkflowState((prev) =>
+          prev.map((col) =>
+            col.id === workflow.id
+              ? {
+                  ...col,
+                  tasks: col.tasks.filter((id) => !missingIds.includes(id)),
+                }
+              : col,
+          ),
+        );
+      }
     }
 
     fetchTasks();
-  }, [workflow.tasks, setTaskCache]);
+  }, [workflow.id, workflow.tasks, setTaskCache, setWorkflowState]);
 
   useEffect(() => {
     setDraftName(workflow.name);

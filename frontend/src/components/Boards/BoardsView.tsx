@@ -31,6 +31,10 @@ export default function BoardsView({
   setAssignee,
   dueDate,
   setDueDate,
+  isResolved,
+  setIsResolved,
+  isClosed,
+  setIsClosed,
   taskId,
   setParent,
   setSetParent,
@@ -87,6 +91,10 @@ export default function BoardsView({
         setAssignee={setAssignee}
         dueDate={dueDate}
         setDueDate={setDueDate}
+        isResolved={isResolved}
+        setIsResolved={setIsResolved}
+        isClosed={isClosed}
+        setIsClosed={setIsClosed}
         taskId={taskId}
         setParent={setParent}
         setSetParent={setSetParent}

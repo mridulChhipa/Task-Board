@@ -21,6 +21,10 @@ interface Props {
   setAssignee: Dispatch<SetStateAction<string>>;
   dueDate: string;
   setDueDate: Dispatch<SetStateAction<string>>;
+  isResolved: boolean;
+  setIsResolved: Dispatch<SetStateAction<boolean>>;
+  isClosed: boolean;
+  setIsClosed: Dispatch<SetStateAction<boolean>>;
   setParent: boolean;
   setSetParent: Dispatch<SetStateAction<boolean>>;
   taskId: string;
@@ -42,6 +46,10 @@ export default function EditTaskModal({
   setAssignee,
   dueDate,
   setDueDate,
+  isResolved,
+  setIsResolved,
+  isClosed,
+  setIsClosed,
   setParent,
   setSetParent,
   taskId,
@@ -136,6 +144,31 @@ export default function EditTaskModal({
               value={dueDate}
             />
           </InputArea>
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '0.5rem' }}>
+            <Label htmlFor="isResolved">Resolved</Label>
+            <input
+              type="checkbox"
+              name="isResolved"
+              checked={isResolved}
+              onChange={(e) => {
+                const nextResolved = e.target.checked;
+                setIsResolved(nextResolved);
+                if (!nextResolved) {
+                  setIsClosed(false);
+                }
+              }}
+            />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '0.5rem' }}>
+            <Label htmlFor="isClosed">Closed</Label>
+            <input
+              type="checkbox"
+              name="isClosed"
+              checked={isClosed}
+              onChange={(e) => setIsClosed(e.target.checked)}
+              disabled={!isResolved}
+            />
+          </div>
           <div style={{ display: 'flex', flexDirection: 'row', gap: '0.5rem' }}>
             <Label htmlFor="showParent">
               Set parent story (uncheck to keep same parent)

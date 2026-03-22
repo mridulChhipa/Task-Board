@@ -17,10 +17,18 @@ export class TaskService {
     dueDate,
     statusId,
     parentId,
+    resolvedAt,
+    closedAt,
   }: CreateTaskBody): Promise<string> {
     try {
       if (type === 'STORY') {
         parentId = null;
+      }
+
+      const resolvedAtValue = resolvedAt ?? null;
+      const closedAtValue = closedAt ?? null;
+      if (closedAtValue && !resolvedAtValue) {
+        throw new Error('Closed task must be resolved first');
       }
 
       if (parentId) {
@@ -59,6 +67,8 @@ export class TaskService {
           dueDate: dueDate,
           statusId,
           parentId,
+          resolvedAt: resolvedAtValue,
+          closedAt: closedAtValue,
         },
       });
 
@@ -99,6 +109,8 @@ export class TaskService {
       dueDate,
       statusId,
       parentId,
+      resolvedAt,
+      closedAt,
     }: CreateTaskBody,
   ): Promise<void> {
     try {
@@ -114,6 +126,12 @@ export class TaskService {
 
       if (type === 'STORY') {
         parentId = null;
+      }
+
+      const resolvedAtValue = resolvedAt ?? null;
+      const closedAtValue = closedAt ?? null;
+      if (closedAtValue && !resolvedAtValue) {
+        throw new Error('Closed task must be resolved first');
       }
 
       if (parentId) {
@@ -161,6 +179,8 @@ export class TaskService {
           dueDate: dueDate,
           statusId: nextStatusId,
           parentId,
+          resolvedAt: resolvedAtValue,
+          closedAt: closedAtValue,
         },
         where: {
           id: taskId,

@@ -33,8 +33,8 @@ export interface Task {
   statusId: string;
   createdAt: Date;
   updatedAt: Date;
-  resolvedAt?: Date;
-  closedAt?: string;
+  resolvedAt: Date | null;
+  closedAt: Date | null;
   parentId?: string;
   threads?: ThreadDTO[];
   activities?: ActivityDTO[];

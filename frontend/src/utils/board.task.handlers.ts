@@ -47,6 +47,8 @@ export function createTaskHandlers(
     taskName,
     taskDescription,
     dueDate,
+    isResolved,
+    isClosed,
     taskType,
     priority,
     setParent,
@@ -66,6 +68,8 @@ export function createTaskHandlers(
     setPriority,
     setAssignee,
     setDueDate,
+    setIsResolved,
+    setIsClosed,
     setEditModal,
     setCurrentTaskId,
   } = setters;
@@ -77,6 +81,8 @@ export function createTaskHandlers(
     setPriority('LOW');
     setAssignee('');
     setDueDate('');
+    setIsResolved(false);
+    setIsClosed(false);
   };
 
   const handleAdd: SubmitEventHandler<HTMLFormElement> = async (e) => {
@@ -93,6 +99,11 @@ export function createTaskHandlers(
     try {
       if (taskType === 'STORY' && setParent) {
         onError('Story cannot have a parent story');
+        return;
+      }
+
+      if (isClosed && !isResolved) {
+        onError('Closed tasks must be resolved first');
         return;
       }
 
@@ -146,6 +157,8 @@ export function createTaskHandlers(
           dueDate: dateObject,
           statusId: activeColumnId,
           parentId: taskType === 'STORY' ? null : setParent ? taskId : null,
+          resolvedAt: isResolved ? new Date() : null,
+          closedAt: isClosed ? new Date() : null,
         }),
       });
 
@@ -176,8 +189,8 @@ export function createTaskHandlers(
           statusId: activeColumnId,
           createdAt: now,
           updatedAt: now,
-          resolvedAt: undefined,
-          closedAt: undefined,
+          resolvedAt: isResolved ? now : null,
+          closedAt: isClosed ? now : null,
           parentId: setParent ? taskId : undefined,
           threads: [],
           activities: [],
@@ -240,6 +253,11 @@ export function createTaskHandlers(
         return;
       }
 
+      if (isClosed && !isResolved) {
+        onError('Closed tasks must be resolved first');
+        return;
+      }
+
       if (setParent) {
         const parentTask = taskCache[taskId];
         const workflowIds = new Set(workflowState.map((wf) => wf.id));
@@ -294,6 +312,8 @@ export function createTaskHandlers(
           parentId: taskType === 'STORY' ? null : (newParentId ?? null),
           statusId,
           dueDate: dueDate !== '' ? new Date(dueDate) : null,
+          resolvedAt: isResolved ? new Date() : null,
+          closedAt: isClosed ? new Date() : null,
         }),
       });
 
@@ -313,6 +333,8 @@ export function createTaskHandlers(
           statusId,
           parentId: newParentId,
           updatedAt: new Date(),
+          resolvedAt: isResolved ? new Date() : null,
+          closedAt: isClosed ? new Date() : null,
         },
       };
 

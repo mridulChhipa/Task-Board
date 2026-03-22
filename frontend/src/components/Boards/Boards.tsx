@@ -40,6 +40,8 @@ export default function Boards({ boards, role }: Props) {
   const [priority, setPriority] = useState<Priority>('LOW');
   const [assignee, setAssignee] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [isResolved, setIsResolved] = useState(false);
+  const [isClosed, setIsClosed] = useState(false);
 
   const [taskId, setTaskId] = useState('');
   const [setParent, setSetParent] = useState(false);
@@ -62,6 +64,8 @@ export default function Boards({ boards, role }: Props) {
     setPriority: setPriority,
     setAssignee: setAssignee,
     setDueDate: setDueDate,
+    setIsResolved: setIsResolved,
+    setIsClosed: setIsClosed,
     setEditModal: setEditModal,
     setCurrentTaskId: setCurrentTaskId,
     setTaskId: setTaskId,
@@ -92,6 +96,8 @@ export default function Boards({ boards, role }: Props) {
       taskName,
       taskDescription,
       dueDate,
+      isResolved,
+      isClosed,
       taskType,
       priority,
       setParent,
@@ -118,6 +124,8 @@ export default function Boards({ boards, role }: Props) {
       setPriority,
       setAssignee,
       setDueDate,
+      setIsResolved,
+      setIsClosed,
       setEditModal,
       setCurrentTaskId,
       setIsAddingEdge,
@@ -164,6 +172,10 @@ export default function Boards({ boards, role }: Props) {
       setAssignee={setAssignee}
       dueDate={dueDate}
       setDueDate={setDueDate}
+      isResolved={isResolved}
+      setIsResolved={setIsResolved}
+      isClosed={isClosed}
+      setIsClosed={setIsClosed}
       taskId={taskId}
       setParent={setParent}
       setSetParent={setSetParent}

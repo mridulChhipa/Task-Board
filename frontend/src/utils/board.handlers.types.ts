@@ -24,6 +24,8 @@ export interface TaskFormState {
   taskName: string;
   taskDescription: string;
   dueDate: string;
+  isResolved: boolean;
+  isClosed: boolean;
   taskType: TaskType;
   priority: Priority;
   setParent: boolean;
@@ -53,6 +55,8 @@ export interface BoardSetters {
   setPriority: Dispatch<SetStateAction<Priority>>;
   setAssignee: Dispatch<SetStateAction<string>>;
   setDueDate: Dispatch<SetStateAction<string>>;
+  setIsResolved: Dispatch<SetStateAction<boolean>>;
+  setIsClosed: Dispatch<SetStateAction<boolean>>;
   setEditModal: Dispatch<SetStateAction<boolean>>;
   setCurrentTaskId: Dispatch<SetStateAction<string | null>>;
   setIsAddingEdge: Dispatch<SetStateAction<boolean>>;

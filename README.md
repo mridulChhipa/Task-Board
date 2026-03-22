@@ -9,7 +9,11 @@
       - update the .env file [PORT=3000, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET, DATABASE_URL]
   4. `npx prisma migrate reset`
   5. `npx prisma migrate dev`
-  6. `npx prisma migrate`
+  6. `npx prisma generate`
+  7. `npm run dev`
+  8. `cd .. && cd frontend`
+  9. `npm install`
+  10. 
 
 ## 2. Running the server
 - The server resided in the backend

@@ -17,6 +17,8 @@ export interface TaskCardSetState {
   setPriority: Dispatch<SetStateAction<Priority>>;
   setAssignee: Dispatch<SetStateAction<string>>;
   setDueDate: Dispatch<SetStateAction<string>>;
+  setIsResolved: Dispatch<SetStateAction<boolean>>;
+  setIsClosed: Dispatch<SetStateAction<boolean>>;
   setEditModal: Dispatch<SetStateAction<boolean>>;
   setCurrentTaskId: Dispatch<SetStateAction<string | null>>;
   setTaskId: Dispatch<SetStateAction<string>>;
@@ -53,6 +55,10 @@ export interface BoardsViewProps {
   setAssignee: Dispatch<SetStateAction<string>>;
   dueDate: string;
   setDueDate: Dispatch<SetStateAction<string>>;
+  isResolved: boolean;
+  setIsResolved: Dispatch<SetStateAction<boolean>>;
+  isClosed: boolean;
+  setIsClosed: Dispatch<SetStateAction<boolean>>;
   taskId: string;
   setParent: boolean;
   setSetParent: Dispatch<SetStateAction<boolean>>;
@@ -108,6 +114,10 @@ export interface BoardsModalStackProps {
   setAssignee: Dispatch<SetStateAction<string>>;
   dueDate: string;
   setDueDate: Dispatch<SetStateAction<string>>;
+  isResolved: boolean;
+  setIsResolved: Dispatch<SetStateAction<boolean>>;
+  isClosed: boolean;
+  setIsClosed: Dispatch<SetStateAction<boolean>>;
   taskId: string;
   setParent: boolean;
   setSetParent: Dispatch<SetStateAction<boolean>>;

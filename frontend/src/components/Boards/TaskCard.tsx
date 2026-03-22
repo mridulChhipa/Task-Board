@@ -26,6 +26,8 @@ interface Props {
     setPriority: React.Dispatch<React.SetStateAction<Priority>>;
     setAssignee: React.Dispatch<React.SetStateAction<string>>;
     setDueDate: React.Dispatch<React.SetStateAction<string>>;
+    setIsResolved: React.Dispatch<React.SetStateAction<boolean>>;
+    setIsClosed: React.Dispatch<React.SetStateAction<boolean>>;
     setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
     setCurrentTaskId: React.Dispatch<React.SetStateAction<string | null>>;
     setTaskId: React.Dispatch<React.SetStateAction<string>>;
@@ -80,7 +82,7 @@ export function TaskCard({
 
   return (
     <div
-      className={styles.taskCard}
+      className={`${styles.taskCard} ${task.closedAt ? styles.taskClosed : task.resolvedAt ? styles.taskResolved : ''}`}
       draggable={draggable}
       onDragStart={dragstartHandler}
       data-parent={task.statusId}
@@ -144,6 +146,8 @@ export function TaskCard({
                       ? new Date(task.dueDate).toISOString().slice(0, 10)
                       : '',
                   );
+                  setState?.setIsResolved(Boolean(task.resolvedAt));
+                  setState?.setIsClosed(Boolean(task.closedAt));
                   setState?.setCurrentTaskId(task.id);
                   setState?.setEditModal(true);
                 }}

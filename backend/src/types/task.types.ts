@@ -36,6 +36,8 @@ export interface CreateTaskBody {
   dueDate: Date;
   statusId: string;
   parentId: string | null;
+  resolvedAt?: Date | null;
+  closedAt?: Date | null;
 }
 
 export interface TaskDTO {

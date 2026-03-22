@@ -52,6 +52,10 @@ export default function BoardsModalStack({
   setAssignee,
   dueDate,
   setDueDate,
+  isResolved,
+  setIsResolved,
+  isClosed,
+  setIsClosed,
   taskId,
   setParent,
   setSetParent,
@@ -110,6 +114,10 @@ export default function BoardsModalStack({
         setAssignee={setAssignee}
         dueDate={dueDate}
         setDueDate={setDueDate}
+        isResolved={isResolved}
+        setIsResolved={setIsResolved}
+        isClosed={isClosed}
+        setIsClosed={setIsClosed}
         setParent={setParent}
         setSetParent={setSetParent}
         taskId={taskId}
