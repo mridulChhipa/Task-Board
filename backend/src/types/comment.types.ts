@@ -1,5 +1,3 @@
-import { UserDetails } from "./auth.types";
-
 export interface ThreadBody {
   taskId: string;
   title: string;

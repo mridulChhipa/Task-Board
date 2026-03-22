@@ -52,6 +52,7 @@ export class NotificationService {
       const ndto: NotificationDTO = toNotifDTO(notif);
       return ndto;
     } catch (error) {
+      void error;
       throw error;
     }
   }

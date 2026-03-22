@@ -61,10 +61,7 @@ export class BoardService {
     return board;
   }
 
-  async update(
-    boardId: string,
-    name: string,
-  ): Promise<void> {
+  async update(boardId: string, name: string): Promise<void> {
     try {
       const existingBoard = await db.board.findFirst({
         where: {
@@ -85,6 +82,7 @@ export class BoardService {
         },
       });
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -163,6 +161,7 @@ export class BoardService {
         storiesToSync.map((story) => syncStatusWithChildren(story.id)),
       );
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -232,6 +231,7 @@ export class BoardService {
 
       return edge;
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -309,6 +309,7 @@ export class BoardService {
 
       return bdto;
     } catch (error) {
+      void error;
       throw error;
     }
   }
@@ -335,6 +336,7 @@ export class BoardService {
 
       return coldto;
     } catch (error) {
+      void error;
       throw error;
     }
   }

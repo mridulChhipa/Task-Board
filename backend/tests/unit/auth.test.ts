@@ -213,10 +213,7 @@ describe('AuthService', () => {
       },
     };
 
-    await assert.rejects(
-      () => service.logout(refreshToken),
-      /delete failed/,
-    );
+    await assert.rejects(() => service.logout(refreshToken), /delete failed/);
   });
 
   test('logout rejects non-refresh tokens', async () => {

@@ -107,9 +107,9 @@ export default function TaskPage() {
       setTask((prev) =>
         prev
           ? {
-            ...prev,
-            threads: [...(prev.threads ?? []), newThread],
-          }
+              ...prev,
+              threads: [...(prev.threads ?? []), newThread],
+            }
           : prev,
       );
       setThreadContent('');

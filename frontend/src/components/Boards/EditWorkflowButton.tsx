@@ -1,5 +1,5 @@
 import { IconPlus } from './boards.images';
-import styles from './Boards.module.css';
+import styles from './boards.module.css';
 import { FormControl } from '../Form/Form';
 import Button from '../Button/Button';
 import { addWorkflow } from '../../utils/board.utils';

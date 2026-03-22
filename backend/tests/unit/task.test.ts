@@ -609,7 +609,10 @@ describe('TaskService', () => {
       findUnique: async () => null,
     };
 
-    await assert.rejects(() => service.delete('task-1'), /Task with the given taskId does not exis/);
+    await assert.rejects(
+      () => service.delete('task-1'),
+      /Task with the given taskId does not exis/,
+    );
   });
 
   test('delete rejects delete failure', async () => {
@@ -684,7 +687,10 @@ describe('TaskService', () => {
       findUnique: async () => null,
     };
 
-    await assert.rejects(() => service.getTask('task-1'), /given taskId does not exist/);
+    await assert.rejects(
+      () => service.getTask('task-1'),
+      /given taskId does not exist/,
+    );
   });
 
   test('getTask rejects fetch failure', async () => {
