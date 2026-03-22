@@ -15,7 +15,7 @@ import { AuthContext } from '../../context/AuthContext';
 import Modal from '../Modal/Modal';
 import Form, { InputArea, Label } from '../Form/Form';
 import InlineRichTextEditor from '../TextEditor/InlineRichTextEditor';
-import { sanitizeHtml } from '../../utils/sanitizer';
+import { sanitizeHtml, highlightEmails } from '../../utils/sanitizer';
 
 interface Props {
   commentId: string;
@@ -250,7 +250,7 @@ export function Comment({
       <div className={styles.commentWrapper}>
         <div className={styles.meta}>
           <div>
-            <strong>User {comment.authorId}</strong>
+            <strong>User {comment.authorName}</strong>
             <span>
               | Created: {new Date(comment.createdAt).toLocaleDateString()}
             </span>
@@ -269,10 +269,6 @@ export function Comment({
           </span>
         </div>
 
-        <div style={{ fontSize: '0.85em', color: '#666' }}>
-          Parent ID: {comment.parentId ? comment.parentId : 'None'}
-        </div>
-
         <div className={styles.content}>
           {isEditing ? (
             <InlineRichTextEditor
@@ -288,7 +284,7 @@ export function Comment({
               style={{ cursor: 'text', margin: 0 }}
               title="Click to edit"
               dangerouslySetInnerHTML={{
-                __html: sanitizeHtml(comment.content),
+                __html: highlightEmails(sanitizeHtml(comment.content)),
               }}
             ></p>
           )}

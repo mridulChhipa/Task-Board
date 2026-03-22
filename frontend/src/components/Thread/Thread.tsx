@@ -195,7 +195,7 @@ export default function Thread({ thread, deleteThread, refreshTask }: Props) {
         </span>
       </div>
       <div className={styles.meta}>
-        Posted by User {thread.authorId} on{' '}
+        Posted by User {thread.authorName} on
         {new Date(thread.createdAt).toDateString()}
       </div>
       <div className={styles.content}>

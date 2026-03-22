@@ -303,6 +303,7 @@ export class CommentService {
         },
         include: {
           replies: true,
+          author: true,
         },
       });
 
@@ -328,6 +329,7 @@ export class CommentService {
               parentId: null,
             },
           },
+          author: true,
         },
       });
 

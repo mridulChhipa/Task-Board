@@ -7,6 +7,7 @@ export interface ThreadDTO {
   createdAt: Date;
   updatedAt: Date;
   taskId: string;
+  authorName: string;
   comments: string[];
 }
 
@@ -19,5 +20,6 @@ export interface CommentDTO {
   parentId: string | null;
   createdAt: Date;
   updatedAt: Date;
+  authorName: string;
   replies: string[];
 }

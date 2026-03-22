@@ -49,10 +49,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   async function handleNotification(senderId: number, notification: string) {
     try {
-      const senderRes = await fetch(`http://localhost:3000/api/auth/${senderId}`, {
-        method: 'GET',
-        credentials: 'include',
-      });
+      const senderRes = await fetch(
+        `http://localhost:3000/api/auth/${senderId}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+        },
+      );
       const senderData = await senderRes.json();
       const sender = senderData.data.personalData.name;
       triggerPopup(sender, notification, false);

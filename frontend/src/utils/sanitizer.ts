@@ -36,3 +36,20 @@ export function sanitizeHtml(dirtyHtml: string): string {
 
   return doc.body.innerHTML;
 }
+
+export function highlightEmails(html: string): string {
+  if (!html) {
+    return '';
+  }
+
+  // Email regex pattern
+  const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi;
+
+  // Replace emails with blue-colored span
+  const highlightedHtml = html.replace(
+    emailRegex,
+    '<span style="color: blue; font-weight: 500;">$1</span>'
+  );
+
+  return highlightedHtml;
+}

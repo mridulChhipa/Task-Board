@@ -4,6 +4,7 @@ import type { CommentDTO, ThreadDTO } from '../types/comment.types';
 type CommentWithChildren = Prisma.CommentGetPayload<{
   include: {
     replies: true;
+    author: true;
   };
 }>;
 
@@ -23,11 +24,13 @@ export function toCommentDTO(comment: CommentWithChildren): CommentDTO {
     threadId: comment.threadId ?? '',
     authorId: comment.authorId,
     replies: repIds,
+    authorName: comment.author.name,
   };
 }
 type ThreadWithChildren = Prisma.ThreadGetPayload<{
   include: {
     comments: true;
+    author: true;
   };
 }>;
 
@@ -47,6 +50,7 @@ export function toThreadDTO(thread: ThreadWithChildren): ThreadDTO {
     isDeleted: thread.isDeleted,
     authorId: thread.authorId,
     comments: cmnts,
+    authorName: thread.author.name,
   };
 }
 

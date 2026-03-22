@@ -92,7 +92,7 @@ export default function BoardTransitionsModal({
                 }}
               >
                 <strong>
-                  {from?.name.toUpperCase() ?? edge.uId} -&gt;{' '}
+                  {from?.name.toUpperCase() ?? edge.uId} -&gt;
                   {to?.name.toUpperCase() ?? edge.vId}
                 </strong>
                 {role === 'PROJECT_ADMIN' && (

@@ -1,3 +1,5 @@
+import { UserDetails } from "./auth.types";
+
 export interface ThreadBody {
   taskId: string;
   title: string;
@@ -38,6 +40,7 @@ export interface CommentDTO {
   parentId: string | null;
   createdAt: Date;
   updatedAt: Date;
+  authorName: string;
   replies: string[];
 }
 
@@ -50,5 +53,6 @@ export interface ThreadDTO {
   createdAt: Date;
   updatedAt: Date;
   taskId: string;
+  authorName: string;
   comments: string[];
 }
