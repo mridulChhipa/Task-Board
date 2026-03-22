@@ -23,6 +23,7 @@ export class NotificationService {
         },
         include: {
           recipient: true,
+          sender: true,
         },
       });
 
@@ -40,7 +41,7 @@ export class NotificationService {
         },
         include: {
           recipient: true,
-          // sender: true,
+          sender: true,
         },
       });
 

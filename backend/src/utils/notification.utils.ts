@@ -4,6 +4,7 @@ import type { NotificationDTO, NotifType } from '../types/notifcation.types';
 type NotificationWithRecipient = Prisma.NotificationGetPayload<{
   include: {
     recipient: true;
+    sender: true;
   };
 }>;
 
@@ -13,6 +14,7 @@ export function toNotifDTO(notif: NotificationWithRecipient): NotificationDTO {
     senderId: notif.senderId,
     recipientId: notif.recipient.id,
     recipientName: notif.recipient.name,
+    senderName: notif.sender.name,
     type: notif.type as NotifType,
     taskId: notif.taskId,
     commentId: notif.commentId,
