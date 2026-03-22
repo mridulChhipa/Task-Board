@@ -6,9 +6,17 @@ import { TaskService } from '../../src/services/task.service';
 import { prisma } from '../../lib/prisma';
 import type { PrismaClient } from '@prisma/client/extension';
 import { PriorityType, TaskType } from '../../src/types/task.types';
+import { NotifType } from '../../src/types/notifcation.types';
 import { notificationService } from '../../src/services/notification.service';
 import { initWSServer, shutdownWSServer } from '../../src/websocket/ws.service';
-import type { TaskCreateArgs, TaskUpdateArgs, TaskFindUniqueArgs, ActivityCreateArgs, CreateNotificationPayload, NotificationDTO } from '../test.types';
+import type {
+  TaskCreateArgs,
+  TaskUpdateArgs,
+  TaskFindUniqueArgs,
+  TaskDeleteArgs,
+  CreateNotificationPayload,
+  NotificationDTO,
+} from '../test.types';
 
 // Ensure sendNotif has a ws server instance to call.
 let wsServer: ReturnType<typeof initWSServer> | null = null;
@@ -27,9 +35,22 @@ describe('TaskService', () => {
 
   beforeEach(() => {
     service = new TaskService();
-    notificationService.createNotification = (async () => ({
-      id: 'notif-1',
-    } as NotificationDTO)) as (payload: CreateNotificationPayload) => Promise<NotificationDTO>;
+    notificationService.createNotification = (async () => {
+      return {
+        id: 'notif-1',
+        recipientId: 1,
+        senderId: 2,
+        taskId: null,
+        commentId: null,
+        threadId: null,
+        type: 'TASK_ASSIGNED' as NotifType,
+        recipientName: 'Recipient',
+        senderName: 'Sender',
+        read: false,
+      } as NotificationDTO;
+    }) as unknown as (
+      payload: CreateNotificationPayload,
+    ) => Promise<NotificationDTO>;
   });
 
   test('create returns task id', async () => {
@@ -59,7 +80,9 @@ describe('TaskService', () => {
     });
 
     assert.equal(taskId, 'task-1');
-    assert.equal(createArgs?.data.title, 'Task Title');
+    assert.ok(createArgs);
+    const taskCreateArgs = createArgs as TaskCreateArgs;
+    assert.equal(taskCreateArgs.data.title, 'Task Title');
   });
 
   test('create clears parentId for story', async () => {
@@ -88,7 +111,9 @@ describe('TaskService', () => {
       closedAt: null,
     });
 
-    assert.equal(createArgs?.data.parentId, null);
+    assert.ok(createArgs);
+    const storyCreateArgs = createArgs as TaskCreateArgs;
+    assert.equal(storyCreateArgs.data.parentId, null);
   });
 
   test('create rejects missing parent task', async () => {
@@ -186,7 +211,9 @@ describe('TaskService', () => {
     };
     notificationService.createNotification = (async () => {
       throw new Error('notification failed');
-    }) as (payload: CreateNotificationPayload) => Promise<NotificationDTO>;
+    }) as unknown as (
+      payload: CreateNotificationPayload,
+    ) => Promise<NotificationDTO>;
 
     await assert.rejects(
       () =>
@@ -267,9 +294,11 @@ describe('TaskService', () => {
       closedAt: null,
     });
 
-    assert.equal(updateArgs?.where.id, 'task-1');
-    assert.equal(updateArgs?.data.title, 'Updated Title');
-    assert.equal(updateArgs?.data.statusId, 'status-2');
+    assert.ok(updateArgs);
+    const taskUpdateArgs = updateArgs as TaskUpdateArgs;
+    assert.equal(taskUpdateArgs.where.id, 'task-1');
+    assert.equal(taskUpdateArgs.data.title, 'Updated Title');
+    assert.equal(taskUpdateArgs.data.statusId, 'status-2');
   });
 
   test('update rejects missing task', async () => {
@@ -465,9 +494,16 @@ describe('TaskService', () => {
 
   test('update triggers status and assignee notifications', async () => {
     const notifications: string[] = [];
-    notificationService.createNotification = (async (payload: CreateNotificationPayload) => {
+    notificationService.createNotification = (async (
+      payload: CreateNotificationPayload,
+    ) => {
       notifications.push(payload.type);
-      return { id: 'notif-1' } as NotificationDTO;
+      return {
+        id: 'notif-1',
+        type: payload.type,
+        recipientName: 'Recipient',
+        senderName: 'Sender',
+      } as NotificationDTO;
     }) as (payload: CreateNotificationPayload) => Promise<NotificationDTO>;
 
     let activityCalls = 0;
@@ -550,7 +586,9 @@ describe('TaskService', () => {
       closedAt: null,
     });
 
-    assert.equal(updateArgs?.data.statusId, 'status-1');
+    assert.ok(updateArgs);
+    const storyUpdateArgs = updateArgs as TaskUpdateArgs;
+    assert.equal(storyUpdateArgs.data.statusId, 'status-1');
   });
 
   test('update rejects update failure', async () => {
@@ -591,10 +629,10 @@ describe('TaskService', () => {
   });
 
   test('delete removes task', async () => {
-    let deleteArgs: { where: { id: string } } | null = null;
+    let deleteArgs: TaskDeleteArgs | null = null;
     db.task = {
       findUnique: async () => ({ id: 'task-1', parentId: null }),
-      delete: async (args: { where: { id: string } }) => {
+      delete: async (args: TaskDeleteArgs) => {
         deleteArgs = args;
         return { id: args.where.id };
       },
@@ -602,7 +640,9 @@ describe('TaskService', () => {
 
     await service.delete('task-1');
 
-    assert.equal(deleteArgs?.where.id, 'task-1');
+    assert.ok(deleteArgs);
+    const taskDeleteArgs = deleteArgs as TaskDeleteArgs;
+    assert.equal(taskDeleteArgs.where.id, 'task-1');
   });
 
   test('delete rejects missing task', async () => {

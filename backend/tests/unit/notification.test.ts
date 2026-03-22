@@ -5,7 +5,11 @@ import { NotificationService } from '../../src/services/notification.service';
 import { prisma } from '../../lib/prisma';
 import type { PrismaClient } from '@prisma/client/extension';
 import { NotifType } from '../../src/types/notifcation.types';
-import type { NotificationCreateArgs, NotificationDeleteArgs, NotificationUpdateArgs } from '../test.types';
+import type {
+  NotificationCreateArgs,
+  NotificationDeleteArgs,
+  NotificationUpdateArgs,
+} from '../test.types';
 
 describe('NotificationService', () => {
   let service: NotificationService;

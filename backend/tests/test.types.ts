@@ -236,6 +236,7 @@ export interface ThreadUpdateArgs {
   data: {
     title?: string;
     content?: string | null;
+    isDeleted?: boolean;
   };
 }
 
@@ -246,6 +247,7 @@ export interface CommentCreateArgs {
     threadId: string;
     authorId: number;
     isDeleted: boolean;
+    parentId?: string | null;
   };
 }
 
@@ -255,6 +257,7 @@ export interface CommentUpdateArgs {
   };
   data: {
     content?: string;
+    isDeleted?: boolean;
   };
 }
 
@@ -351,13 +354,13 @@ export interface NotificationDTO {
   id: string;
   senderId: number;
   recipientId: number;
-  taskId?: string | null;
-  commentId?: string | null;
-  threadId?: string | null;
+  taskId: string | null;
+  commentId: string | null;
+  threadId: string | null;
   type: NotifType;
-  read?: boolean;
-  recipientName?: string;
-  senderName?: string;
+  read: boolean;
+  recipientName: string;
+  senderName: string;
   recipient?: {
     id: number;
     name: string;
@@ -381,6 +384,7 @@ export interface CommentCreatePayload {
   content: string;
   authorId: number;
   isDeleted: boolean;
+  parentId?: string | null;
 }
 
 export interface CreateNotificationPayload {

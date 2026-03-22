@@ -4,7 +4,14 @@ import assert from 'node:assert';
 import { BoardService } from '../../src/services/board.service';
 import { prisma } from '../../lib/prisma';
 import type { PrismaClient } from '@prisma/client/extension';
-import type { BoardCreateArgs, WorkflowCreateArgs, WorkflowUpdateArgs, WorkflowDeleteArgs, EdgeConstraintCreateArgs, EdgeConstraintDeleteArgs } from '../test.types';
+import type {
+  BoardCreateArgs,
+  WorkflowCreateArgs,
+  WorkflowUpdateArgs,
+  WorkflowDeleteArgs,
+  EdgeConstraintCreateArgs,
+  EdgeConstraintDeleteArgs,
+} from '../test.types';
 
 describe('BoardService', () => {
   let service: BoardService;

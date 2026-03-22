@@ -8,7 +8,14 @@ import type { PrismaClient } from '@prisma/client/extension';
 import { notificationService } from '../../src/services/notification.service';
 import { initWSServer, shutdownWSServer } from '../../src/websocket/ws.service';
 import { NotifType } from '../../src/types/notifcation.types';
-import type { ThreadCreateArgs, ThreadUpdateArgs, CommentCreateArgs, CommentUpdateArgs, ActivityCreateArgs, CreateNotificationPayload, NotificationDTO } from '../test.types';
+import type {
+  ThreadCreateArgs,
+  ThreadUpdateArgs,
+  CommentCreateArgs,
+  CommentUpdateArgs,
+  CreateNotificationPayload,
+  NotificationDTO,
+} from '../test.types';
 
 // Ensure sendNotif has a ws server instance to call.
 let wsServer: ReturnType<typeof initWSServer> | null = null;
@@ -31,10 +38,22 @@ describe('CommentService', () => {
 
   beforeEach(() => {
     service = new CommentService();
-    notificationService.createNotification = (async () => ({
-      id: 'notif-1',
-      type: NotifType.COMMENT_ADDED,
-    } as NotificationDTO)) as (payload: CreateNotificationPayload) => Promise<NotificationDTO>;
+    notificationService.createNotification = (async () => {
+      return {
+        id: 'notif-1',
+        type: NotifType.COMMENT_ADDED,
+        recipientId: 1,
+        senderId: 2,
+        taskId: null,
+        commentId: null,
+        threadId: null,
+        recipientName: 'Recipient',
+        senderName: 'Sender',
+        read: false,
+      } as NotificationDTO;
+    }) as unknown as (
+      payload: CreateNotificationPayload,
+    ) => Promise<NotificationDTO>;
   });
 
   test('createThread returns created thread', async () => {
@@ -122,7 +141,9 @@ describe('CommentService', () => {
     };
     notificationService.createNotification = (async () => {
       throw new Error('notification failed');
-    }) as (payload: CreateNotificationPayload) => Promise<NotificationDTO>;
+    }) as unknown as (
+      payload: CreateNotificationPayload,
+    ) => Promise<NotificationDTO>;
 
     await assert.rejects(
       () =>
@@ -159,8 +180,10 @@ describe('CommentService', () => {
       isDeleted: false,
     });
 
-    assert.equal(updateArgs?.where.id, 'thread-1');
-    assert.equal(updateArgs?.data.title, 'Updated Thread');
+    assert.ok(updateArgs);
+    const threadUpdateArgs = updateArgs as ThreadUpdateArgs;
+    assert.equal(threadUpdateArgs.where.id, 'thread-1');
+    assert.equal(threadUpdateArgs.data.title, 'Updated Thread');
   });
 
   test('updateThread rejects missing thread', async () => {
@@ -215,7 +238,9 @@ describe('CommentService', () => {
 
     await service.deleteThread('thread-1');
 
-    assert.equal(updateArgs?.data.isDeleted, true);
+    assert.ok(updateArgs);
+    const threadDeleteArgs = updateArgs as ThreadUpdateArgs;
+    assert.equal(threadDeleteArgs.data.isDeleted, true);
   });
 
   test('deleteThread rejects missing thread', async () => {
@@ -314,10 +339,25 @@ describe('CommentService', () => {
 
   test('createComment handles mention notification', async () => {
     const notifications: string[] = [];
-    notificationService.createNotification = (async (payload: CreateNotificationPayload) => {
+    notificationService.createNotification = (async (
+      payload: CreateNotificationPayload,
+    ) => {
       notifications.push(payload.type);
-      return { id: 'notif-1' } as NotificationDTO;
-    }) as (payload: CreateNotificationPayload) => Promise<NotificationDTO>;
+      return {
+        id: 'notif-1',
+        type: payload.type,
+        recipientId: 1,
+        senderId: 2,
+        taskId: payload.taskId ?? null,
+        commentId: payload.commentId ?? null,
+        threadId: payload.threadId ?? null,
+        recipientName: 'Recipient',
+        senderName: 'Sender',
+        read: false,
+      } as NotificationDTO;
+    }) as unknown as (
+      payload: CreateNotificationPayload,
+    ) => Promise<NotificationDTO>;
 
     db.comment = {
       create: async () => ({
@@ -387,7 +427,9 @@ describe('CommentService', () => {
     };
     notificationService.createNotification = (async () => {
       throw new Error('notification failed');
-    }) as (payload: CreateNotificationPayload) => Promise<NotificationDTO>;
+    }) as unknown as (
+      payload: CreateNotificationPayload,
+    ) => Promise<NotificationDTO>;
 
     await assert.rejects(
       () =>
@@ -424,8 +466,10 @@ describe('CommentService', () => {
       isDeleted: false,
     });
 
-    assert.equal(updateArgs?.where.id, 'comment-1');
-    assert.equal(updateArgs?.data.content, 'Updated comment');
+    assert.ok(updateArgs);
+    const commentUpdateArgs = updateArgs as CommentUpdateArgs;
+    assert.equal(commentUpdateArgs.where.id, 'comment-1');
+    assert.equal(commentUpdateArgs.data.content, 'Updated comment');
   });
 
   test('updateComment rejects missing comment', async () => {
@@ -477,7 +521,9 @@ describe('CommentService', () => {
 
     await service.deleteComment('comment-1', 'thread-1');
 
-    assert.equal(updateArgs?.data.isDeleted, true);
+    assert.ok(updateArgs);
+    const commentDeleteArgs = updateArgs as CommentUpdateArgs;
+    assert.equal(commentDeleteArgs.data.isDeleted, true);
   });
 
   test('deleteComment rejects missing comment', async () => {

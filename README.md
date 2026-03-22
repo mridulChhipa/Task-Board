@@ -23,8 +23,7 @@ cd 'task-board'
 - Follow the given instruction separately for backend:
   1. `cd backend`
   2. `npm install`
-  3. `npx prisma init --datasource-provider postgresql --output ../generated/prisma`
-      - This will generate some files and .env 
+  3.  - This will generate some files and .env 
       - update the .env file [PORT=3000, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET, DATABASE_URL]
   4. `npx prisma migrate reset`
   5. `npx prisma migrate dev`

@@ -5,7 +5,13 @@ import { ProjectService } from '../../src/services/project.service';
 import { prisma } from '../../lib/prisma';
 import type { PrismaClient } from '@prisma/client/extension';
 import { ProjectRole } from '../../src/types/project.types';
-import type { ProjectCreateArgs, ProjectUpdateArgs, ProjectMemberCreateArgs, ProjectMemberDeleteArgs, ProjectMemberUpdateArgs } from '../test.types';
+import type {
+  ProjectCreateArgs,
+  ProjectUpdateArgs,
+  ProjectMemberCreateArgs,
+  ProjectMemberDeleteArgs,
+  ProjectMemberUpdateArgs,
+} from '../test.types';
 
 describe('ProjectService', () => {
   let service: ProjectService;
@@ -382,7 +388,11 @@ describe('ProjectService', () => {
     const project = await service.getProject('project-1');
 
     assert.equal(project.id, 'project-1');
-    assert.equal((project as unknown as {members: Array<{userId: number}>}).members[0]?.userId, 1);
+    assert.equal(
+      (project as unknown as { members: Array<{ userId: number }> }).members[0]
+        ?.userId,
+      1,
+    );
   });
 
   test('getProject rejects missing project', async () => {
