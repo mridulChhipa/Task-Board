@@ -1,8 +1,4 @@
-import type { Board, Project } from '../types/project.types';
-
-interface Membership {
-  userId: number;
-}
+import type { Board, Project, Member } from '../types/project.types';
 
 interface IncomingProject {
   id: string;
@@ -12,7 +8,7 @@ interface IncomingProject {
   // lastModified: string;
   role: string;
   isArchived: boolean;
-  members: Membership[];
+  members: Member[];
   boards: Board[];
 }
 
@@ -41,7 +37,7 @@ export async function fetchProject(pid: string): Promise<Project> {
       description,
       isArchived,
       role: 'PROJECT_MEMBER',
-      members: members.map((member) => member.userId),
+      members,
       boards,
     };
     return project;
