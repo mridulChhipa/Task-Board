@@ -20,6 +20,7 @@ import { projectService } from './project.service';
 import type { NotifType } from '../types/notification.types';
 import { getWSServer } from '../websocket/ws';
 import { requireEnv } from '../config/env';
+import { UnauthorizedError } from '../errors';
 
 export class AuthService {
   async register(body: RegisterBody): Promise<AuthToken> {
@@ -97,7 +98,7 @@ export class AuthService {
         requireEnv('JWT_REFRESH_SECRET'),
       );
       if (payload.type !== TokenType.REFRESH) {
-        throw new Error('Invalid token type');
+        throw new UnauthorizedError('Invalid token type');
       }
 
       await db.session.delete({
@@ -121,7 +122,7 @@ export class AuthService {
       );
 
       if (payload.type !== TokenType.REFRESH) {
-        throw new Error('Invalid token type');
+        throw new UnauthorizedError('Invalid token type');
       }
       const session = await db.session.findUnique({
         where: {
@@ -137,7 +138,7 @@ export class AuthService {
         session.expiresAt < new Date() ||
         session.token !== refreshToken
       ) {
-        throw new Error('Invalid or expired refresh token');
+        throw new UnauthorizedError('Invalid or expired refresh token');
       }
 
       const tokens = generateAuthTokens(

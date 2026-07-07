@@ -22,8 +22,11 @@ export default function Boards({ boards, role }: Props) {
   const { user } = useContext(AuthContext);
   const { taskCache: initialTaskCache } = useContext(ProjectContext);
   const [activeIndex, setActiveIndex] = useState(0);
-  const activeBoard = boards[activeIndex];
-  const [workflowState, setWorkflowState] = useState(activeBoard.workflows);
+  // A fresh project has no boards yet, so activeBoard can be undefined.
+  const activeBoard: Board | undefined = boards[activeIndex];
+  const [workflowState, setWorkflowState] = useState(
+    activeBoard?.workflows ?? [],
+  );
   // Seeded from the project fetch so columns render without refetching
   // every task individually.
   const [taskCache, setTaskCache] =
@@ -37,7 +40,7 @@ export default function Boards({ boards, role }: Props) {
   const [boardLimit, setBoardLimit] = useState<number>(0);
 
   const [dragHighlight, setDragHighlight] = useState<boolean[]>(
-    activeBoard.workflows.map(() => false),
+    activeBoard?.workflows.map(() => false) ?? [],
   );
   const [taskName, setTaskName] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
@@ -53,7 +56,9 @@ export default function Boards({ boards, role }: Props) {
   const [showChild, setShowChild] = useState(false);
   const [showChildOf, setShowChildOf] = useState<Task[] | null>(null);
   const [showViewEdgesModal, setShowViewEdgesModal] = useState(false);
-  const [edges, setEdges] = useState<EdgeConstraint[]>(activeBoard.edges ?? []);
+  const [edges, setEdges] = useState<EdgeConstraint[]>(
+    activeBoard?.edges ?? [],
+  );
   const [boardRefreshKey, setBoardRefreshKey] = useState(0);
 
   const [fromEdgeName, setFromEdgeName] = useState<string>('');
@@ -78,13 +83,28 @@ export default function Boards({ boards, role }: Props) {
     setShowChildOf: setShowChildOf,
   };
 
+  // Reset board-scoped state whenever the active board changes identity:
+  // switching tabs, or the first board being created after an empty state.
+  // The task cache spans the whole project, so it is kept.
+  const [prevActiveBoard, setPrevActiveBoard] = useState(activeBoard);
+  if (prevActiveBoard !== activeBoard) {
+    setPrevActiveBoard(activeBoard);
+    setWorkflowState(activeBoard?.workflows ?? []);
+    setDragHighlight(activeBoard?.workflows.map(() => false) ?? []);
+    setEdges(activeBoard?.edges ?? []);
+  }
+
+  if (boards.length === 0 || !activeBoard) {
+    return (
+      <>
+        <br />
+        <h1>Start Working</h1>
+      </>
+    );
+  }
+
   const handleSetActiveIndex = (index: number) => {
-    const nextBoard = boards[index];
     setActiveIndex(index);
-    setWorkflowState(nextBoard.workflows);
-    setDragHighlight(nextBoard.workflows.map(() => false));
-    setEdges(nextBoard.edges ?? []);
-    // The cache spans the whole project, so switching boards keeps it.
   };
 
   const boardHandlers = createBoardHandlers({
@@ -138,15 +158,6 @@ export default function Boards({ boards, role }: Props) {
       setEdges,
     },
   });
-
-  if (boards.length === 0) {
-    return (
-      <>
-        <br />
-        <h1>Start Working</h1>
-      </>
-    );
-  }
 
   return (
     <BoardsView

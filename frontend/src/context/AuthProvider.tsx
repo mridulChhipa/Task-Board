@@ -13,12 +13,21 @@ import {
   disconnectNotificationSocket,
 } from '../utils/notification.socket';
 
-async function tryRefreshToken(): Promise<boolean> {
-  const res = await fetch(`${API_URL}/api/auth/refresh`, {
+// Single-flight: the refresh endpoint rotates the session token, so two
+// concurrent calls (e.g. StrictMode double-mounting the effect in dev) would
+// race - the slower one presents the already-rotated token and gets rejected.
+let refreshPromise: Promise<boolean> | null = null;
+
+function tryRefreshToken(): Promise<boolean> {
+  refreshPromise ??= fetch(`${API_URL}/api/auth/refresh`, {
     method: 'PATCH',
     credentials: 'include',
-  });
-  return res.ok;
+  })
+    .then((res) => res.ok)
+    .finally(() => {
+      refreshPromise = null;
+    });
+  return refreshPromise;
 }
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
