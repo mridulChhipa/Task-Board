@@ -24,10 +24,23 @@ export const defaultAuth: AuthContextType = {
 
 export const AuthContext = createContext(defaultAuth);
 
-export interface DispatchType {
-  type: string;
-  payload: AuthContextType | NotificationDTO[];
-}
+export type DispatchType =
+  | {
+      type:
+        | 'LOGIN'
+        | 'LOGOUT'
+        | 'LOADING'
+        | 'LOGOUT_FAILURE'
+        | 'REFRESH_FAILURE'
+        | 'PROJECT_CREATED'
+        | 'PROJECT_UPDATED'
+        | 'UPDATE_USER';
+      payload: AuthContextType;
+    }
+  | {
+      type: 'SET_NOTIFICATIONS';
+      payload: NotificationDTO[];
+    };
 
 export const DispatchContext = createContext<React.Dispatch<DispatchType>>(
   () => {},
@@ -38,27 +51,18 @@ export function authReducer(
   action: DispatchType,
 ): AuthContextType {
   switch (action.type) {
-    case 'LOGIN':
-      return action.payload as AuthContextType;
-    case 'LOGOUT':
-      return action.payload as AuthContextType;
-    case 'LOADING':
-      return action.payload as AuthContextType;
-    case 'LOGOUT_FAILURE':
-      return action.payload as AuthContextType;
-    case 'REFRESH_FAILURE':
-      return action.payload as AuthContextType;
     case 'SET_NOTIFICATIONS':
       return {
         ...state,
         user: state.user
           ? {
               ...state.user,
-              notifications: action.payload as NotificationDTO[],
+              notifications: action.payload,
             }
           : state.user,
       };
     default:
-      return state;
+      // Every other action replaces the auth state with its payload.
+      return action.payload;
   }
 }

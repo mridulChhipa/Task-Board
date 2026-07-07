@@ -196,46 +196,48 @@ export class CommentService {
         });
 
         const mentions: string[] = extractEmailMentions(createdComment.content);
+        const normalizedEmails = mentions.map((mention) =>
+          mention.startsWith('@') ? mention.slice(1) : mention,
+        );
 
-        console.log(mentions);
-
-        const author = await db.user.findUnique({
-          where: {
-            id: authorId,
-          },
-        });
-
-        for (const mention of mentions) {
-          const normalizedEmail = mention.startsWith('@')
-            ? mention.slice(1)
-            : mention;
-          console.log('Mentioned: ', normalizedEmail);
-          const user = await db.user.findFirst({
-            where: {
-              email: {
-                equals: normalizedEmail,
-                mode: 'insensitive',
+        if (normalizedEmails.length > 0) {
+          // One batched lookup for the author and every mentioned user
+          // instead of a query per mention.
+          const [author, mentionedUsers] = await Promise.all([
+            db.user.findUnique({
+              where: { id: authorId },
+              select: { name: true },
+            }),
+            db.user.findMany({
+              where: {
+                email: {
+                  in: normalizedEmails,
+                  mode: 'insensitive',
+                },
               },
-            },
-          });
+              select: { id: true },
+            }),
+          ]);
 
-          if (user) {
-            const createdNotification =
-              await notificationService.createNotification({
-                recipientId: user.id,
-                senderId: authorId,
-                taskId: taskId,
-                type: NotifType.MENTIONED,
-                commentId: createdComment.id,
-                threadId: threadId,
-              });
+          await Promise.all(
+            mentionedUsers.map(async (user) => {
+              const createdNotification =
+                await notificationService.createNotification({
+                  recipientId: user.id,
+                  senderId: authorId,
+                  taskId: taskId,
+                  type: NotifType.MENTIONED,
+                  commentId: createdComment.id,
+                  threadId: threadId,
+                });
 
-            sendNotif(
-              authorId,
-              user.id,
-              `${createdNotification.type}: You were mentioned in a comment on task: ${task.title} by ${author?.name}`,
-            );
-          }
+              sendNotif(
+                authorId,
+                user.id,
+                `${createdNotification.type}: You were mentioned in a comment on task: ${task.title} by ${author?.name}`,
+              );
+            }),
+          );
         }
 
         sendNotif(
@@ -281,7 +283,7 @@ export class CommentService {
         data: {
           type: 'COMMENT_EDITED',
           commentId: id,
-          taskId: existingComment.threadId,
+          threadId: existingComment.threadId,
         },
       });
     } catch (error) {
@@ -316,7 +318,7 @@ export class CommentService {
         data: {
           type: 'COMMENT_DELETED',
           commentId: id,
-          taskId: existingComment.threadId,
+          threadId: existingComment.threadId,
         },
       });
     } catch (error) {

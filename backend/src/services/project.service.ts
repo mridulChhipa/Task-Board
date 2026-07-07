@@ -222,7 +222,17 @@ export class ProjectService {
             include: {
               workflows: {
                 include: {
-                  tasks: true,
+                  // Children ids let the client build its task cache from
+                  // this single response instead of refetching every task.
+                  tasks: {
+                    include: {
+                      children: {
+                        select: {
+                          id: true,
+                        },
+                      },
+                    },
+                  },
                 },
               },
               edgeConstraints: true,

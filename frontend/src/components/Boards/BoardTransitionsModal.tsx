@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import type { Dispatch, SetStateAction, SubmitEventHandler } from 'react';
 import type { EdgeConstraint, Workflow } from '../../types/boards.types';
 import type { Board } from '../../types/project.types';
@@ -99,7 +100,7 @@ export default function BoardTransitionsModal({
                   <span
                     onClick={async () => {
                       const res = await fetch(
-                        `http://localhost:3000/api/project/${projectId}/board/${activeBoard.id}/remove-edge/${edge.id}`,
+                        `${API_URL}/api/project/${projectId}/board/${activeBoard.id}/remove-edge/${edge.id}`,
                         {
                           method: 'DELETE',
                           credentials: 'include',

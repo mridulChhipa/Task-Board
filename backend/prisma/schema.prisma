@@ -50,6 +50,8 @@ model Session {
   expiresAt DateTime
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Project {
@@ -73,6 +75,7 @@ model ProjectMember {
   role      ProjectLevelRole
 
   @@unique([projectId, userId], name: "uniqueUser")
+  @@index([userId])
 }
 
 model Board {
@@ -82,6 +85,8 @@ model Board {
   project         Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
   workflows       Workflow[]
   edgeConstraints EdgeConstraint[]
+
+  @@index([projectId])
 }
 
 model Workflow {
@@ -97,6 +102,8 @@ model Workflow {
   activitiesNew    Activity[]       @relation("newStatus")
   startConstraints EdgeConstraint[] @relation("startedge")
   endConstraints   EdgeConstraint[] @relation("endedge")
+
+  @@index([boardId])
 }
 
 enum TaskType {
@@ -132,6 +139,9 @@ model Task {
   children    Task[]     @relation("TaskToTask")
   threads     Thread[]
   activities  Activity[]
+
+  @@index([statusId])
+  @@index([parentId])
 }
 
 enum ActivityType {
@@ -173,6 +183,10 @@ model Activity {
   timestamp      DateTime     @default(now())
   user           User?        @relation(name: "commentUser", fields: [userId], references: [id], onDelete: SetNull)
   userId         Int?
+
+  @@index([taskId])
+  @@index([threadId])
+  @@index([commentId])
 }
 
 model Thread {
@@ -188,6 +202,8 @@ model Thread {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   activities Activity[]
+
+  @@index([taskId])
 }
 
 model Comment {
@@ -204,6 +220,9 @@ model Comment {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   activities Activity[]
+
+  @@index([threadId])
+  @@index([parentId])
 }
 
 model Notification {
@@ -217,6 +236,8 @@ model Notification {
   taskId      String?
   commentId   String?
   threadId    String?
+
+  @@index([recipientId])
 }
 
 enum NotifType {

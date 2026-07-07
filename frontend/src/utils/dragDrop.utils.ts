@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import type { EdgeConstraint, Task, Workflow } from '../types/boards.types';
 import type { Board } from '../types/project.types';
 import { sortWorkflows } from './board.utils';
@@ -13,7 +14,6 @@ const dragData = {
 
 export function dragstartHandler(event: React.DragEvent<HTMLDivElement>) {
   event.stopPropagation();
-  console.log('column drag start');
   event.dataTransfer.setData(dragData.itemType, 'column');
   event.dataTransfer.setData(dragData.columnOrderId, event.currentTarget.id);
 }
@@ -24,7 +24,6 @@ export function taskDragstartHandler(
   edges: EdgeConstraint[],
   setDragHighlight: React.Dispatch<React.SetStateAction<boolean[]>>,
 ) {
-  console.log('task drag start');
   event.stopPropagation();
   const taskType = event.currentTarget.dataset.tasktype ?? '';
   const childCount = Number(event.currentTarget.dataset.childcount ?? 0);
@@ -204,32 +203,72 @@ export async function dropHandler(
       }
       const limit = workflows[currColIdx].limit;
       const taskCount = workflows[currColIdx].tasks.length;
-      console.log(currColIdx);
       if (limit !== -1 && taskCount >= limit) {
         handleError('Task transfer not allowed due to WIP limit');
         throw new Error('Task transfer not allowed due to WIP limit');
       }
     }
   }
-  async function changeOrder(workflow: Workflow, newOrderIdx: number) {
+  if (dragItemType === 'column') {
+    const startIdx = Number(draggedColumnOrderId);
+    const endIdx = Number(event.currentTarget.id);
+
+    // Compute every column's new position first, then persist and apply
+    // the whole reorder in one pass (the previous per-column fire-and-forget
+    // updates raced each other and overwrote state).
+    const moves: Array<{ workflow: Workflow; newOrderIdx: number }> = [];
+    workflows.forEach((workflow) => {
+      if (
+        endIdx > startIdx &&
+        workflow.orderIdx > startIdx &&
+        workflow.orderIdx <= endIdx
+      ) {
+        moves.push({ workflow, newOrderIdx: workflow.orderIdx - 1 });
+      } else if (endIdx > startIdx && workflow.orderIdx === startIdx) {
+        moves.push({ workflow, newOrderIdx: endIdx });
+      } else if (
+        endIdx < startIdx &&
+        workflow.orderIdx >= endIdx &&
+        workflow.orderIdx < startIdx
+      ) {
+        moves.push({ workflow, newOrderIdx: workflow.orderIdx + 1 });
+      } else if (endIdx < startIdx && workflow.orderIdx === startIdx) {
+        moves.push({ workflow, newOrderIdx: endIdx });
+      }
+    });
+
     try {
-      await fetch(
-        `http://localhost:3000/api/project/${activeBoard.projectId}/board/${activeBoard.id}/update-column/${workflow.id}`,
-        {
-          method: 'PUT',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name: workflow.name,
-            limit: workflow.limit,
-            orderIdx: newOrderIdx,
-          }),
-        },
+      await Promise.all(
+        moves.map(({ workflow, newOrderIdx }) =>
+          fetch(
+            `${API_URL}/api/project/${activeBoard.projectId}/board/${activeBoard.id}/update-column/${workflow.id}`,
+            {
+              method: 'PUT',
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                name: workflow.name,
+                limit: workflow.limit,
+                orderIdx: newOrderIdx,
+              }),
+            },
+          ),
+        ),
       );
-      workflow.orderIdx = newOrderIdx;
-      const newWorkflowState = [...workflowState];
+
+      const newIdxById = new Map(
+        moves.map((move) => [move.workflow.id, move.newOrderIdx]),
+      );
+      const newWorkflowState = workflowState.map((workflow) =>
+        newIdxById.has(workflow.id)
+          ? {
+              ...workflow,
+              orderIdx: newIdxById.get(workflow.id) ?? workflow.orderIdx,
+            }
+          : workflow,
+      );
       const sortedWF = await sortWorkflows(
         newWorkflowState,
         () => {},
@@ -243,29 +282,6 @@ export async function dropHandler(
       handleError('Column update failed with');
       throw new Error('Column update failed with error: ', { cause: err });
     }
-  }
-  if (dragItemType === 'column') {
-    const startIdx = Number(draggedColumnOrderId);
-    const endIdx = Number(event.currentTarget.id);
-    workflows.forEach((workflow) => {
-      if (
-        endIdx > startIdx &&
-        workflow.orderIdx > startIdx &&
-        workflow.orderIdx <= endIdx
-      ) {
-        changeOrder(workflow, workflow.orderIdx - 1);
-      } else if (endIdx > startIdx && workflow.orderIdx === startIdx) {
-        changeOrder(workflow, endIdx);
-      } else if (
-        endIdx < startIdx &&
-        workflow.orderIdx >= endIdx &&
-        workflow.orderIdx < startIdx
-      ) {
-        changeOrder(workflow, workflow.orderIdx + 1);
-      } else if (endIdx < startIdx && workflow.orderIdx === startIdx) {
-        changeOrder(workflow, endIdx);
-      }
-    });
   } else if (dragItemType === 'task') {
     const currCol = Number(event.currentTarget.id);
     const colId = workflows[currCol].id;
@@ -274,7 +290,7 @@ export async function dropHandler(
     let ogParentId = '';
     let subtaskIds: string[] = [];
     try {
-      const res1 = await fetch(`http://localhost:3000/api/task/${taskId}`, {
+      const res1 = await fetch(`${API_URL}/api/task/${taskId}`, {
         credentials: 'include',
       });
       const data = await res1.json();
@@ -292,39 +308,31 @@ export async function dropHandler(
       }
       parentTaskId = data.task.parentId;
       if (parentTaskId && parentTaskId !== '') {
-        const res2 = await fetch(
-          `http://localhost:3000/api/task/${parentTaskId}`,
-          {
-            credentials: 'include',
-          },
-        );
+        const res2 = await fetch(`${API_URL}/api/task/${parentTaskId}`, {
+          credentials: 'include',
+        });
         const dataParent = await res2.json();
         ogParentId = dataParent.task.statusId;
-        console.log('Old parent column: ', ogParentId);
         subtaskIds = dataParent.task.children ?? [];
       }
-      const res = await fetch(
-        `http://localhost:3000/api/task/update/${taskId}`,
-        {
-          method: 'PUT',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            title: data.task.title,
-            description: data.task.description,
-            type: data.task.type,
-            priority: data.task.priority,
-            assignee: data.task.assignee,
-            reporter: data.task.reporter ?? -1,
-            dueDate: data.task.dueDate,
-            statusId: colId,
-          }),
+      const res = await fetch(`${API_URL}/api/task/update/${taskId}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
-      const text = await res.text();
-      console.log('Task update response: ', text);
+        body: JSON.stringify({
+          title: data.task.title,
+          description: data.task.description,
+          type: data.task.type,
+          priority: data.task.priority,
+          assignee: data.task.assignee,
+          reporter: data.task.reporter ?? -1,
+          dueDate: data.task.dueDate,
+          statusId: colId,
+        }),
+      });
+      await res.text();
       setTaskCache((prev) => {
         const next = { ...prev };
         const cachedTask = next[taskId];
@@ -355,26 +363,20 @@ export async function dropHandler(
         return workflow;
       }
     });
-    console.log(newWFState);
     let targetParentId = '';
     if (parentTaskId && parentTaskId !== '') {
       try {
         const subtasksColIds = await Promise.all(
           subtaskIds.map(async (subtaskId) => {
-            const res = await fetch(
-              `http://localhost:3000/api/task/${subtaskId}`,
-              {
-                credentials: 'include',
-              },
-            );
+            const res = await fetch(`${API_URL}/api/task/${subtaskId}`, {
+              credentials: 'include',
+            });
             const data = await res.json();
             return data.task.statusId;
           }),
         );
         for (const workflow of newWFState) {
-          console.log('Checking workflow ', workflow.orderIdx);
           if (subtasksColIds.some((id) => id === workflow.id)) {
-            console.log('Found new parent column: ', workflow.id);
             targetParentId = workflow.id;
             break;
           }
@@ -423,7 +425,6 @@ export async function dropHandler(
       });
     }
 
-    console.log(newWFState2);
     const sortedWF = await sortWorkflows(newWFState2, () => {}, taskCache);
     setWorkflowState(sortedWF);
     setDragHighlight(sortedWF.map(() => false));

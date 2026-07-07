@@ -4,8 +4,7 @@ import assert from 'node:assert';
 
 import { app } from '../../src/app';
 import { generateAuthTokens } from '../../src/utils/jwt';
-import { prisma } from '../../lib/prisma';
-import type { PrismaClient } from '@prisma/client/extension';
+import { db } from '../helpers';
 import { ProjectRole } from '../../src/types/project.types';
 import type {
   ProjectCreateArgs,
@@ -20,8 +19,6 @@ import type {
 describe('Project API Endpoints (RBAC)', () => {
   let server: http.Server;
   let baseUrl: string;
-
-  const db: PrismaClient = prisma;
 
   let currentUser: {
     id: number;
@@ -67,6 +64,16 @@ describe('Project API Endpoints (RBAC)', () => {
       });
       server.on('error', reject);
     });
+
+    // The auth guard checks the session row for the presented token.
+    db.session = {
+      findUnique: async (args: { where: { id: string } }) => ({
+        id: args.where.id,
+        userId: 1,
+        token: 'stub-token',
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+      }),
+    };
 
     db.user = {
       findUnique: async (args: UserFindUniqueArgs) => {
@@ -246,7 +253,7 @@ describe('Project API Endpoints (RBAC)', () => {
       }),
     });
 
-    assert.equal(response.status, 500);
+    assert.equal(response.status, 403);
     const data = (await response.json()) as { msg: string };
     assert.equal(data.msg, 'Global Admin priviledges required');
   });
@@ -290,7 +297,7 @@ describe('Project API Endpoints (RBAC)', () => {
       },
     });
 
-    assert.equal(response.status, 500);
+    assert.equal(response.status, 403);
     const data = (await response.json()) as { msg: string };
     assert.equal(data.msg, 'Not a global user');
   });
@@ -346,7 +353,7 @@ describe('Project API Endpoints (RBAC)', () => {
       }),
     });
 
-    assert.equal(response.status, 500);
+    assert.equal(response.status, 403);
     const data = (await response.json()) as { msg: string };
     assert.equal(data.msg, 'Insufficient Priviledges');
   });
@@ -400,7 +407,7 @@ describe('Project API Endpoints (RBAC)', () => {
       },
     );
 
-    assert.equal(response.status, 500);
+    assert.equal(response.status, 403);
     const data = (await response.json()) as { msg: string };
     assert.equal(data.msg, 'Insufficient Priviledges');
   });
@@ -466,7 +473,7 @@ describe('Project API Endpoints (RBAC)', () => {
       },
     );
 
-    assert.equal(response.status, 500);
+    assert.equal(response.status, 403);
     const data = (await response.json()) as { msg: string };
     assert.equal(data.msg, 'Insufficient Priviledges');
   });
@@ -530,7 +537,7 @@ describe('Project API Endpoints (RBAC)', () => {
       },
     );
 
-    assert.equal(response.status, 500);
+    assert.equal(response.status, 403);
     const data = (await response.json()) as { msg: string };
     assert.equal(data.msg, 'Insufficient Priviledges');
   });
@@ -596,7 +603,7 @@ describe('Project API Endpoints (RBAC)', () => {
       },
     );
 
-    assert.equal(response.status, 500);
+    assert.equal(response.status, 403);
     const data = (await response.json()) as { msg: string };
     assert.equal(data.msg, 'Insufficient Priviledges');
   });
@@ -634,7 +641,7 @@ describe('Project API Endpoints (RBAC)', () => {
       },
     });
 
-    assert.equal(response.status, 500);
+    assert.equal(response.status, 403);
     const data = (await response.json()) as { msg: string };
     assert.equal(data.msg, 'Insufficient Priviledges');
   });

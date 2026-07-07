@@ -1,14 +1,9 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import { type Server as HttpServer } from 'http';
+import { type Server as HttpServer, type IncomingMessage } from 'http';
 
-type WSMessage =
-  | { messageType: 'NEW_USER'; userId: number }
-  | {
-      messageType: 'NOTIFICATION';
-      senderId: number;
-      recieverId: number;
-      notification: string;
-    };
+import { verifyToken } from '../utils/jwt';
+import { requireEnv } from '../config/env';
+import { TokenType } from '../types/auth.types';
 
 let wsServer: WebSocketService;
 
@@ -35,32 +30,55 @@ export class WebSocketService {
 
   constructor(httpServer: HttpServer) {
     this.wss = new WebSocketServer({ server: httpServer });
-    this.wss.on('connection', (ws) => this.newConnection(ws));
+    this.wss.on('connection', (ws, req) => this.newConnection(ws, req));
   }
 
-  newConnection(ws: WebSocket) {
-    console.log('New User Connected');
-    ws.on('message', (message) => {
-      const data = JSON.parse(message.toString()) as WSMessage;
-      if (data.messageType === 'NEW_USER') {
-        this.addUser(ws, data.userId);
-        console.log('User added to hashmap');
-      } else if (data.messageType === 'NOTIFICATION') {
-        this.sendNotification(
-          data.senderId,
-          data.recieverId,
-          data.notification,
-        );
-      }
-    });
+  newConnection(ws: WebSocket, req: IncomingMessage) {
+    // The user identity comes from the auth cookie on the upgrade request.
+    // Trusting a client-sent userId would let anyone receive another
+    // user's notifications.
+    const userId = this.authenticate(req);
+    if (userId === null) {
+      ws.close(4401, 'Unauthorized');
+      return;
+    }
+
+    this.addUser(ws, userId);
     ws.on('close', () => {
-      for (const [userId, socket] of this.userSockets.entries()) {
-        if (socket === ws) {
-          this.removeUser(userId);
-          return;
-        }
+      if (this.userSockets.get(userId) === ws) {
+        this.userSockets.delete(userId);
       }
     });
+  }
+
+  private authenticate(req: IncomingMessage): number | null {
+    const cookieHeader = req.headers.cookie;
+    if (!cookieHeader) {
+      return null;
+    }
+
+    const token = cookieHeader
+      .split(';')
+      .map((part) => part.trim())
+      .find((part) => part.startsWith('refreshToken='))
+      ?.slice('refreshToken='.length);
+
+    if (!token) {
+      return null;
+    }
+
+    try {
+      const payload = verifyToken(
+        decodeURIComponent(token),
+        requireEnv('JWT_REFRESH_SECRET'),
+      );
+      if (payload.type !== TokenType.REFRESH) {
+        return null;
+      }
+      return payload.sub;
+    } catch {
+      return null;
+    }
   }
 
   addUser(ws: WebSocket, userId: number) {
@@ -73,19 +91,12 @@ export class WebSocketService {
 
   sendNotification(senderId: number, recieverId: number, notification: string) {
     const recieverSocket = this.userSockets.get(recieverId);
-    console.log('Reciever Socket: ', recieverSocket);
-    if (recieverSocket) {
-      if (recieverSocket.readyState !== WebSocket.OPEN) {
-        console.error('WebSocket is not open');
-        return;
-      }
-      recieverSocket.send(
-        JSON.stringify({ messageType: 'NOTIFICATION', senderId, notification }),
-      );
-      console.log('Sent notification');
-    } else {
-      console.error('No WebSocket found for userId: ', recieverId);
+    if (!recieverSocket || recieverSocket.readyState !== WebSocket.OPEN) {
+      return;
     }
+    recieverSocket.send(
+      JSON.stringify({ messageType: 'NOTIFICATION', senderId, notification }),
+    );
   }
 
   removeUser(userId: number) {

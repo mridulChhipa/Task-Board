@@ -5,8 +5,7 @@ import { AuthService } from '../../src/services/auth.service';
 import { generateAuthTokens } from '../../src/utils/jwt';
 import { hash } from '../../src/utils/hash';
 import { GlobalRole } from '../../generated/prisma/enums';
-import { prisma } from '../../lib/prisma';
-import { PrismaClient } from '@prisma/client/extension';
+import { db, restoreDbAfterEach, stub } from '../helpers';
 import { projectService } from '../../src/services/project.service';
 import type {
   UserCreateArgs,
@@ -19,7 +18,8 @@ import { ProjectRole } from '../../src/types/project.types';
 
 describe('AuthService', () => {
   let service: AuthService;
-  const db: PrismaClient = prisma;
+
+  restoreDbAfterEach();
 
   before(() => {
     process.env.JWT_ACCESS_SECRET = 'test-access-secret';
@@ -426,23 +426,20 @@ describe('AuthService', () => {
           {
             projectId: 'project-1',
             role: 'PROJECT_ADMIN',
+            project: {
+              id: 'project-1',
+              name: 'Member Project',
+              description: null,
+              isArchived: false,
+              members: [{ userId: 1 }],
+            },
           },
         ],
         notifications: [],
       }),
     };
 
-    db.project = {
-      findUnique: async () => ({
-        id: 'project-1',
-        name: 'Member Project',
-        description: null,
-        isArchived: false,
-        members: [{ userId: 1 }],
-      }),
-    };
-
-    projectService.fetchGlobalAdminProjects = (async () => [
+    stub(projectService, 'fetchGlobalAdminProjects', (async () => [
       {
         id: 'project-2',
         name: 'Global Project',
@@ -451,16 +448,7 @@ describe('AuthService', () => {
         members: [1],
         isArchived: false,
       },
-    ]) as unknown as () => Promise<
-      Array<{
-        id: string;
-        name: string;
-        description: string | null;
-        role: ProjectRole;
-        members: number[];
-        isArchived: boolean;
-      }>
-    >;
+    ]) as unknown as typeof projectService.fetchGlobalAdminProjects);
 
     const result = await service.userDetails(1);
 
@@ -487,14 +475,11 @@ describe('AuthService', () => {
           {
             projectId: 'project-missing',
             role: 'PROJECT_MEMBER',
+            project: null,
           },
         ],
         notifications: [],
       }),
-    };
-
-    db.project = {
-      findUnique: async () => null,
     };
 
     await assert.rejects(() => service.userDetails(1), /Project not found/);

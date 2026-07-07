@@ -27,20 +27,23 @@ export class BoardService {
       { name: 'done', order: 3 },
     ];
 
-    const createdWorkflows = [];
+    let createdWorkflows: Array<{
+      id: string;
+      name: string;
+      boardId: string;
+      limit: number;
+      orderIdx: number;
+    }>;
 
     try {
-      for (const defWorkflow of defaultWorkflows) {
-        const createdWorkflow = await db.workflow.create({
-          data: {
-            name: defWorkflow.name,
-            orderIdx: defWorkflow.order,
-            boardId: createdBoard.id,
-            limit: defWorkflow.name === 'in progress' ? 5 : -1,
-          },
-        });
-        createdWorkflows.push(createdWorkflow);
-      }
+      createdWorkflows = await db.workflow.createManyAndReturn({
+        data: defaultWorkflows.map((defWorkflow) => ({
+          name: defWorkflow.name,
+          orderIdx: defWorkflow.order,
+          boardId: createdBoard.id,
+          limit: defWorkflow.name === 'in progress' ? 5 : -1,
+        })),
+      });
     } catch (error) {
       throw new Error('Error creating default workflows: ', { cause: error });
     }
@@ -198,12 +201,6 @@ export class BoardService {
     targetColId: string,
   ): Promise<EdgeConstraintDTO> {
     try {
-      console.log(
-        'Adding edge with sourceColId: ',
-        sourceColId,
-        ' and targetColId: ',
-        targetColId,
-      );
       const existingBoard = await db.board.findFirst({
         where: {
           id: boardId,

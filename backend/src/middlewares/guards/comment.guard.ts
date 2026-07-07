@@ -1,7 +1,9 @@
 import type { NextFunction, Request, Response, RequestHandler } from 'express';
 import type { AuthenticatedRequest } from '../../types/auth.types';
 import { db } from '../../config/db';
-import { GlobalRole, type ProjectRole } from '../../types/project.types';
+import type { ProjectRole } from '../../types/project.types';
+import { authorizeMembership, resolveId } from './membership';
+import { ForbiddenError, NotFoundError, ValidationError } from '../../errors';
 
 async function authorizeForTask(
   taskId: string,
@@ -27,35 +29,15 @@ async function authorizeForTask(
   });
 
   if (!task?.status?.board?.projectId) {
-    throw new Error('Task not found for authorization');
+    throw new NotFoundError('Task not found for authorization');
   }
 
-  const user = await db.user.findUnique({
-    where: {
-      email,
-    },
-  });
-
-  const membership = await db.projectMember.findUnique({
-    where: {
-      uniqueUser: {
-        projectId: task.status.board.projectId,
-        userId,
-      },
-    },
-  });
-
-  if (!user) {
-    throw new Error('User does not exists');
-  }
-
-  if (!membership) {
-    if (user.globalRole !== GlobalRole.GLOBAL_ADMIN) {
-      throw new Error('Not a global user');
-    }
-  } else if (!allowedRoles.includes(membership.role as ProjectRole)) {
-    throw new Error('Insufficient Priviledges');
-  }
+  await authorizeMembership(
+    task.status.board.projectId,
+    userId,
+    email,
+    allowedRoles,
+  );
 }
 
 async function resolveTaskIdFromComment(
@@ -97,37 +79,6 @@ async function resolveTaskIdFromComment(
   return null;
 }
 
-export function authorizeTaskIdRole(
-  allowedRoles: ProjectRole[],
-): RequestHandler {
-  return async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> => {
-    try {
-      const authReq = req as unknown as AuthenticatedRequest;
-      const userId = authReq.user.sub;
-      const email = authReq.user.email;
-
-      const rawTaskId = authReq.params.taskId ?? authReq.body.taskId;
-      const taskId =
-        typeof rawTaskId === 'string' && rawTaskId.trim() !== ''
-          ? rawTaskId
-          : undefined;
-
-      if (!taskId) {
-        throw new Error('Task ID is required for authorization');
-      }
-
-      await authorizeForTask(taskId, userId, email, allowedRoles);
-      next();
-    } catch (err) {
-      next(err);
-    }
-  };
-}
-
 export function authorizeThreadIdRole(
   allowedRoles: ProjectRole[],
 ): RequestHandler {
@@ -138,18 +89,10 @@ export function authorizeThreadIdRole(
   ): Promise<void> => {
     try {
       const authReq = req as unknown as AuthenticatedRequest;
-      const userId = authReq.user.sub;
-      const email = authReq.user.email;
-
-      const rawThreadId =
-        authReq.params.tid ?? authReq.params.threadId ?? authReq.body.threadId;
-      const threadId =
-        typeof rawThreadId === 'string' && rawThreadId.trim() !== ''
-          ? rawThreadId
-          : undefined;
+      const threadId = resolveId(req, ['tid', 'threadId']);
 
       if (!threadId) {
-        throw new Error('Thread ID is required for authorization');
+        throw new ValidationError('Thread ID is required for authorization');
       }
 
       const thread = await db.thread.findUnique({
@@ -162,10 +105,15 @@ export function authorizeThreadIdRole(
       });
 
       if (!thread) {
-        throw new Error('Thread not found for authorization');
+        throw new NotFoundError('Thread not found for authorization');
       }
 
-      await authorizeForTask(thread.taskId, userId, email, allowedRoles);
+      await authorizeForTask(
+        thread.taskId,
+        authReq.user.sub,
+        authReq.user.email,
+        allowedRoles,
+      );
       next();
     } catch (err) {
       next(err);
@@ -183,30 +131,16 @@ export function authorizeCommentIdRole(
   ): Promise<void> => {
     try {
       const authReq = req as unknown as AuthenticatedRequest;
-      const userId = authReq.user.sub;
-      const email = authReq.user.email;
-
-      const rawCommentId =
-        authReq.params.cid ??
-        authReq.params.commentId ??
-        authReq.body.commentId;
-      const commentId =
-        typeof rawCommentId === 'string' && rawCommentId.trim() !== ''
-          ? rawCommentId
-          : undefined;
+      const commentId = resolveId(req, ['cid', 'commentId']);
 
       if (!commentId) {
-        throw new Error('Comment ID is required for authorization');
+        throw new ValidationError('Comment ID is required for authorization');
       }
 
       let taskId = await resolveTaskIdFromComment(commentId);
 
       if (!taskId) {
-        const rawThreadId = authReq.query.threadId ?? authReq.body.threadId;
-        const threadId =
-          typeof rawThreadId === 'string' && rawThreadId.trim() !== ''
-            ? rawThreadId
-            : undefined;
+        const threadId = resolveId(req, ['threadId']);
 
         if (threadId) {
           const thread = await db.thread.findUnique({
@@ -223,10 +157,15 @@ export function authorizeCommentIdRole(
       }
 
       if (!taskId) {
-        throw new Error('Comment task not found for authorization');
+        throw new NotFoundError('Comment task not found for authorization');
       }
 
-      await authorizeForTask(taskId, userId, email, allowedRoles);
+      await authorizeForTask(
+        taskId,
+        authReq.user.sub,
+        authReq.user.email,
+        allowedRoles,
+      );
       next();
     } catch (err) {
       next(err);
@@ -243,42 +182,27 @@ export function authoriseCommentAuthor(): RequestHandler {
     try {
       const authReq = req as unknown as AuthenticatedRequest;
       const id = authReq.user.sub;
-
-      let commentId = authReq.params.commentId ?? authReq.params.cid;
-      if (commentId === undefined) {
-        console.log('Undefined id');
-        commentId = authReq.body.commentId;
-      }
+      const commentId = resolveId(req, ['commentId', 'cid']);
 
       if (!commentId) {
-        throw new Error('Comment ID is required for authorization');
+        throw new ValidationError('Comment ID is required for authorization');
       }
 
-      if (typeof commentId !== 'string') {
-        throw new Error('Invalid Comment ID format');
-      }
-
-      const user = await db.user.findUnique({
-        where: {
-          id,
-        },
-      });
-
-      if (!user) {
-        throw new Error('User does not exist');
-      }
       const comment = await db.comment.findUnique({
         where: {
           id: commentId,
         },
+        select: {
+          authorId: true,
+        },
       });
 
       if (!comment) {
-        throw new Error('Comment does not exist');
+        throw new NotFoundError('Comment does not exist');
       }
 
       if (comment.authorId !== id) {
-        throw new Error('User is not the author of the comment');
+        throw new ForbiddenError('User is not the author of the comment');
       }
 
       next();
@@ -297,42 +221,27 @@ export function authoriseThreadAuthor(): RequestHandler {
     try {
       const authReq = req as unknown as AuthenticatedRequest;
       const id = authReq.user.sub;
-
-      let threadId = authReq.params.tid ?? authReq.params.threadId;
-      if (threadId === undefined) {
-        threadId = authReq.body.threadId;
-      }
+      const threadId = resolveId(req, ['tid', 'threadId']);
 
       if (!threadId) {
-        throw new Error('Thread ID is required for authorization');
-      }
-
-      if (typeof threadId !== 'string') {
-        throw new Error('Invalid Thread ID format');
-      }
-
-      const user = await db.user.findUnique({
-        where: {
-          id,
-        },
-      });
-
-      if (!user) {
-        throw new Error('User does not exist');
+        throw new ValidationError('Thread ID is required for authorization');
       }
 
       const thread = await db.thread.findUnique({
         where: {
           id: threadId,
         },
+        select: {
+          authorId: true,
+        },
       });
 
       if (!thread) {
-        throw new Error('Thread does not exist');
+        throw new NotFoundError('Thread does not exist');
       }
 
       if (thread.authorId !== id) {
-        throw new Error('User is not the author of the thread');
+        throw new ForbiddenError('User is not the author of the thread');
       }
 
       next();

@@ -1,4 +1,5 @@
-import { useEffect, useState, type SubmitEvent } from 'react';
+import { API_URL } from '../../config';
+import { useEffect, useRef, useState, type SubmitEvent } from 'react';
 import type { Task, Workflow } from '../../types/boards.types';
 import { IconDelete, IconPlus, IconSettings } from './boards.images';
 import { TaskCard } from './TaskCard';
@@ -66,13 +67,10 @@ export function KanbanColumn({
 
   async function deleteTask(taskId: string) {
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/task/delete/${taskId}`,
-        {
-          credentials: 'include',
-          method: 'DELETE',
-        },
-      );
+      const response = await fetch(`${API_URL}/api/task/delete/${taskId}`, {
+        credentials: 'include',
+        method: 'DELETE',
+      });
 
       if (!response.ok) {
         throw new Error("Can't delete task", { cause: response.text });
@@ -113,6 +111,11 @@ export function KanbanColumn({
     }
   }
 
+  // Read the cache through a ref so the fetch effect does not re-run
+  // every time the cache is filled in.
+  const taskCacheRef = useRef(taskCache);
+  taskCacheRef.current = taskCache;
+
   useEffect(() => {
     async function fetchTasks() {
       if (workflow.tasks === undefined || workflow.tasks.length === 0) {
@@ -122,8 +125,12 @@ export function KanbanColumn({
 
       const results = await Promise.all(
         workflow.tasks.map(async (id) => {
+          const cached = taskCacheRef.current[id];
+          if (cached) {
+            return cached;
+          }
           try {
-            const res = await fetch(`http://localhost:3000/api/task/${id}`, {
+            const res = await fetch(`${API_URL}/api/task/${id}`, {
               credentials: 'include',
             });
             if (!res.ok) {

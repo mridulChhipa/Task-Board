@@ -188,18 +188,6 @@ export class TaskService {
         },
       });
 
-      console.log(parentId);
-
-      await db.activity.create({
-        data: {
-          taskId,
-          type: 'TASK_ASSIGNEE_CHANGED',
-          oldAssigneeId: existingTask.assignee, // PlaceHolder value since old assignee does not exist
-          newAssigneeId: assignee,
-          userId: reporter,
-        },
-      });
-
       if (existingTask.parentId) {
         await syncStatusWithChildren(existingTask.parentId);
       }

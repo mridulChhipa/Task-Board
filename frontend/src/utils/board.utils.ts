@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import type { Priority, Task, Workflow } from '../types/boards.types';
 import type { Board } from '../types/project.types';
 
@@ -14,7 +15,7 @@ export async function fetchBoard(
 ): Promise<Board> {
   try {
     const response = await fetch(
-      `http://localhost:3000/api/project/${projectId}/board/${bid}`,
+      `${API_URL}/api/project/${projectId}/board/${bid}`,
       {
         credentials: 'include',
         headers: {
@@ -47,7 +48,7 @@ export async function addWorkflow(
 ): Promise<Workflow> {
   try {
     const response = await fetch(
-      `http://localhost:3000/api/project/${projectId}/board/add-column/${boardId}`,
+      `${API_URL}/api/project/${projectId}/board/add-column/${boardId}`,
       {
         credentials: 'include',
         headers: {
@@ -81,7 +82,6 @@ export async function sortWorkflows(
   onError: (msg: string) => void = () => {},
   taskCache: Record<string, Task> = {},
 ): Promise<Workflow[]> {
-  console.log('Sorting workflows');
   async function getTaskMeta(taskId: string) {
     const cached = taskCache[taskId];
     if (cached) {
@@ -91,7 +91,7 @@ export async function sortWorkflows(
       };
     }
     try {
-      const res = await fetch(`http://localhost:3000/api/task/${taskId}`, {
+      const res = await fetch(`${API_URL}/api/task/${taskId}`, {
         credentials: 'include',
       });
       const resJson = await res.json();
@@ -104,7 +104,6 @@ export async function sortWorkflows(
       throw new Error('Error fetching task details', { cause: err });
     }
   }
-  console.log(workflows);
   const workflowTasks = await Promise.all(
     workflows.map(async (workflow) =>
       Promise.all(

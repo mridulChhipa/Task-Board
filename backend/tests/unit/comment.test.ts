@@ -3,8 +3,7 @@ import { after, before, beforeEach, describe, test } from 'node:test';
 import assert from 'node:assert';
 
 import { CommentService } from '../../src/services/comment.service';
-import { prisma } from '../../lib/prisma';
-import type { PrismaClient } from '@prisma/client/extension';
+import { db, restoreDbAfterEach, stub } from '../helpers';
 import { notificationService } from '../../src/services/notification.service';
 import { initWSServer, shutdownWSServer } from '../../src/websocket/ws.service';
 import { NotifType } from '../../src/types/notifcation.types';
@@ -22,7 +21,8 @@ let wsServer: ReturnType<typeof initWSServer> | null = null;
 
 describe('CommentService', () => {
   let service: CommentService;
-  const db: PrismaClient = prisma;
+
+  restoreDbAfterEach();
 
   before(() => {
     const server = http.createServer();
@@ -38,7 +38,7 @@ describe('CommentService', () => {
 
   beforeEach(() => {
     service = new CommentService();
-    notificationService.createNotification = (async () => {
+    stub(notificationService, 'createNotification', (async () => {
       return {
         id: 'notif-1',
         type: NotifType.COMMENT_ADDED,
@@ -53,7 +53,7 @@ describe('CommentService', () => {
       } as NotificationDTO;
     }) as unknown as (
       payload: CreateNotificationPayload,
-    ) => Promise<NotificationDTO>;
+    ) => Promise<NotificationDTO>);
   });
 
   test('createThread returns created thread', async () => {
@@ -139,11 +139,11 @@ describe('CommentService', () => {
         assignee: 2,
       }),
     };
-    notificationService.createNotification = (async () => {
+    stub(notificationService, 'createNotification', (async () => {
       throw new Error('notification failed');
     }) as unknown as (
       payload: CreateNotificationPayload,
-    ) => Promise<NotificationDTO>;
+    ) => Promise<NotificationDTO>);
 
     await assert.rejects(
       () =>
@@ -171,6 +171,9 @@ describe('CommentService', () => {
           isDeleted: args.data.isDeleted,
         };
       },
+    };
+    db.activity = {
+      create: async () => ({ id: 'activity-1' }),
     };
 
     await service.updateThread('thread-1', {
@@ -339,7 +342,7 @@ describe('CommentService', () => {
 
   test('createComment handles mention notification', async () => {
     const notifications: string[] = [];
-    notificationService.createNotification = (async (
+    stub(notificationService, 'createNotification', (async (
       payload: CreateNotificationPayload,
     ) => {
       notifications.push(payload.type);
@@ -357,7 +360,7 @@ describe('CommentService', () => {
       } as NotificationDTO;
     }) as unknown as (
       payload: CreateNotificationPayload,
-    ) => Promise<NotificationDTO>;
+    ) => Promise<NotificationDTO>);
 
     db.comment = {
       create: async () => ({
@@ -383,7 +386,7 @@ describe('CommentService', () => {
     };
     db.user = {
       findUnique: async () => ({ id: 1, name: 'Author' }),
-      findFirst: async () => ({ id: 3, name: 'Mentioned' }),
+      findMany: async () => [{ id: 3 }],
     };
 
     await service.createComment({
@@ -425,11 +428,11 @@ describe('CommentService', () => {
       findUnique: async () => ({ id: 1, name: 'Author' }),
       findFirst: async () => null,
     };
-    notificationService.createNotification = (async () => {
+    stub(notificationService, 'createNotification', (async () => {
       throw new Error('notification failed');
     }) as unknown as (
       payload: CreateNotificationPayload,
-    ) => Promise<NotificationDTO>;
+    ) => Promise<NotificationDTO>);
 
     await assert.rejects(
       () =>
@@ -457,6 +460,9 @@ describe('CommentService', () => {
           isDeleted: args.data.isDeleted,
         };
       },
+    };
+    db.activity = {
+      create: async () => ({ id: 'activity-1' }),
     };
 
     await service.updateComment('comment-1', {
@@ -517,6 +523,9 @@ describe('CommentService', () => {
         updateArgs = args;
         return { id: args.where.id, isDeleted: args.data.isDeleted };
       },
+    };
+    db.activity = {
+      create: async () => ({ id: 'activity-1' }),
     };
 
     await service.deleteComment('comment-1', 'thread-1');

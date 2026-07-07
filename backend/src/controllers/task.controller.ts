@@ -14,7 +14,6 @@ export class TaskController {
 
       next();
     } catch (error) {
-      console.log('Task create control err: ', error);
       next(error);
     }
   }
@@ -36,7 +35,6 @@ export class TaskController {
 
       next();
     } catch (error) {
-      console.log('Task update control err: ', error);
       next(error);
     }
   }
@@ -57,7 +55,6 @@ export class TaskController {
 
       next();
     } catch (error) {
-      console.log('Task delete control err: ', error);
       next(error);
     }
   }
@@ -76,7 +73,6 @@ export class TaskController {
       res.status(200).json({ task: fetchedTask });
       next();
     } catch (error) {
-      console.log('Fetch error: ', error);
       next(error);
     }
   }

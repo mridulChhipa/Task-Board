@@ -2,8 +2,7 @@ import { beforeEach, describe, test } from 'node:test';
 import assert from 'node:assert';
 
 import { BoardService } from '../../src/services/board.service';
-import { prisma } from '../../lib/prisma';
-import type { PrismaClient } from '@prisma/client/extension';
+import { db, restoreDbAfterEach } from '../helpers';
 import type {
   BoardCreateArgs,
   WorkflowCreateArgs,
@@ -15,14 +14,13 @@ import type {
 
 describe('BoardService', () => {
   let service: BoardService;
-  const db: PrismaClient = prisma;
+  restoreDbAfterEach();
 
   beforeEach(() => {
     service = new BoardService();
   });
 
   test('create returns board with default workflows', async () => {
-    let workflowCreateCount = 0;
     db.board = {
       create: async (args: BoardCreateArgs) => ({
         id: 'board-1',
@@ -32,16 +30,16 @@ describe('BoardService', () => {
     };
 
     db.workflow = {
-      create: async (args: WorkflowCreateArgs) => {
-        workflowCreateCount += 1;
-        return {
-          id: `workflow-${workflowCreateCount}`,
-          name: args.data.name,
-          boardId: args.data.boardId,
-          orderIdx: args.data.orderIdx,
-          limit: args.data.limit,
-        };
-      },
+      createManyAndReturn: async (args: {
+        data: Array<WorkflowCreateArgs['data']>;
+      }) =>
+        args.data.map((workflow, index) => ({
+          id: `workflow-${index + 1}`,
+          name: workflow.name,
+          boardId: workflow.boardId,
+          orderIdx: workflow.orderIdx,
+          limit: workflow.limit,
+        })),
     };
 
     const result = await service.create('project-1', 'Board One');
@@ -75,7 +73,7 @@ describe('BoardService', () => {
       }),
     };
     db.workflow = {
-      create: async () => {
+      createManyAndReturn: async () => {
         throw new Error('error creating workflow');
       },
     };
@@ -127,8 +125,10 @@ describe('BoardService', () => {
 
     await service.update('board-1', 'Updated Board');
 
-    assert.equal(updateArgs?.where.id, 'board-1');
-    assert.equal(updateArgs?.data.name, 'Updated Board');
+    assert.ok(updateArgs);
+    const boardUpdateArgs = updateArgs as WorkflowUpdateArgs;
+    assert.equal(boardUpdateArgs.where.id, 'board-1');
+    assert.equal(boardUpdateArgs.data.name, 'Updated Board');
   });
 
   test('addColumn returns created column', async () => {
@@ -183,8 +183,10 @@ describe('BoardService', () => {
 
     await service.updateColumn('column-1', 'board-1', 'Updated', 4, 3);
 
-    assert.equal(updateArgs?.where.id, 'column-1');
-    assert.equal(updateArgs?.data.name, 'Updated');
+    assert.ok(updateArgs);
+    const columnUpdateArgs = updateArgs as WorkflowUpdateArgs;
+    assert.equal(columnUpdateArgs.where.id, 'column-1');
+    assert.equal(columnUpdateArgs.data.name, 'Updated');
   });
 
   test('updateColumn rejects missing column', async () => {
@@ -252,7 +254,8 @@ describe('BoardService', () => {
 
     await service.deleteColumn('column-1', 'board-1');
 
-    assert.equal(deleteArgs?.where.id, 'column-1');
+    assert.ok(deleteArgs);
+    assert.equal((deleteArgs as WorkflowDeleteArgs).where.id, 'column-1');
   });
 
   test('deleteColumn rejects missing column', async () => {
@@ -349,7 +352,8 @@ describe('BoardService', () => {
 
     await service.deleteEdge('board-1', 'edge-1');
 
-    assert.equal(deleteArgs?.where.id, 'edge-1');
+    assert.ok(deleteArgs);
+    assert.equal((deleteArgs as EdgeConstraintDeleteArgs).where.id, 'edge-1');
   });
 
   test('deleteEdge rejects delete failure', async () => {
@@ -376,7 +380,8 @@ describe('BoardService', () => {
 
     await service.deleteBoard('board-1');
 
-    assert.equal(deleteArgs?.where.id, 'board-1');
+    assert.ok(deleteArgs);
+    assert.equal((deleteArgs as { where: { id: string } }).where.id, 'board-1');
   });
 
   test('deleteBoard rejects delete failure', async () => {

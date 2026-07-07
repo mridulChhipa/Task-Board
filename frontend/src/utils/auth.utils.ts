@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import { useContext, useCallback } from 'react';
 import {
   AuthContext,
@@ -17,7 +18,7 @@ export function useLogout() {
     });
 
     try {
-      const response = await fetch('http://localhost:3000/api/auth/logout', {
+      const response = await fetch(`${API_URL}/api/auth/logout`, {
         credentials: 'include',
         method: 'POST',
         headers: {
@@ -65,14 +66,11 @@ export function useFetchUser() {
 
     // console.log(user);
     try {
-      const userRes = await fetch(
-        `http://localhost:3000/api/auth/${user?.userId}`,
-        {
-          method: 'GET',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-        },
-      );
+      const userRes = await fetch(`${API_URL}/api/auth/${user?.userId}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
 
       if (!userRes.ok) {
         throw new Error('Failed to fetch user data');
@@ -84,7 +82,7 @@ export function useFetchUser() {
       if (userData.data.personalData.globalRole === 'GLOBAL_ADMIN') {
         // console.log('Trying to fetch global admin project');
         const globalRes = await fetch(
-          'http://localhost:3000/api/project/all-projects/global',
+          `${API_URL}/api/project/all-projects/global`,
           {
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },

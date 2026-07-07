@@ -57,10 +57,7 @@ export class NotificationController {
       }
 
       await notificationService.deleteNotification(nid);
-      res.status(204).json({
-        status: 'success',
-        data: null,
-      });
+      res.status(204).end();
 
       next();
     } catch (error) {

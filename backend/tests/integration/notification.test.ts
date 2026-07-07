@@ -4,16 +4,13 @@ import assert from 'node:assert';
 
 import { app } from '../../src/app';
 import { generateAuthTokens } from '../../src/utils/jwt';
-import { prisma } from '../../lib/prisma';
+import { db } from '../helpers';
 import type { Prisma } from '../../generated/prisma/client';
-import type { PrismaClient } from '@prisma/client/extension';
 import { NotifType } from '../../src/types/notifcation.types';
 
 describe('Notification API Endpoints', () => {
   let server: http.Server;
   let baseUrl: string;
-
-  const db: PrismaClient = prisma;
 
   let currentUser: {
     id: number;
@@ -66,6 +63,16 @@ describe('Notification API Endpoints', () => {
       });
       server.on('error', reject);
     });
+
+    // The auth guard checks the session row for the presented token.
+    db.session = {
+      findUnique: async (args: { where: { id: string } }) => ({
+        id: args.where.id,
+        userId: 1,
+        token: 'stub-token',
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+      }),
+    };
 
     db.user = {
       findUnique: async (args: Prisma.UserFindUniqueArgs) => {
@@ -220,7 +227,7 @@ describe('Notification API Endpoints', () => {
       },
     });
 
-    assert.equal(response.status, 500);
+    assert.equal(response.status, 403);
     const data = (await response.json()) as { msg?: string };
     assert.equal(data.msg, 'Not allowed to access this notification');
   });
@@ -256,7 +263,7 @@ describe('Notification API Endpoints', () => {
       },
     });
 
-    assert.equal(response.status, 500);
+    assert.equal(response.status, 403);
     const data = (await response.json()) as { msg?: string };
     assert.equal(data.msg, 'Not allowed to access this notification');
   });
@@ -302,7 +309,7 @@ describe('Notification API Endpoints', () => {
       }),
     });
 
-    assert.equal(response.status, 500);
+    assert.equal(response.status, 403);
     const data = (await response.json()) as { msg?: string };
     assert.equal(data.msg, 'Not allowed to access this notification');
   });

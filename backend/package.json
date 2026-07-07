@@ -12,8 +12,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "dummy": "tsx dummy/test-script.ts",
-    "integration-test": "tsx tests/integration/script.ts",
-    "unit-test": "tsx tests/unit/script.ts"
+    "test": "npm run unit-test && npm run integration-test",
+    "integration-test": "tsx tests/run.ts integration",
+    "unit-test": "tsx tests/run.ts unit"
   },
   "keywords": [],
   "author": "",

@@ -1,25 +1,30 @@
+import { WS_URL } from '../config';
+
+type MessageHandler = (senderId: number, notification: string) => void;
+
+const MAX_RECONNECT_ATTEMPTS = 5;
+
+/**
+ * Notification push channel. The server identifies the user from the auth
+ * cookie on the upgrade request, so no identity message is sent. Reconnects
+ * with backoff unless closed by the client.
+ */
 export class NotificationWebSocket {
-  userId: number;
-  socket: WebSocket;
-  messageHandler: (senderId: number, notification: string) => void;
+  private socket: WebSocket | null = null;
+  private messageHandler: MessageHandler;
+  private closedByClient = false;
+  private reconnectAttempts = 0;
 
-  constructor(
-    userId: number,
-    messageHandler: (senderId: number, notification: string) => void,
-  ) {
-    this.userId = userId;
-    this.socket = new WebSocket('ws://localhost:3000');
+  constructor(messageHandler: MessageHandler) {
     this.messageHandler = messageHandler;
-    this.setup();
-
-    console.log('WebSocket connection established for user', userId);
+    this.connect();
   }
 
-  setup() {
+  private connect() {
+    this.socket = new WebSocket(WS_URL);
+
     this.socket.onopen = () => {
-      this.socket.send(
-        JSON.stringify({ messageType: 'NEW_USER', userId: this.userId }),
-      );
+      this.reconnectAttempts = 0;
     };
     this.socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -27,11 +32,20 @@ export class NotificationWebSocket {
         this.messageHandler(data.senderId, data.notification);
       }
     };
-    this.socket.onerror = (error) => {
-      console.error('WebSocket error: ', error);
-    };
     this.socket.onclose = () => {
-      console.log('WebSocket connection closed');
+      if (
+        this.closedByClient ||
+        this.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS
+      ) {
+        return;
+      }
+      this.reconnectAttempts += 1;
+      setTimeout(() => this.connect(), 1000 * this.reconnectAttempts);
     };
+  }
+
+  close() {
+    this.closedByClient = true;
+    this.socket?.close();
   }
 }

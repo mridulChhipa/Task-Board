@@ -143,7 +143,7 @@ export async function syncStatusWithChildren(storyId: string): Promise<void> {
     });
 
     if (story.parentId) {
-      syncStatusWithChildren(story.parentId);
+      await syncStatusWithChildren(story.parentId);
     }
   } catch (error) {
     throw new Error('Error syncing status: ', { cause: error });

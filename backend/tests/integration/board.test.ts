@@ -4,8 +4,7 @@ import assert from 'node:assert';
 
 import { app } from '../../src/app';
 import { generateAuthTokens } from '../../src/utils/jwt';
-import { prisma } from '../../lib/prisma';
-import type { PrismaClient } from '@prisma/client/extension';
+import { db } from '../helpers';
 import { ProjectRole } from '../../src/types/project.types';
 import type {
   BoardCreateArgs,
@@ -26,8 +25,6 @@ describe('Board API Endpoints (RBAC)', () => {
   let server: http.Server;
   let baseUrl: string;
 
-  const db: PrismaClient = prisma;
-
   let currentUser: {
     id: number;
     email: string;
@@ -35,7 +32,6 @@ describe('Board API Endpoints (RBAC)', () => {
   } | null = null;
 
   let membershipRole: ProjectRole | null = null;
-  let workflowCreateCount = 0;
 
   const projectId = 'project-1';
   const boardId = 'board-1';
@@ -75,6 +71,16 @@ describe('Board API Endpoints (RBAC)', () => {
       });
       server.on('error', reject);
     });
+
+    // The auth guard checks the session row for the presented token.
+    db.session = {
+      findUnique: async (args: { where: { id: string } }) => ({
+        id: args.where.id,
+        userId: 1,
+        token: 'stub-token',
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+      }),
+    };
 
     db.user = {
       findUnique: async (args: UserFindUniqueArgs) => {
@@ -172,26 +178,23 @@ describe('Board API Endpoints (RBAC)', () => {
     };
 
     db.workflow = {
-      create: async (args: WorkflowCreateArgs) => {
-        workflowCreateCount += 1;
-        if (workflowCreateCount <= 4) {
-          return {
-            id: `workflow-${workflowCreateCount}`,
-            name: args.data.name,
-            boardId: args.data.boardId,
-            orderIdx: args.data.orderIdx,
-            limit: args.data.limit,
-          };
-        }
-
-        return {
-          id: columnId,
-          name: args.data.name,
-          boardId: args.data.boardId,
-          orderIdx: args.data.orderIdx,
-          limit: args.data.limit,
-        };
-      },
+      createManyAndReturn: async (args: {
+        data: Array<WorkflowCreateArgs['data']>;
+      }) =>
+        args.data.map((workflow, index) => ({
+          id: `workflow-${index + 1}`,
+          name: workflow.name,
+          boardId: workflow.boardId,
+          orderIdx: workflow.orderIdx,
+          limit: workflow.limit,
+        })),
+      create: async (args: WorkflowCreateArgs) => ({
+        id: columnId,
+        name: args.data.name,
+        boardId: args.data.boardId,
+        orderIdx: args.data.orderIdx,
+        limit: args.data.limit,
+      }),
       findFirst: async (args: WorkflowFindFirstArgs) => {
         if (args.where?.id !== columnId) {
           return null;
@@ -298,7 +301,7 @@ describe('Board API Endpoints (RBAC)', () => {
       }),
     });
 
-    assert.equal(response.status, 500);
+    assert.equal(response.status, 403);
     const data = (await response.json()) as { msg: string };
     assert.equal(data.msg, 'Insufficient Priviledges');
   });
@@ -347,7 +350,7 @@ describe('Board API Endpoints (RBAC)', () => {
       }),
     });
 
-    assert.equal(response.status, 500);
+    assert.equal(response.status, 403);
     const data = (await response.json()) as { msg: string };
     assert.equal(data.msg, 'Insufficient Priviledges');
   });
@@ -388,7 +391,7 @@ describe('Board API Endpoints (RBAC)', () => {
       },
     });
 
-    assert.equal(response.status, 500);
+    assert.equal(response.status, 403);
     const data = (await response.json()) as { msg: string };
     assert.equal(data.msg, 'Insufficient Priviledges');
   });
@@ -571,7 +574,7 @@ describe('Board API Endpoints (RBAC)', () => {
       },
     });
 
-    assert.equal(response.status, 500);
+    assert.equal(response.status, 403);
     const data = (await response.json()) as { msg: string };
     assert.equal(data.msg, 'Not a global user');
   });

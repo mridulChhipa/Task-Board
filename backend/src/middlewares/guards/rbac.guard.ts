@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction, RequestHandler } from 'express';
 import type { AuthenticatedRequest } from '../../types/auth.types';
 import { db } from '../../config/db';
 import { GlobalRole } from '../../../generated/prisma/enums';
+import { ForbiddenError, UnauthorizedError } from '../../errors';
 
 export function authorizeGlobalAdmin(): RequestHandler {
   return async (
@@ -20,11 +21,11 @@ export function authorizeGlobalAdmin(): RequestHandler {
       });
 
       if (!user) {
-        throw new Error('User not found');
+        throw new UnauthorizedError('User not found');
       }
 
       if (user.globalRole !== GlobalRole.GLOBAL_ADMIN) {
-        throw new Error('Global Admin priviledges required');
+        throw new ForbiddenError('Global Admin priviledges required');
       }
 
       next();

@@ -7,17 +7,14 @@ import assert from 'node:assert';
 import { app } from '../../src/app';
 import { generateAuthTokens } from '../../src/utils/jwt';
 
-import { prisma } from '../../lib/prisma';
+import { db } from '../helpers';
 import type { Prisma } from '../../generated/prisma/client';
-import type { PrismaClient } from '@prisma/client/extension';
 
 describe('Auth API Endpoints', () => {
   let server: http.Server;
   let baseUrl: string;
   let refreshSessionId: string | null = null;
   let refreshTokenValue: string | null = null;
-
-  const db: PrismaClient = prisma;
 
   before(async () => {
     process.env.JWT_ACCESS_SECRET = 'test-access-secret';
@@ -164,6 +161,10 @@ describe('Auth API Endpoints', () => {
       'native@node.test',
       sessionId,
     );
+
+    // The auth guard verifies the session row exists before allowing logout.
+    refreshSessionId = sessionId;
+    refreshTokenValue = refreshToken;
 
     const response = await fetch(`${baseUrl}/api/auth/logout`, {
       method: 'POST',

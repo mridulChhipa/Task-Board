@@ -53,21 +53,33 @@ function App() {
           <Route
             path="/project/:pid"
             element={
-              <ProjectProvider>
-                <ProjectPage></ProjectPage>
-              </ProjectProvider>
+              <RequireAuth>
+                <ProjectProvider>
+                  <ProjectPage></ProjectPage>
+                </ProjectProvider>
+              </RequireAuth>
             }
           />
 
           <Route
             path="/project/:pid/task/:tid"
             element={
-              <ProjectProvider>
-                <TaskPage />
-              </ProjectProvider>
+              <RequireAuth>
+                <ProjectProvider>
+                  <TaskPage />
+                </ProjectProvider>
+              </RequireAuth>
             }
           />
-          <Route path="/account" element={<Account />} />
+          <Route
+            path="/account"
+            element={
+              <RequireAuth>
+                <Account />
+              </RequireAuth>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

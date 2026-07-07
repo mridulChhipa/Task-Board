@@ -26,7 +26,6 @@ export class ProjectController {
 
       next();
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -52,7 +51,6 @@ export class ProjectController {
 
       next();
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -76,7 +74,6 @@ export class ProjectController {
 
       next();
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -101,7 +98,6 @@ export class ProjectController {
 
       next();
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -126,7 +122,6 @@ export class ProjectController {
 
       next();
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -151,7 +146,6 @@ export class ProjectController {
 
       next();
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -198,9 +192,7 @@ export class ProjectController {
 
       await projectService.deleteProject(projectId);
 
-      res.status(204).json({
-        stauts: 'Delete successful',
-      });
+      res.status(204).end();
 
       next();
     } catch (err) {

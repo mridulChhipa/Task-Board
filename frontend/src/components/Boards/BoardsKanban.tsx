@@ -90,7 +90,7 @@ export default function BoardsKanban({
           className={styles.panel}
         >
           <div className={styles.kanbanBoard}>
-            {workflowState
+            {[...workflowState]
               .sort((a, b) => a.orderIdx - b.orderIdx)
               .map((workflow, index) => {
                 return (

@@ -2,8 +2,7 @@ import { beforeEach, describe, test } from 'node:test';
 import assert from 'node:assert';
 
 import { ProjectService } from '../../src/services/project.service';
-import { prisma } from '../../lib/prisma';
-import type { PrismaClient } from '@prisma/client/extension';
+import { db, restoreDbAfterEach } from '../helpers';
 import { ProjectRole } from '../../src/types/project.types';
 import type {
   ProjectCreateArgs,
@@ -15,7 +14,7 @@ import type {
 
 describe('ProjectService', () => {
   let service: ProjectService;
-  const db: PrismaClient = prisma;
+  restoreDbAfterEach();
 
   beforeEach(() => {
     service = new ProjectService();
@@ -41,7 +40,8 @@ describe('ProjectService', () => {
     });
 
     assert.equal(project.id, 'project-1');
-    assert.equal(createArgs?.data.name, 'New Project');
+    assert.ok(createArgs);
+    assert.equal((createArgs as ProjectCreateArgs).data.name, 'New Project');
   });
 
   test('create rejects create failure', async () => {
@@ -82,7 +82,8 @@ describe('ProjectService', () => {
       isArchived: false,
     });
 
-    assert.equal(updateArgs?.where.id, 'project-1');
+    assert.ok(updateArgs);
+    assert.equal((updateArgs as ProjectUpdateArgs).where.id, 'project-1');
     assert.deepEqual(result.members, [1, 2]);
     assert.equal(result.name, 'Updated Project');
   });
@@ -132,7 +133,8 @@ describe('ProjectService', () => {
 
     await service.setArchiveStatus('project-1', { isArchived: true });
 
-    assert.equal(updateArgs?.data.isArchived, true);
+    assert.ok(updateArgs);
+    assert.equal((updateArgs as ProjectUpdateArgs).data.isArchived, true);
   });
 
   test('setArchiveStatus rejects update failure', async () => {
@@ -170,7 +172,8 @@ describe('ProjectService', () => {
       role: ProjectRole.PROJECT_MEMBER,
     });
 
-    assert.equal(createdMembership?.data.userId, 7);
+    assert.ok(createdMembership);
+    assert.equal((createdMembership as ProjectMemberCreateArgs).data.userId, 7);
   });
 
   test('assignUser rejects existing membership', async () => {
@@ -242,7 +245,12 @@ describe('ProjectService', () => {
 
     await service.removeUser('project-1', { userMail: 'member@node.test' });
 
-    assert.equal(deleteArgs?.where.uniqueUser.userId, 5);
+    assert.ok(deleteArgs);
+    assert.equal(
+      (deleteArgs as unknown as { where: { uniqueUser: { userId: number } } })
+        .where.uniqueUser.userId,
+      5,
+    );
   });
 
   test('removeUser rejects missing user', async () => {
@@ -305,7 +313,11 @@ describe('ProjectService', () => {
       role: ProjectRole.PROJECT_ADMIN,
     });
 
-    assert.equal(updateArgs?.data.role, ProjectRole.PROJECT_ADMIN);
+    assert.ok(updateArgs);
+    assert.equal(
+      (updateArgs as ProjectMemberUpdateArgs).data.role,
+      ProjectRole.PROJECT_ADMIN,
+    );
   });
 
   test('updateUserRole rejects missing user', async () => {
@@ -431,7 +443,11 @@ describe('ProjectService', () => {
 
     await service.deleteProject('project-1');
 
-    assert.equal(deleteArgs?.where.id, 'project-1');
+    assert.ok(deleteArgs);
+    assert.equal(
+      (deleteArgs as { where: { id: string } }).where.id,
+      'project-1',
+    );
   });
 
   test('deleteProject rejects missing project', async () => {

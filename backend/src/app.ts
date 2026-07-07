@@ -23,7 +23,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.get('/', (req: Request, res: Response) => {
-  console.log('Route: /');
   res.json({ message: 'Hello, Start your Task Board Journey!' });
 });
 

@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import { type SubmitEvent, type Dispatch, type SetStateAction } from 'react';
 import type { User } from '../context/AuthContext';
 import type { Operation } from '../pages/Dashboard/Dashboard';
@@ -31,7 +32,7 @@ export async function handleAdd(e: SubmitEvent, props: Props) {
         props.newRole,
       );
       const res = await fetch(
-        `http://localhost:3000/api/project/assign-user/${props.currProject}`,
+        `${API_URL}/api/project/assign-user/${props.currProject}`,
         {
           method: 'POST',
           credentials: 'include',
@@ -62,7 +63,7 @@ export async function handleAdd(e: SubmitEvent, props: Props) {
   } else if (props.operation === 'Edit') {
     try {
       const res = await fetch(
-        `http://localhost:3000/api/project/update-role/${props.currProject}`,
+        `${API_URL}/api/project/update-role/${props.currProject}`,
         {
           method: 'PATCH',
           credentials: 'include',
@@ -92,7 +93,7 @@ export async function handleAdd(e: SubmitEvent, props: Props) {
   } else {
     try {
       const res = await fetch(
-        `http://localhost:3000/api/project/remove-user/${props.currProject}`,
+        `${API_URL}/api/project/remove-user/${props.currProject}`,
         {
           method: 'POST',
           credentials: 'include',
@@ -125,7 +126,7 @@ export async function handleAdd(e: SubmitEvent, props: Props) {
 export async function addGlobal(e: SubmitEvent, props: Props) {
   e.preventDefault();
   try {
-    await fetch(`http://localhost:3000/api/auth/update-user`, {
+    await fetch(`${API_URL}/api/auth/update-user`, {
       method: 'PATCH',
       credentials: 'include',
       headers: {
@@ -145,12 +146,11 @@ export async function addGlobal(e: SubmitEvent, props: Props) {
 export async function getMembers(props: Props): Promise<ProjectMember[]> {
   async function getEmail(userId: number): Promise<string> {
     try {
-      const res = await fetch(`http://localhost:3000/api/auth/${userId}`, {
+      const res = await fetch(`${API_URL}/api/auth/${userId}`, {
         method: 'GET',
         credentials: 'include',
       });
       const userData = await res.json();
-      console.log(userData);
       return userData.data.personalData.email;
     } catch (err) {
       props.handleError('Could not find email of user');
@@ -158,25 +158,21 @@ export async function getMembers(props: Props): Promise<ProjectMember[]> {
     }
   }
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/project/${props.currProject}`,
-      {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    const res = await fetch(`${API_URL}/api/project/${props.currProject}`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    );
+    });
     const data = await res.json();
     const users = data.data.members;
-    const projectMembers: ProjectMember[] = users.map((user: User) => {
-      return {
-        email: getEmail(user.userId),
+    const projectMembers: ProjectMember[] = await Promise.all(
+      users.map(async (user: User) => ({
+        email: await getEmail(user.userId),
         role: user.role,
-      };
-    });
-    console.log(projectMembers);
+      })),
+    );
     return projectMembers;
   } catch (err) {
     props.handleError('Error fetching project members');

@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import type { NotificationDTO, NotifType } from '../types/Notification.types';
 
 export function typeToString(notif: NotifDisplay): string {
@@ -35,22 +36,16 @@ export async function setNotifications(
     await Promise.all(
       notifications
         .map(async (notif) => {
-          const res = await fetch(
-            `http://localhost:3000/api/task/${notif.taskId}`,
-            {
-              method: 'GET',
-              credentials: 'include',
-            },
-          );
+          const res = await fetch(`${API_URL}/api/task/${notif.taskId}`, {
+            method: 'GET',
+            credentials: 'include',
+          });
           const data = await res.json();
           const taskName = data.task.title;
-          const res2 = await fetch(
-            `http://localhost:3000/api/auth/${notif.senderId}`,
-            {
-              method: 'GET',
-              credentials: 'include',
-            },
-          );
+          const res2 = await fetch(`${API_URL}/api/auth/${notif.senderId}`, {
+            method: 'GET',
+            credentials: 'include',
+          });
           const data2 = await res2.json();
           const senderName = data2.data.personalData.name;
 

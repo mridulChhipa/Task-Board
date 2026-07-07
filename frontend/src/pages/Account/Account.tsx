@@ -1,7 +1,9 @@
+import { API_URL } from '../../config';
 import { useContext, useState, type SubmitEvent } from 'react';
 import { AuthContext, DispatchContext } from '../../context/AuthContext';
 import styles from './Account.module.css';
 import Button from '../../components/Button/Button';
+import defaultAvatar from '../../assets/legacy/default_avatar.png';
 
 export default function Account() {
   const { user } = useContext(AuthContext);
@@ -14,7 +16,7 @@ export default function Account() {
     if (!user) {
       return;
     }
-    const res = await fetch(`http://localhost:3000/api/auth/update-user`, {
+    const res = await fetch(`${API_URL}/api/auth/update-user`, {
       method: 'PATCH',
       credentials: 'include',
       headers: {
@@ -26,8 +28,7 @@ export default function Account() {
         email: user?.email,
       }),
     });
-    const data = await res.json();
-    console.log(data);
+    await res.json();
     setName('');
     setAvatarURL('');
     dispatch({
@@ -43,14 +44,11 @@ export default function Account() {
     <div className={styles.accountPage}>
       <h1>Account Page</h1>
       <div className={styles.upper}>
-        {user?.avatar ? (
-          <img src={user.avatar} className={styles.avatar} />
-        ) : (
-          <img
-            src={'../../components/Boards/boards.images.tsx'}
-            className={styles.avatar}
-          />
-        )}
+        <img
+          src={user?.avatar ? user.avatar : defaultAvatar}
+          alt="User avatar"
+          className={styles.avatar}
+        />
       </div>
       <form onSubmit={updateUser} className={styles.createForm}>
         <div className={styles.inputArea}>

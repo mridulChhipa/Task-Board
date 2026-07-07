@@ -2,8 +2,7 @@ import { beforeEach, describe, test } from 'node:test';
 import assert from 'node:assert';
 
 import { NotificationService } from '../../src/services/notification.service';
-import { prisma } from '../../lib/prisma';
-import type { PrismaClient } from '@prisma/client/extension';
+import { db, restoreDbAfterEach } from '../helpers';
 import { NotifType } from '../../src/types/notifcation.types';
 import type {
   NotificationCreateArgs,
@@ -13,7 +12,7 @@ import type {
 
 describe('NotificationService', () => {
   let service: NotificationService;
-  const db: PrismaClient = prisma;
+  restoreDbAfterEach();
 
   beforeEach(() => {
     service = new NotificationService();
@@ -126,7 +125,11 @@ describe('NotificationService', () => {
 
     await service.deleteNotification('notification-1');
 
-    assert.equal(deleteArgs?.where.id, 'notification-1');
+    assert.ok(deleteArgs);
+    assert.equal(
+      (deleteArgs as NotificationDeleteArgs).where.id,
+      'notification-1',
+    );
   });
 
   test('deleteNotification rejects delete failure', async () => {
@@ -153,7 +156,8 @@ describe('NotificationService', () => {
 
     await service.readNotification('notification-1', true);
 
-    assert.equal(updateArgs?.data.read, true);
+    assert.ok(updateArgs);
+    assert.equal((updateArgs as NotificationUpdateArgs).data.read, true);
   });
 
   test('readNotification rejects update failure', async () => {

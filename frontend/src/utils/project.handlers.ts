@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import { type SubmitEvent, type Dispatch, type SetStateAction } from 'react';
 import type { Project } from '../types/project.types';
 import type { DispatchType, User } from '../context/AuthContext';
@@ -25,7 +26,7 @@ export async function handleCreate(e: SubmitEvent, props: Props) {
   e.preventDefault();
 
   try {
-    await fetch('http://localhost:3000/api/project/create', {
+    await fetch(`${API_URL}/api/project/create`, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -64,20 +65,17 @@ export async function handleCreate(e: SubmitEvent, props: Props) {
             },
           });
 
-          await fetch(
-            `http://localhost:3000/api/project/assign-user/${project.id}`,
-            {
-              method: 'POST',
-              credentials: 'include',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                userMail: props.user.email,
-                role: 'PROJECT_ADMIN',
-              }),
+          await fetch(`${API_URL}/api/project/assign-user/${project.id}`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
             },
-          );
+            body: JSON.stringify({
+              userMail: props.user.email,
+              role: 'PROJECT_ADMIN',
+            }),
+          });
         }
       })
       .catch((err) => {
@@ -101,7 +99,7 @@ export async function handleUpdate(e: SubmitEvent, props: Props) {
 
   try {
     const res = await fetch(
-      `http://localhost:3000/api/project/update/${props.currProject}`,
+      `${API_URL}/api/project/update/${props.currProject}`,
       {
         method: 'PATCH',
         credentials: 'include',

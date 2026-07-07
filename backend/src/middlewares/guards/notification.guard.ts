@@ -2,6 +2,8 @@ import type { NextFunction, Request, Response, RequestHandler } from 'express';
 import type { AuthenticatedRequest } from '../../types/auth.types';
 import { db } from '../../config/db';
 import { GlobalRole } from '../../types/project.types';
+import { resolveId } from './membership';
+import { ForbiddenError, NotFoundError, ValidationError } from '../../errors';
 
 export function authorizeNotificationOwner(): RequestHandler {
   return async (
@@ -14,15 +16,12 @@ export function authorizeNotificationOwner(): RequestHandler {
       const userId = authReq.user.sub;
       const email = authReq.user.email;
 
-      const rawNotificationId =
-        authReq.params.nid ?? authReq.body.notificationId;
-      const notificationId =
-        typeof rawNotificationId === 'string' && rawNotificationId.trim() !== ''
-          ? rawNotificationId
-          : undefined;
+      const notificationId = resolveId(req, ['nid', 'notificationId']);
 
       if (!notificationId) {
-        throw new Error('Notification ID is required for authorization');
+        throw new ValidationError(
+          'Notification ID is required for authorization',
+        );
       }
 
       const notification = await db.notification.findUnique({
@@ -35,7 +34,7 @@ export function authorizeNotificationOwner(): RequestHandler {
       });
 
       if (!notification) {
-        throw new Error('Notification not found for authorization');
+        throw new NotFoundError('Notification not found for authorization');
       }
 
       if (notification.recipientId !== userId) {
@@ -43,10 +42,13 @@ export function authorizeNotificationOwner(): RequestHandler {
           where: {
             email,
           },
+          select: {
+            globalRole: true,
+          },
         });
 
         if (!user || user.globalRole !== GlobalRole.GLOBAL_ADMIN) {
-          throw new Error('Not allowed to access this notification');
+          throw new ForbiddenError('Not allowed to access this notification');
         }
       }
 

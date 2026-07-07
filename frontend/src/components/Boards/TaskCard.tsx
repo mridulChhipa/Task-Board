@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import type { Task } from '../../types/boards.types';
 import styles from './task.module.css';
 import { formatDate, isOverdue } from '../../utils/helpers';
@@ -38,7 +39,7 @@ interface Props {
 
 async function getMailfromId(id: number): Promise<string> {
   try {
-    const res = await fetch(`http://localhost:3000/api/auth/${id}`, {
+    const res = await fetch(`${API_URL}/api/auth/${id}`, {
       credentials: 'include',
     });
     const data = await res.json();
@@ -56,7 +57,7 @@ async function childrenOf(task: Task | null): Promise<Task[]> {
   }
   const children = await Promise.all(
     task.children.map(async (child: string) => {
-      const res = await fetch(`http://localhost:3000/api/task/${child}`, {
+      const res = await fetch(`${API_URL}/api/task/${child}`, {
         credentials: 'include',
       });
       const data = await res.json();

@@ -1,24 +1,30 @@
 import { execSync } from 'node:child_process';
 import { readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const files = readdirSync(__dirname).filter(
+const suite = process.argv[2];
+if (suite !== 'unit' && suite !== 'integration') {
+  console.error('Usage: tsx tests/run.ts <unit|integration>');
+  process.exit(1);
+}
+
+const suiteDir = join(__dirname, suite);
+const files = readdirSync(suiteDir).filter(
   (file) => file.endsWith('.test.ts') && !file.startsWith('.'),
 );
 
-console.log(`Found ${files.length} test files to run:`);
+console.log(`Found ${files.length} ${suite} test files to run:`);
 files.forEach((f) => console.log(`- ${f}`));
 console.log('\n=======================================\n');
 
 let hasFailures = false;
 
 for (const file of files) {
-  const filePath = join(__dirname, file);
+  const filePath = join(suiteDir, file);
   console.log(`Running \x1b[36m${file}\x1b[0m...`);
 
   try {

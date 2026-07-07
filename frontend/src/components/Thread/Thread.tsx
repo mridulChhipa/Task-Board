@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import {
   useContext,
   useState,
@@ -43,7 +44,7 @@ export default function Thread({ thread, deleteThread, refreshTask }: Props) {
     if (hasTitleChange || hasContentChange) {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/comment/update-thread/${thread.id}`,
+          `${API_URL}/api/comment/update-thread/${thread.id}`,
           {
             credentials: 'include',
             method: 'PATCH',
@@ -95,24 +96,21 @@ export default function Thread({ thread, deleteThread, refreshTask }: Props) {
   async function handleCommentSubmit(e: SubmitEvent) {
     e.preventDefault();
     try {
-      const res = await fetch(
-        'http://localhost:3000/api/comment/create-comment',
-        {
-          credentials: 'include',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            taskId,
-            threadId: thread.id,
-            authorId: authContext?.user?.userId,
-            content: comment,
-            isDeleted: false,
-            parentId: null,
-          }),
+      const res = await fetch(`${API_URL}/api/comment/create-comment`, {
+        credentials: 'include',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+        body: JSON.stringify({
+          taskId,
+          threadId: thread.id,
+          authorId: authContext?.user?.userId,
+          content: comment,
+          isDeleted: false,
+          parentId: null,
+        }),
+      });
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -133,7 +131,7 @@ export default function Thread({ thread, deleteThread, refreshTask }: Props) {
   async function deleteComment(id: string) {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/comment/delete-comment/${id}`,
+        `${API_URL}/api/comment/delete-comment/${id}`,
         {
           method: 'PATCH',
           credentials: 'include',

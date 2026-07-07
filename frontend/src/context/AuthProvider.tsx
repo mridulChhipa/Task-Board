@@ -1,128 +1,81 @@
-import { useEffect, useReducer, useState } from 'react';
+import { useEffect, useReducer } from 'react';
 import type { ReactNode } from 'react';
+
+import { API_URL } from '../config';
 import {
   authReducer,
   DispatchContext,
   defaultAuth,
   AuthContext,
 } from './AuthContext';
-import { NotificationWebSocket } from '../utils/Websockets.utils';
-import { triggerPopup } from './PopupProvider';
+import {
+  connectNotificationSocket,
+  disconnectNotificationSocket,
+} from '../utils/notification.socket';
 
-let isRefreshing = false;
-let refreshPromise: Promise<Record<string, unknown> | null> | null = null;
-
-async function tryRefreshToken(): Promise<Record<string, unknown> | null> {
-  if (isRefreshing && refreshPromise) {
-    return refreshPromise;
-  }
-
-  isRefreshing = true;
-  refreshPromise = fetch('http://localhost:3000/api/auth/refresh', {
+async function tryRefreshToken(): Promise<boolean> {
+  const res = await fetch(`${API_URL}/api/auth/refresh`, {
     method: 'PATCH',
     credentials: 'include',
-  })
-    .then((res) => {
-      if (!res.ok) {
-        throw new Error('No response');
-      }
-      return res.json();
-    })
-    .catch((err) => {
-      throw err;
-    })
-    .finally(() => {
-      isRefreshing = false;
-      refreshPromise = null;
-    });
-
-  if (!refreshPromise) {
-    throw new Error('Failed to refresh token');
-  }
-
-  return refreshPromise;
+  });
+  return res.ok;
 }
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isLoading, setIsLoading] = useState(true);
   const [authContext, dispatch] = useReducer(authReducer, defaultAuth);
 
-  async function handleNotification(senderId: number, notification: string) {
-    try {
-      const senderRes = await fetch(
-        `http://localhost:3000/api/auth/${senderId}`,
-        {
-          method: 'GET',
-          credentials: 'include',
-        },
-      );
-      const senderData = await senderRes.json();
-      const sender = senderData.data.personalData.name;
-      triggerPopup(sender, notification, false);
-
-      const meRes = await fetch('http://localhost:3000/api/auth/me', {
-        method: 'GET',
-        credentials: 'include',
-      });
-      const meData = await meRes.json();
-      dispatch({
-        type: 'SET_NOTIFICATIONS',
-        payload: meData.notifications || [],
-      });
-    } catch (err) {
-      console.error('Notification handling failed:', err);
-    }
-  }
-
   useEffect(() => {
+    let cancelled = false;
+
     const restoreUser = async () => {
       try {
-        void isLoading;
         const refreshed = await tryRefreshToken();
         if (!refreshed) {
-          console.log('Wait');
+          throw new Error('No valid session');
+        }
+
+        const res = await fetch(`${API_URL}/api/auth/me`, {
+          credentials: 'include',
+        });
+        const user = await res.json();
+        if (cancelled) {
           return;
         }
 
-        await fetch('http://localhost:3000/api/auth/me', {
-          credentials: 'include',
-        })
-          .then((res) => res.json())
-          .then((user) => {
-            console.log('Restored user:', user);
-            dispatch({
-              type: 'LOGIN',
-              payload: {
-                user: {
-                  userId: user.sub,
-                  email: user.email,
-                  name: '',
-                  projects: [],
-                  avatar: '',
-                  role: user.role,
-                  notifications: user.notifications || [],
-                },
-
-                isLoading: false,
-              },
-            });
-
-            new NotificationWebSocket(user.sub, handleNotification);
-          });
-      } catch (err) {
-        console.log('Could not restore user', err);
-
         dispatch({
-          type: 'REFRESH_FAILURE',
-          payload: { ...defaultAuth, isLoading: false },
+          type: 'LOGIN',
+          payload: {
+            user: {
+              userId: user.sub,
+              email: user.email,
+              name: '',
+              projects: [],
+              avatar: '',
+              role: user.role,
+              notifications: user.notifications || [],
+            },
+            isLoading: false,
+          },
         });
-      } finally {
-        setIsLoading(false);
+
+        connectNotificationSocket(dispatch);
+      } catch {
+        if (!cancelled) {
+          dispatch({
+            type: 'REFRESH_FAILURE',
+            payload: { ...defaultAuth, isLoading: false },
+          });
+        }
       }
     };
 
     restoreUser();
-  }, [isLoading]);
+
+    return () => {
+      cancelled = true;
+      disconnectNotificationSocket();
+    };
+  }, []);
 
   return (
     <DispatchContext.Provider value={dispatch}>

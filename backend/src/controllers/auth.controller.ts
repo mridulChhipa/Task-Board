@@ -1,6 +1,18 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction, CookieOptions } from 'express';
 import { authService } from '../services/auth.service';
-import type { LoginBody, RegisterBody, UserDetails } from '../types/auth.types';
+import type {
+  AuthenticatedRequest,
+  LoginBody,
+  RegisterBody,
+  UserDetails,
+} from '../types/auth.types';
+
+const refreshCookieOptions: CookieOptions = {
+  httpOnly: true,
+  secure: process.env.MODE === 'PRODUCTION',
+  sameSite: process.env.MODE === 'PRODUCTION' ? 'strict' : 'lax',
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+};
 
 export class AuthController {
   async register(
@@ -13,12 +25,7 @@ export class AuthController {
       const { accessToken, refreshToken, userId } =
         await authService.register(body);
 
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: process.env.MODE === 'PRODUCTION',
-        sameSite: process.env.MODE === 'PRODUCTION' ? 'strict' : 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
+      res.cookie('refreshToken', refreshToken, refreshCookieOptions);
 
       res.status(201).json({
         message: 'User registered successfully',
@@ -38,12 +45,7 @@ export class AuthController {
       const { accessToken, refreshToken, userId } =
         await authService.login(body);
 
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: process.env.MODE === 'PRODUCTION',
-        sameSite: process.env.MODE === 'PRODUCTION' ? 'none' : 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
+      res.cookie('refreshToken', refreshToken, refreshCookieOptions);
 
       res.status(200).json({
         message: 'User Login successful',
@@ -66,19 +68,13 @@ export class AuthController {
       const oldRefreshToken = req.cookies.refreshToken;
       if (!oldRefreshToken) {
         res.status(401).json({ error: 'No refresh token' });
+        return;
       }
-
-      // console.log("Old Refresh Token", oldRefreshToken);
 
       const { accessToken, refreshToken, userId } =
         await authService.refresh(oldRefreshToken);
 
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: process.env.MODE === 'PRODUCTION',
-        sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
+      res.cookie('refreshToken', refreshToken, refreshCookieOptions);
 
       res.status(200).json({
         message: 'Token Refresh Successfull',
@@ -103,6 +99,21 @@ export class AuthController {
       });
 
       next();
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async me(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const authReq = req as AuthenticatedRequest;
+      const user = await authService.sessionUserSummary(authReq.user.email);
+
+      res.status(200).json({
+        ...authReq.user,
+        role: user?.globalRole ?? null,
+        notifications: user?.notifications ?? [],
+      });
     } catch (error) {
       next(error);
     }

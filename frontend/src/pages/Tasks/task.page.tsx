@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import { useParams } from 'react-router-dom';
 import { useContext, useEffect, useState, type SubmitEvent } from 'react';
 import styles from './task.page.module.css';
@@ -27,7 +28,7 @@ export default function TaskPage() {
   useEffect(() => {
     async function fetchTask() {
       try {
-        const res = await fetch(`http://localhost:3000/api/task/${tid}`, {
+        const res = await fetch(`${API_URL}/api/task/${tid}`, {
           credentials: 'include',
         });
 
@@ -77,23 +78,20 @@ export default function TaskPage() {
   async function handleThreadSubmit(e: SubmitEvent) {
     e.preventDefault();
     try {
-      const res = await fetch(
-        'http://localhost:3000/api/comment/create-thread',
-        {
-          credentials: 'include',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            taskId: task?.id,
-            title: threadTitle,
-            content: threadContent,
-            authorId: authContext.user?.userId,
-            isDeleted: false,
-          }),
+      const res = await fetch(`${API_URL}/api/comment/create-thread`, {
+        credentials: 'include',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+        body: JSON.stringify({
+          taskId: task?.id,
+          title: threadTitle,
+          content: threadContent,
+          authorId: authContext.user?.userId,
+          isDeleted: false,
+        }),
+      });
 
       if (!res.ok) {
         throw new Error("Can't create thread at the moment", {
@@ -122,7 +120,7 @@ export default function TaskPage() {
   async function deleteThread(id: string) {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/comment/delete-thread/${id}`,
+        `${API_URL}/api/comment/delete-thread/${id}`,
         {
           method: 'PATCH',
           credentials: 'include',
@@ -155,7 +153,7 @@ export default function TaskPage() {
             return (
               <Thread
                 refreshTask={() => {
-                  setRefreshKey(refreshKey + 1);
+                  setRefreshKey((key) => key + 1);
                 }}
                 deleteThread={deleteThread}
                 key={idx}

@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import { useState, useContext, useEffect } from 'react';
 import styles from './auth.module.css';
 import Button from '../../components/Button/Button';
@@ -9,9 +10,8 @@ import Form, {
   InputArea,
   Label,
 } from '../../components/Form/Form';
-import { NotificationWebSocket } from '../../utils/Websockets.utils';
+import { connectNotificationSocket } from '../../utils/notification.socket';
 import { handleError } from '../../App';
-import { triggerPopup } from '../../context/PopupProvider';
 
 export default function LogInPage() {
   const navigate = useNavigate();
@@ -23,30 +23,6 @@ export default function LogInPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  async function handleNotification(senderId: number, notification: string) {
-    try {
-      const res1 = await fetch(`http://localhost:3000/api/auth/${senderId}`, {
-        method: 'GET',
-        credentials: 'include',
-      });
-      const data1 = await res1.json();
-      const sender = data1.data.personalData.name;
-      triggerPopup(sender, notification, false);
-
-      const res = await fetch('http://localhost:3000/api/auth/me', {
-        method: 'GET',
-        credentials: 'include',
-      });
-      const data = await res.json();
-      dispatch({
-        type: 'SET_NOTIFICATIONS',
-        payload: data.notifications || [],
-      });
-    } catch (err) {
-      console.error('Notification handling failed:', err);
-    }
-  }
-
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
 
@@ -54,7 +30,7 @@ export default function LogInPage() {
     setIsLoading(true);
 
     try {
-      const loginRes = await fetch('http://localhost:3000/api/auth/login', {
+      const loginRes = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -67,16 +43,11 @@ export default function LogInPage() {
 
       const loginData = await loginRes.json();
 
-      const userRes = await fetch(
-        `http://localhost:3000/api/auth/${loginData.userId}`,
-        {
-          method: 'GET',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-        },
-      );
-
-      console.log('Hello World!');
+      const userRes = await fetch(`${API_URL}/api/auth/${loginData.userId}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
 
       if (!userRes.ok) {
         handleError('Login Failed');
@@ -84,8 +55,6 @@ export default function LogInPage() {
       }
 
       const userData = await userRes.json();
-
-      console.log(userData);
 
       dispatch({
         type: 'LOGIN',
@@ -103,7 +72,7 @@ export default function LogInPage() {
         },
       });
 
-      new NotificationWebSocket(loginData.userId, handleNotification);
+      connectNotificationSocket(dispatch);
 
       navigate('/dashboard');
     } catch (err) {

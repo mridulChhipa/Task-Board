@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import type { SubmitEventHandler } from 'react';
 import type { EdgeConstraint } from '../types/boards.types';
 import type {
@@ -27,7 +28,7 @@ export function createWorkflowHandlers(
 
     try {
       await fetch(
-        `http://localhost:3000/api/project/${projectId}/board/${activeBoard.id}/remove-column/${workflowId}`,
+        `${API_URL}/api/project/${projectId}/board/${activeBoard.id}/remove-column/${workflowId}`,
         {
           method: 'DELETE',
           credentials: 'include',
@@ -63,7 +64,7 @@ export function createWorkflowHandlers(
 
     try {
       await fetch(
-        `http://localhost:3000/api/project/${activeBoard.projectId}/board/${activeBoard.id}/update-column/${workflowId}`,
+        `${API_URL}/api/project/${activeBoard.projectId}/board/${activeBoard.id}/update-column/${workflowId}`,
         {
           method: 'PUT',
           credentials: 'include',
@@ -125,7 +126,7 @@ export function createWorkflowHandlers(
       }
 
       const response = await fetch(
-        `http://localhost:3000/api/project/${projectId}/board/${activeBoard.id}/create-edge`,
+        `${API_URL}/api/project/${projectId}/board/${activeBoard.id}/create-edge`,
         {
           method: 'POST',
           credentials: 'include',

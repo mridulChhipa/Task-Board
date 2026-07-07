@@ -11,7 +11,6 @@ export class BoardController {
     try {
       const projectId = req.params.projectId;
       if (typeof projectId !== 'string') {
-        console.log('Params', req.params);
         throw new Error('Invalid type for projectId');
       }
 
@@ -84,12 +83,6 @@ export class BoardController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      console.log(
-        'Updating column with id: ',
-        req.params.columnId,
-        ' in board: ',
-        req.params.boardId,
-      );
       const columnId = req.params.columnId;
       const boardId = req.params.boardId;
 
@@ -217,7 +210,6 @@ export class BoardController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      console.log('Fetching board with id: ', req.params.boardId);
       const boardId = req.params.boardId;
       if (typeof boardId !== 'string') {
         throw new Error('Invalid type for boardId');

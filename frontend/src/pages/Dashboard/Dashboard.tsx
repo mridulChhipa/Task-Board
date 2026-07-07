@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import { useContext, useEffect, useState, type SubmitEvent } from 'react';
 import { AuthContext, DispatchContext } from '../../context/AuthContext';
 import { useFetchUser } from '../../utils/auth.utils';
@@ -219,7 +220,7 @@ function DashBoard() {
                         ),
                       );
                       await fetch(
-                        `http://localhost:3000/api/notification/${notification.id}`,
+                        `${API_URL}/api/notification/${notification.id}`,
                         {
                           method: 'PATCH',
                           credentials: 'include',
@@ -247,7 +248,7 @@ function DashBoard() {
                     onClick={async () => {
                       setNotifs(notifs.filter((n) => n.id !== notification.id));
                       await fetch(
-                        `http://localhost:3000/api/notification/${notification.id}`,
+                        `${API_URL}/api/notification/${notification.id}`,
                         {
                           method: 'DELETE',
                           credentials: 'include',

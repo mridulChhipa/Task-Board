@@ -14,18 +14,14 @@ import type {
 
 import { generateAuthTokens, verifyToken } from '../utils/jwt';
 import { GlobalRole } from '../../generated/prisma/enums';
+import type { Prisma } from '../../generated/prisma/client';
 import { type ProjectDetails, ProjectRole } from '../types/project.types';
 import { projectService } from './project.service';
 import type { NotifType } from '../types/notifcation.types';
-import type { WebSocketService } from '../websocket/ws.service';
 import { getWSServer } from '../websocket/ws';
+import { requireEnv } from '../config/env';
 
 export class AuthService {
-  private wsServer: WebSocketService | null = null;
-  constructor() {
-    this.wsServer = getWSServer();
-  }
-
   async register(body: RegisterBody): Promise<AuthToken> {
     try {
       const existingUser = await db.user.findUnique({
@@ -98,7 +94,7 @@ export class AuthService {
     try {
       const payload = verifyToken(
         refreshToken,
-        process.env.JWT_REFRESH_SECRET ?? '',
+        requireEnv('JWT_REFRESH_SECRET'),
       );
       if (payload.type !== TokenType.REFRESH) {
         throw new Error('Invalid token type');
@@ -110,7 +106,7 @@ export class AuthService {
         },
       });
 
-      this.wsServer?.removeUser(payload.sub);
+      getWSServer()?.removeUser(payload.sub);
     } catch (error) {
       void error;
       throw error;
@@ -121,7 +117,7 @@ export class AuthService {
     try {
       const payload = verifyToken(
         refreshToken,
-        process.env.JWT_REFRESH_SECRET ?? '',
+        requireEnv('JWT_REFRESH_SECRET'),
       );
 
       if (payload.type !== TokenType.REFRESH) {
@@ -167,194 +163,118 @@ export class AuthService {
     }
   }
 
+  /** Lightweight payload for GET /me: role and raw notifications. */
+  async sessionUserSummary(email: string) {
+    return db.user.findUnique({
+      where: { email },
+      select: { globalRole: true, notifications: true },
+    });
+  }
+
   async userDetails(userId: number): Promise<CompleteUser> {
-    try {
-      const rawUserData = await db.user.findUnique({
-        where: {
-          id: userId,
-        },
-        include: {
-          projects: true,
-          notifications: {
-            include: {
-              recipient: true,
-              sender: true,
-            },
-          },
-        },
-      });
-
-      if (!rawUserData) {
-        throw new Error('User not found');
-      }
-
-      const allProjs: ProjectDetails[] = [];
-
-      const membershipProjects = await Promise.all(
-        rawUserData.projects.map(async (membership) => ({
-          membership,
-          currProj: await db.project.findUnique({
-            where: {
-              id: membership.projectId,
-            },
-            include: {
-              members: true,
-            },
-          }),
-        })),
-      );
-
-      const projectMap = new Map<string, string>();
-
-      for (const { membership, currProj } of membershipProjects) {
-        if (!currProj) {
-          throw new Error('Project not found');
-        }
-
-        const allMembers: number[] = [];
-        for (const member of currProj.members) {
-          allMembers.push(member.userId);
-        }
-
-        allProjs.push({
-          id: currProj.id,
-          name: currProj.name,
-          description: currProj.description ?? '',
-          role: membership.role as ProjectRole,
-          members: allMembers,
-          isArchived: currProj.isArchived,
-        });
-        projectMap.set(currProj.id, membership.role);
-      }
-
-      if (rawUserData.globalRole === 'GLOBAL_ADMIN') {
-        const globalProjects = await projectService.fetchGlobalAdminProjects();
-        // allProjs.splice(0, allProjs.length);
-        for (const currProj of globalProjects) {
-          if (projectMap.has(currProj.id)) {
-            continue;
-          }
-          allProjs.push({
-            id: currProj.id,
-            name: currProj.name,
-            description: currProj.description ?? '',
-            role: ProjectRole.PROJECT_VIEWER,
-            members: currProj.members,
-            isArchived: currProj.isArchived,
-          });
-        }
-      }
-
-      const userData: CompleteUser = {
-        personalData: {
-          userId: rawUserData.id,
-          name: rawUserData.name,
-          email: rawUserData.email,
-          avatar: rawUserData.avatar,
-          globalRole: rawUserData.globalRole,
-        },
-        projectData: allProjs,
-        notifications: rawUserData.notifications.map((notif) => ({
-          id: notif.id,
-          recipientId: notif.recipientId,
-          senderId: notif.senderId,
-          taskId: notif.taskId,
-          commentId: notif.commentId,
-          threadId: notif.threadId,
-          type: notif.type as NotifType,
-          recipientName: notif.recipient.name,
-          senderName: notif.sender.name,
-          read: notif.read,
-        })),
-      };
-
-      return userData;
-    } catch (error) {
-      void error;
-      throw error;
-    }
+    return this.buildUserDetails({ id: userId }, true);
   }
 
   async userDetailsByMail(userMail: string): Promise<CompleteUser> {
-    try {
-      const rawUserData = await db.user.findUnique({
-        where: {
-          email: userMail,
-        },
-        include: {
-          projects: true,
-          notifications: {
-            include: {
-              recipient: true,
-              sender: true,
+    return this.buildUserDetails({ email: userMail }, false);
+  }
+
+  /**
+   * Fetch the user with memberships, their projects (and member lists) and
+   * notifications in a single nested query instead of one query per project.
+   */
+  private async buildUserDetails(
+    where: Prisma.UserWhereUniqueInput,
+    includeGlobalProjects: boolean,
+  ): Promise<CompleteUser> {
+    const rawUserData = await db.user.findUnique({
+      where,
+      include: {
+        projects: {
+          include: {
+            project: {
+              include: {
+                members: {
+                  select: {
+                    userId: true,
+                  },
+                },
+              },
             },
           },
         },
-      });
+        notifications: {
+          include: {
+            recipient: true,
+            sender: true,
+          },
+        },
+      },
+    });
 
-      if (!rawUserData) {
-        throw new Error('User not found');
+    if (!rawUserData) {
+      throw new Error('User not found');
+    }
+
+    const allProjs: ProjectDetails[] = [];
+    const projectMap = new Map<string, string>();
+
+    for (const membership of rawUserData.projects) {
+      const currProj = membership.project;
+      if (!currProj) {
+        throw new Error('Project not found');
       }
 
-      const allProjs: ProjectDetails[] = [];
+      allProjs.push({
+        id: currProj.id,
+        name: currProj.name,
+        description: currProj.description ?? '',
+        role: membership.role as ProjectRole,
+        members: currProj.members.map((member) => member.userId),
+        isArchived: currProj.isArchived,
+      });
+      projectMap.set(currProj.id, membership.role);
+    }
 
-      for (const membership of rawUserData.projects) {
-        const currProj = await db.project.findUnique({
-          where: {
-            id: membership.projectId,
-          },
-          include: {
-            members: true,
-          },
-        });
-
-        if (!currProj) {
-          throw new Error('Project not found');
+    if (includeGlobalProjects && rawUserData.globalRole === 'GLOBAL_ADMIN') {
+      const globalProjects = await projectService.fetchGlobalAdminProjects();
+      for (const currProj of globalProjects) {
+        if (projectMap.has(currProj.id)) {
+          continue;
         }
-
-        const allMembers: number[] = [];
-        for (const member of currProj.members) {
-          allMembers.push(member.userId);
-        }
-
         allProjs.push({
           id: currProj.id,
           name: currProj.name,
           description: currProj.description ?? '',
-          role: membership.role as ProjectRole,
-          members: allMembers,
+          role: ProjectRole.PROJECT_VIEWER,
+          members: currProj.members,
           isArchived: currProj.isArchived,
         });
       }
-
-      const userData: CompleteUser = {
-        personalData: {
-          userId: rawUserData.id,
-          email: rawUserData.email,
-          name: rawUserData.name,
-          avatar: rawUserData.avatar,
-          globalRole: rawUserData.globalRole,
-        },
-        projectData: allProjs,
-        notifications: rawUserData.notifications.map((notif) => ({
-          id: notif.id,
-          recipientId: notif.recipientId,
-          senderId: notif.senderId,
-          taskId: notif.taskId,
-          commentId: notif.commentId,
-          threadId: notif.threadId,
-          type: notif.type as NotifType,
-          recipientName: notif.recipient.name,
-          senderName: notif.sender.name,
-          read: notif.read,
-        })),
-      };
-
-      return userData;
-    } catch (error) {
-      void error;
-      throw error;
     }
+
+    return {
+      personalData: {
+        userId: rawUserData.id,
+        name: rawUserData.name,
+        email: rawUserData.email,
+        avatar: rawUserData.avatar,
+        globalRole: rawUserData.globalRole,
+      },
+      projectData: allProjs,
+      notifications: rawUserData.notifications.map((notif) => ({
+        id: notif.id,
+        recipientId: notif.recipientId,
+        senderId: notif.senderId,
+        taskId: notif.taskId,
+        commentId: notif.commentId,
+        threadId: notif.threadId,
+        type: notif.type as NotifType,
+        recipientName: notif.recipient.name,
+        senderName: notif.sender.name,
+        read: notif.read,
+      })),
+    };
   }
 
   async updateUser(body: UserDetails): Promise<void> {

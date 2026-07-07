@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import {
   useContext,
   useEffect,
@@ -46,7 +47,7 @@ export function Comment({
     async (cid: string) => {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/comment/t/${cid}?threadId=${encodeURIComponent(threadId)}`,
+          `${API_URL}/api/comment/t/${cid}?threadId=${encodeURIComponent(threadId)}`,
           {
             credentials: 'include',
           },
@@ -90,7 +91,7 @@ export function Comment({
     if (hasContentChange) {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/comment/update-comment/${comment.id}`,
+          `${API_URL}/api/comment/update-comment/${comment.id}`,
           {
             credentials: 'include',
             method: 'PATCH',
@@ -134,19 +135,16 @@ export function Comment({
 
   async function deleteReply(id: string) {
     try {
-      const res = await fetch(
-        `http://localhost:3000/api/comment/delete-comment/${id}`,
-        {
-          method: 'PATCH',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            threadId: '', // need to put it here
-          }),
+      const res = await fetch(`${API_URL}/api/comment/delete-comment/${id}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+        body: JSON.stringify({
+          threadId,
+        }),
+      });
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -162,24 +160,21 @@ export function Comment({
   async function handleReplySubmit(e: SubmitEvent) {
     e.preventDefault();
     try {
-      const res = await fetch(
-        'http://localhost:3000/api/comment/create-comment',
-        {
-          credentials: 'include',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            taskId,
-            threadId,
-            authorId: authContext?.user?.userId,
-            content: reply,
-            isDeleted: false,
-            parentId: commentId,
-          }),
+      const res = await fetch(`${API_URL}/api/comment/create-comment`, {
+        credentials: 'include',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+        body: JSON.stringify({
+          taskId,
+          threadId,
+          authorId: authContext?.user?.userId,
+          content: reply,
+          isDeleted: false,
+          parentId: commentId,
+        }),
+      });
 
       if (!res.ok) {
         const errorText = await res.text();

@@ -5,9 +5,9 @@ import {
   authoriseCommentAuthor,
   authoriseThreadAuthor,
   authorizeCommentIdRole,
-  authorizeTaskIdRole,
   authorizeThreadIdRole,
 } from '../middlewares/guards/comment.guard';
+import { authorizeTaskIdRole } from '../middlewares/guards/task.guard';
 import { ProjectRole } from '../types/project.types';
 
 const commentRouter = Router();
@@ -57,7 +57,6 @@ commentRouter.patch(
   '/delete-comment/:cid',
   authoriseCommentAuthor(),
   (req, res, next) => {
-    console.log(req.body);
     commentController.deleteComment(req, res, next);
   },
 );

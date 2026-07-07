@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import { useEffect, useReducer, type ReactNode } from 'react';
 import {
   defaultProject,
@@ -7,25 +8,31 @@ import {
 } from './ProjectContext';
 import { useParams } from 'react-router-dom';
 import type { Board, Project } from '../types/project.types';
-import type { Workflow } from '../types/boards.types';
+import type { Task, Workflow } from '../types/boards.types';
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
   const [projectData, dispatch] = useReducer(projectReducer, defaultProject);
   const { pid } = useParams();
 
   useEffect(() => {
+    let cancelled = false;
+
     async function fetchProj() {
       try {
-        await fetch(`http://localhost:3000/api/project/${pid}`, {
+        await fetch(`${API_URL}/api/project/${pid}`, {
           credentials: 'include',
         })
           .then((res) => res.json())
           .then((resJson) => {
+            if (cancelled) {
+              return;
+            }
             const projData = resJson.data;
             const project: Project = {
               ...projData,
               boards: [],
             };
+            const taskCache: Record<string, Task> = {};
             for (const boardData of projData.boards) {
               const board: Board = {
                 ...boardData,
@@ -41,6 +48,12 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
 
                 for (const task of workflowData.tasks) {
                   workflow.tasks.push(task.id);
+                  taskCache[task.id] = {
+                    ...task,
+                    children: (task.children ?? []).map(
+                      (child: { id: string }) => child.id,
+                    ),
+                  };
                 }
 
                 board.workflows.push(workflow);
@@ -55,11 +68,15 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
               payload: {
                 project,
                 isLoading: false,
+                taskCache,
               },
             });
           });
       } catch (err) {
-        console.log('Could not restore user', err);
+        if (cancelled) {
+          return;
+        }
+        console.error('Could not fetch project', err);
 
         dispatch({
           type: 'REFRESH_FAILURE',
@@ -69,6 +86,10 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     }
 
     fetchProj();
+
+    return () => {
+      cancelled = true;
+    };
   }, [pid]);
 
   return (

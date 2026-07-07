@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import { useContext, useState } from 'react';
 import styles from './project.page.module.css';
 import Button from '../../components/Button/Button';
@@ -19,7 +20,7 @@ export default function ProjectPage() {
   const { user } = useContext(AuthContext);
 
   const dispatch = useContext(ProjectDispatchContext);
-  const { project } = useContext(ProjectContext);
+  const { project, taskCache } = useContext(ProjectContext);
   const role = project?.members.find(
     (member) => member.userId === user?.userId,
   )?.role;
@@ -33,7 +34,7 @@ export default function ProjectPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:3000/api/project/${project.id}/board/create`,
+        `${API_URL}/api/project/${project.id}/board/create`,
         {
           method: 'POST',
           credentials: 'include',
@@ -48,7 +49,6 @@ export default function ProjectPage() {
       );
 
       const resJson = await res.json();
-      console.log(resJson);
 
       const rawBoard = resJson.board;
       const board: Board = {
@@ -61,12 +61,9 @@ export default function ProjectPage() {
         ),
         edges: rawBoard.edgeConstraints ?? rawBoard.edges ?? [],
       };
-      console.log(board);
-      const updatedBoards: Board[] = project.boards;
-      updatedBoards.push(board);
       const updatedProj: Project = {
         ...project,
-        boards: updatedBoards,
+        boards: [...project.boards, board],
       };
 
       dispatch({
@@ -74,6 +71,7 @@ export default function ProjectPage() {
         payload: {
           project: updatedProj,
           isLoading: false,
+          taskCache,
         },
       });
 

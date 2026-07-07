@@ -1,5 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 
+import { AppError } from '../errors';
+
 export const errorHandler = (
   err: unknown,
   req: Request,
@@ -9,7 +11,11 @@ export const errorHandler = (
   let stat = 500;
   let msg = 'An unexpected error occurred';
 
-  if (err instanceof Error) {
+  if (err instanceof AppError) {
+    stat = err.status;
+    msg = err.message;
+  } else if (err instanceof Error) {
+    // Legacy fallback for errors that have not been converted to AppError.
     msg = err.message;
 
     if (

@@ -3,8 +3,7 @@ import { before, beforeEach, describe, test } from 'node:test';
 import assert from 'node:assert';
 
 import { TaskService } from '../../src/services/task.service';
-import { prisma } from '../../lib/prisma';
-import type { PrismaClient } from '@prisma/client/extension';
+import { db, restoreDbAfterEach, stub } from '../helpers';
 import { PriorityType, TaskType } from '../../src/types/task.types';
 import { NotifType } from '../../src/types/notifcation.types';
 import { notificationService } from '../../src/services/notification.service';
@@ -23,7 +22,8 @@ let wsServer: ReturnType<typeof initWSServer> | null = null;
 
 describe('TaskService', () => {
   let service: TaskService;
-  const db: PrismaClient = prisma;
+
+  restoreDbAfterEach();
 
   before(() => {
     const server = http.createServer();
@@ -35,7 +35,7 @@ describe('TaskService', () => {
 
   beforeEach(() => {
     service = new TaskService();
-    notificationService.createNotification = (async () => {
+    stub(notificationService, 'createNotification', (async () => {
       return {
         id: 'notif-1',
         recipientId: 1,
@@ -50,7 +50,7 @@ describe('TaskService', () => {
       } as NotificationDTO;
     }) as unknown as (
       payload: CreateNotificationPayload,
-    ) => Promise<NotificationDTO>;
+    ) => Promise<NotificationDTO>);
   });
 
   test('create returns task id', async () => {
@@ -209,11 +209,11 @@ describe('TaskService', () => {
     db.task = {
       create: async () => ({ id: 'task-1' }),
     };
-    notificationService.createNotification = (async () => {
+    stub(notificationService, 'createNotification', (async () => {
       throw new Error('notification failed');
     }) as unknown as (
       payload: CreateNotificationPayload,
-    ) => Promise<NotificationDTO>;
+    ) => Promise<NotificationDTO>);
 
     await assert.rejects(
       () =>
@@ -494,7 +494,7 @@ describe('TaskService', () => {
 
   test('update triggers status and assignee notifications', async () => {
     const notifications: string[] = [];
-    notificationService.createNotification = (async (
+    stub(notificationService, 'createNotification', (async (
       payload: CreateNotificationPayload,
     ) => {
       notifications.push(payload.type);
@@ -504,7 +504,7 @@ describe('TaskService', () => {
         recipientName: 'Recipient',
         senderName: 'Sender',
       } as NotificationDTO;
-    }) as (payload: CreateNotificationPayload) => Promise<NotificationDTO>;
+    }) as (payload: CreateNotificationPayload) => Promise<NotificationDTO>);
 
     let activityCalls = 0;
     db.task = {
@@ -542,7 +542,8 @@ describe('TaskService', () => {
       closedAt: null,
     });
 
-    assert.equal(activityCalls, 3);
+    // One activity for the status change, one for the assignee change.
+    assert.equal(activityCalls, 2);
     assert.equal(notifications.length, 2);
   });
 

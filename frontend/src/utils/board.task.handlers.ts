@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import type { SubmitEventHandler } from 'react';
 import type {
   Priority,
@@ -19,12 +20,9 @@ async function getUserIdFromEmail(
   onError: (msg: string) => void,
 ): Promise<number> {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/auth/get-user-by-mail/${email}`,
-      {
-        credentials: 'include',
-      },
-    );
+    const res = await fetch(`${API_URL}/api/auth/get-user-by-mail/${email}`, {
+      credentials: 'include',
+    });
     const resJson = await res.json();
     return resJson.data.personalData.userId;
   } catch (err) {
@@ -124,13 +122,10 @@ export function createTaskHandlers(
         }
       }
 
-      const res1 = await fetch(
-        `http://localhost:3000/api/project/${projectId}`,
-        {
-          method: 'GET',
-          credentials: 'include',
-        },
-      );
+      const res1 = await fetch(`${API_URL}/api/project/${projectId}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
       const projectData = await res1.json();
       const members = projectData.data.members.map(
         (member: ProjectMember) => member.userId,
@@ -141,7 +136,7 @@ export function createTaskHandlers(
         throw new Error('Assignee is not a member of the project');
       }
 
-      const res = await fetch('http://localhost:3000/api/task/create', {
+      const res = await fetch(`${API_URL}/api/task/create`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -234,12 +229,9 @@ export function createTaskHandlers(
     }
 
     try {
-      const ogRes = await fetch(
-        `http://localhost:3000/api/task/${currentTaskId}`,
-        {
-          credentials: 'include',
-        },
-      );
+      const ogRes = await fetch(`${API_URL}/api/task/${currentTaskId}`, {
+        credentials: 'include',
+      });
       const ogData = await ogRes.json();
       const parentId = ogData.task.parentId;
       const statusId = ogData.task.statusId;
@@ -280,13 +272,10 @@ export function createTaskHandlers(
       }
 
       if (projectId) {
-        const projectRes = await fetch(
-          `http://localhost:3000/api/project/${projectId}`,
-          {
-            method: 'GET',
-            credentials: 'include',
-          },
-        );
+        const projectRes = await fetch(`${API_URL}/api/project/${projectId}`, {
+          method: 'GET',
+          credentials: 'include',
+        });
         const projectData = await projectRes.json();
         const members = projectData.data.members.map(
           (member: ProjectMember) => member.userId,
@@ -300,7 +289,7 @@ export function createTaskHandlers(
         }
       }
 
-      await fetch(`http://localhost:3000/api/task/update/${currentTaskId}`, {
+      await fetch(`${API_URL}/api/task/update/${currentTaskId}`, {
         credentials: 'include',
         method: 'PUT',
         headers: {

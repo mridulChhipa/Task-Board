@@ -9,6 +9,7 @@ import type {
 import { createBoardHandlers } from '../../utils/board.utils';
 import { useParams } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
+import { ProjectContext } from '../../context/ProjectContext';
 import { handleError } from '../../App';
 import BoardsView from './BoardsView';
 
@@ -19,10 +20,14 @@ interface Props {
 
 export default function Boards({ boards, role }: Props) {
   const { user } = useContext(AuthContext);
+  const { taskCache: initialTaskCache } = useContext(ProjectContext);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeBoard = boards[activeIndex];
   const [workflowState, setWorkflowState] = useState(activeBoard.workflows);
-  const [taskCache, setTaskCache] = useState<Record<string, Task>>({});
+  // Seeded from the project fetch so columns render without refetching
+  // every task individually.
+  const [taskCache, setTaskCache] =
+    useState<Record<string, Task>>(initialTaskCache);
   const [isAdding, setIsAdding] = useState(false);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
@@ -79,7 +84,7 @@ export default function Boards({ boards, role }: Props) {
     setWorkflowState(nextBoard.workflows);
     setDragHighlight(nextBoard.workflows.map(() => false));
     setEdges(nextBoard.edges ?? []);
-    setTaskCache({});
+    // The cache spans the whole project, so switching boards keeps it.
   };
 
   const boardHandlers = createBoardHandlers({

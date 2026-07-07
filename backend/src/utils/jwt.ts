@@ -4,6 +4,8 @@ import type { SignOptions } from 'jsonwebtoken';
 
 import { TokenType } from '../types/auth.types';
 import type { AuthToken, JWTPayload } from '../types/auth.types';
+import { requireEnv } from '../config/env';
+import { UnauthorizedError } from '../errors';
 
 interface SignParams {
   userId: number;
@@ -18,7 +20,7 @@ const signToken = (params: SignParams): string => {
   const payload: JWTPayload = {
     sub: params.userId,
     email: params.email,
-    iss: process.env.JWT_ISSUER ?? '',
+    iss: process.env.JWT_ISSUER ?? 'task-board',
     jti: params.jti,
     type: params.type,
   };
@@ -43,7 +45,7 @@ const verifyToken = (token: string, secret: string): JWTPayload => {
 
     return decoded as unknown as JWTPayload;
   } catch (error) {
-    throw new Error('Invalid or expired token', {
+    throw new UnauthorizedError('Invalid or expired token', {
       cause: error,
     });
   }
@@ -59,7 +61,7 @@ const generateAuthTokens = (
     email,
     type: TokenType.ACCESS,
     jti,
-    secret: process.env.JWT_ACCESS_SECRET ?? '',
+    secret: requireEnv('JWT_ACCESS_SECRET'),
     expiresIn: 15 * 60,
   });
 
@@ -68,7 +70,7 @@ const generateAuthTokens = (
     email,
     type: TokenType.REFRESH,
     jti,
-    secret: process.env.JWT_REFRESH_SECRET ?? '',
+    secret: requireEnv('JWT_REFRESH_SECRET'),
     expiresIn: 7 * 24 * 60 * 60,
   });
 
