@@ -3,7 +3,7 @@ import assert from 'node:assert';
 
 import { NotificationService } from '../../src/services/notification.service';
 import { db, restoreDbAfterEach } from '../helpers';
-import { NotifType } from '../../src/types/notifcation.types';
+import { NotifType } from '../../src/types/notification.types';
 import type {
   NotificationCreateArgs,
   NotificationDeleteArgs,

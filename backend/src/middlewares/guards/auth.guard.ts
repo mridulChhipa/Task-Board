@@ -8,7 +8,7 @@ import { UnauthorizedError } from '../../errors';
 
 export async function authenticateToken(
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction,
 ): Promise<void> {
   try {

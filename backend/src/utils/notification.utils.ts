@@ -1,5 +1,5 @@
 import type { Prisma } from '../../generated/prisma/client';
-import type { NotificationDTO, NotifType } from '../types/notifcation.types';
+import type { NotificationDTO, NotifType } from '../types/notification.types';
 
 type NotificationWithRecipient = Prisma.NotificationGetPayload<{
   include: {

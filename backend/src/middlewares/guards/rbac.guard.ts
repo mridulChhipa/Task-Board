@@ -7,7 +7,7 @@ import { ForbiddenError, UnauthorizedError } from '../../errors';
 export function authorizeGlobalAdmin(): RequestHandler {
   return async (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction,
   ): Promise<void> => {
     try {

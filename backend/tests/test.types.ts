@@ -4,7 +4,7 @@
  */
 
 import type { GlobalRole, ProjectRole } from '../src/types/project.types';
-import type { NotifType } from '../src/types/notifcation.types';
+import type { NotifType } from '../src/types/notification.types';
 import type { TaskType, PriorityType } from '../src/types/task.types';
 
 // ============ Prisma Argument Types ============

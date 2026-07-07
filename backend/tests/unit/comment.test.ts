@@ -6,7 +6,7 @@ import { CommentService } from '../../src/services/comment.service';
 import { db, restoreDbAfterEach, stub } from '../helpers';
 import { notificationService } from '../../src/services/notification.service';
 import { initWSServer, shutdownWSServer } from '../../src/websocket/ws.service';
-import { NotifType } from '../../src/types/notifcation.types';
+import { NotifType } from '../../src/types/notification.types';
 import type {
   ThreadCreateArgs,
   ThreadUpdateArgs,

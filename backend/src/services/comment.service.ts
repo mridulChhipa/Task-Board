@@ -7,7 +7,7 @@ import type {
   UpdateCommentBody,
   UpdateThreadBody,
 } from '../types/comment.types';
-import { NotifType } from '../types/notifcation.types';
+import { NotifType } from '../types/notification.types';
 import {
   extractEmailMentions,
   toCommentDTO,

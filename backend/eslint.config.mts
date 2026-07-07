@@ -127,9 +127,17 @@ export default defineConfig([
           format: ['PascalCase'],
         },
         {
-          selector: ['variable', 'function', 'method', 'parameter', 'property'],
+          selector: ['variable', 'function', 'method', 'property'],
           format: ['camelCase'],
           leadingUnderscore: 'forbid',
+          trailingUnderscore: 'forbid',
+        },
+        {
+          // Unused-but-required parameters (Express middleware signatures)
+          // are marked with a leading underscore.
+          selector: 'parameter',
+          format: ['camelCase'],
+          leadingUnderscore: 'allow',
           trailingUnderscore: 'forbid',
         },
         {

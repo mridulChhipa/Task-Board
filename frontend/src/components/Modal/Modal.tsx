@@ -13,7 +13,6 @@ function Modal({
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
-      <form></form>
     </div>
   );
 }

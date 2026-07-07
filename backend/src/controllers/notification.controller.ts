@@ -1,6 +1,6 @@
 import { notificationService } from '../services/notification.service';
 import type { Request, Response, NextFunction } from 'express';
-import type { NotifBody } from '../types/notifcation.types';
+import type { NotifBody } from '../types/notification.types';
 
 export class NotificationController {
   async createNotification(

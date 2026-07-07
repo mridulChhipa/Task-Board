@@ -1,6 +1,5 @@
 import { API_URL } from '../config';
 import type { Priority, Task, Workflow } from '../types/boards.types';
-import type { Board } from '../types/project.types';
 
 const priorityRank: Record<Priority, number> = {
   CRITICAL: 0,
@@ -8,36 +7,6 @@ const priorityRank: Record<Priority, number> = {
   MEDIUM: 2,
   LOW: 3,
 };
-
-export async function fetchBoard(
-  bid: string,
-  projectId: string,
-): Promise<Board> {
-  try {
-    const response = await fetch(
-      `${API_URL}/api/project/${projectId}/board/${bid}`,
-      {
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    );
-
-    if (!response.ok) {
-      throw new Error(`Server responded with status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const board: Board = data.board;
-
-    return board;
-  } catch (err) {
-    throw new Error("Can't fetch project at the moment[fetchboard]", {
-      cause: err,
-    });
-  }
-}
 
 export async function addWorkflow(
   boardId: string,

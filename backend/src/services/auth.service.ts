@@ -17,7 +17,7 @@ import { GlobalRole } from '../../generated/prisma/enums';
 import type { Prisma } from '../../generated/prisma/client';
 import { type ProjectDetails, ProjectRole } from '../types/project.types';
 import { projectService } from './project.service';
-import type { NotifType } from '../types/notifcation.types';
+import type { NotifType } from '../types/notification.types';
 import { getWSServer } from '../websocket/ws';
 import { requireEnv } from '../config/env';
 

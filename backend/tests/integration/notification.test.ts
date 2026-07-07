@@ -6,7 +6,7 @@ import { app } from '../../src/app';
 import { generateAuthTokens } from '../../src/utils/jwt';
 import { db } from '../helpers';
 import type { Prisma } from '../../generated/prisma/client';
-import { NotifType } from '../../src/types/notifcation.types';
+import { NotifType } from '../../src/types/notification.types';
 
 describe('Notification API Endpoints', () => {
   let server: http.Server;

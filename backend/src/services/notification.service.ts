@@ -1,5 +1,5 @@
 import { db } from '../config/db';
-import type { NotifBody, NotificationDTO } from '../types/notifcation.types';
+import type { NotifBody, NotificationDTO } from '../types/notification.types';
 import { toNotifDTO } from '../utils/notification.utils';
 
 export class NotificationService {

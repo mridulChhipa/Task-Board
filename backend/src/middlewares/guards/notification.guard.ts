@@ -8,7 +8,7 @@ import { ForbiddenError, NotFoundError, ValidationError } from '../../errors';
 export function authorizeNotificationOwner(): RequestHandler {
   return async (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction,
   ): Promise<void> => {
     try {

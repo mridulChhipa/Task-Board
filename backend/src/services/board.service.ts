@@ -233,7 +233,7 @@ export class BoardService {
     }
   }
 
-  async deleteEdge(boardId: string, edgeId: string): Promise<void> {
+  async deleteEdge(_boardId: string, edgeId: string): Promise<void> {
     try {
       await db.edgeConstraint.delete({
         where: {

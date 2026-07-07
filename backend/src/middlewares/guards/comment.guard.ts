@@ -84,7 +84,7 @@ export function authorizeThreadIdRole(
 ): RequestHandler {
   return async (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction,
   ): Promise<void> => {
     try {
@@ -126,7 +126,7 @@ export function authorizeCommentIdRole(
 ): RequestHandler {
   return async (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction,
   ): Promise<void> => {
     try {
@@ -176,7 +176,7 @@ export function authorizeCommentIdRole(
 export function authoriseCommentAuthor(): RequestHandler {
   return async (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction,
   ): Promise<void> => {
     try {
@@ -215,7 +215,7 @@ export function authoriseCommentAuthor(): RequestHandler {
 export function authoriseThreadAuthor(): RequestHandler {
   return async (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction,
   ): Promise<void> => {
     try {

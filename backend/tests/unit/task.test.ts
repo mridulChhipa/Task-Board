@@ -5,7 +5,7 @@ import assert from 'node:assert';
 import { TaskService } from '../../src/services/task.service';
 import { db, restoreDbAfterEach, stub } from '../helpers';
 import { PriorityType, TaskType } from '../../src/types/task.types';
-import { NotifType } from '../../src/types/notifcation.types';
+import { NotifType } from '../../src/types/notification.types';
 import { notificationService } from '../../src/services/notification.service';
 import { initWSServer, shutdownWSServer } from '../../src/websocket/ws.service';
 import type {

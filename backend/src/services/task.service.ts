@@ -3,7 +3,7 @@ import { syncStatusWithChildren, toTaskDTO } from '../utils/task.utils';
 import type { Priority, TaskType } from '../../generated/prisma/enums';
 import type { CreateTaskBody, TaskDTO } from '../types/task.types';
 import { notificationService } from './notification.service';
-import { NotifType } from '../types/notifcation.types';
+import { NotifType } from '../types/notification.types';
 import { sendNotif } from '../websocket/ws.service';
 
 export class TaskService {

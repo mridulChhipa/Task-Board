@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 import type { ProjectDetails } from './project.types';
-import type { NotificationDTO } from './notifcation.types';
+import type { NotificationDTO } from './notification.types';
 
 // export enum TokenType {
 //   ACCESS = 'ACCESS',
